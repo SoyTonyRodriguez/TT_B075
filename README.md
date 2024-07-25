@@ -61,3 +61,12 @@ npm run dev
 ```
 * Al ejecutar el comando, hacer clic a la URL generada en Local:
 ![Web_run](./images/image.png)
+
+#### Dependencias extras
+
+Si por algun motivo no se instalaron, estos son los paquetes instalados externamente
+
+```shell
+npm i react-router-dom react-hot-toast axios react-hook-form
+npm install -D tailwindcss postcss autoprefixer
+```
