@@ -2,7 +2,7 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer className="relative bg-gradient-to-r from-blue-800 to-blue-500 text-white">
+    <footer className="relative bg-gradient-to-r from-blue-800 to-blue-500 text-white mt-10">
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <svg
           className="absolute bottom-0 w-full h-auto"
@@ -20,7 +20,7 @@ function Footer() {
           <p className="text-xs">
             High level experience in web design and development knowledge, producing quality work.
           </p>
-          <p className="text-xs">TT 2024-B075</p>
+          <p className="text-xs">TT 2024-B075</p> {/* No se como centrar esto */}
           <button className="bg-black px-4 py-2 rounded hover:bg-gray-800">Contact Us</button>
         </div>
         <div className="flex justify-between items-center mt-4">
