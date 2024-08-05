@@ -1,5 +1,7 @@
 # Instrucciones para configurar el TT
 
+## **Tabla de contenido**
+[TOC]
 
 ## Node js
 #### Instalacion en windows
