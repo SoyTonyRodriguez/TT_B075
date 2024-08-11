@@ -1,10 +1,33 @@
 import React from 'react';
 import promoImage from '../img/ipn-main.webp'; // Import your image here
+import enlace from '../img/enlace.png';
 
 function MainContent() {
   return (
     <main className="container mx-auto mt-10 px-4 flex">
-      <div className="w-2/3">
+
+        <div className="w-2/3">
+        <h1 className="text-center text-[36px] underline">BIENVENIDO</h1>
+        <div className="text-center bg-blue-500 text-white p-4">
+      <div className="flex justify-around">
+        <div className="flex-1 p-2 hover:bg-blue-700">
+          <img src={enlace} alt="Enlaces Oficiales" className="mb-2 w-12 mx-auto"/>
+          <p>Enlaces oficiales</p>
+        </div>
+        <div className="flex-1 p-2 hover:bg-blue-700">
+          <img src="icon2.png" alt="Convocatoria" className="mb-2 w-12 mx-auto"/>
+          <p>Convocatoria</p>
+        </div>
+        <div className="flex-1 p-2 hover:bg-blue-700">
+          <img src="icon3.png" alt="Nuestro Proyecto" className="mb-2 w-12 mx-auto"/>
+          <p>Nuestro Proyecto</p>
+        </div>
+        <div className="flex-1 p-2 hover:bg-blue-700">
+          <img src="icon4.png" alt="Iniciar Sesión" className="mb-2 w-12 mx-auto"/>
+          <p>Iniciar sesión</p>
+        </div>
+      </div>
+    </div>
         <img src={promoImage} alt="Promoción docente" className="w-full h-auto" />
         <h2 className="text-2xl font-bold mt-4">La promoción docente en el instituto Politécnico Nacional</h2>
         <p className="mt-4 text-gray-700">
