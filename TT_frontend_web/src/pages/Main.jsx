@@ -6,7 +6,7 @@ import enlace from '../img/enlace.png';
 
 function MainContent() {
   return (
-    <main className="container mx-auto mt-10 px-4 flex">
+    <main className="container mx-auto mt-10 px-4 flex ">
 
         <div className="w-2/3">
         <h1 className="text-center text-[36px] underline">BIENVENIDO</h1>
