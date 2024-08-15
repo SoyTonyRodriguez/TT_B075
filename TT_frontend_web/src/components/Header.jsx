@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
 import React from "react";
+import { Link } from "react-router-dom";
 import logo from "../img/logoescom.png";
+
 
 function Header() {
   return (
@@ -20,9 +21,9 @@ function Header() {
             Nosotros
           </a>
         </nav>
-        <button className="bg-black px-4 py-2 rounded hover:bg-gray-800">
+        <Link to= "/Login" className="bg-black px-4 py-2 rounded hover:bg-gray-800">
           Iniciar Sesión
-        </button>
+        </Link>
       </div>
       <div className="mx-auto container justify-between items-center bg-white h-0.5"></div>
       {/* White underline */}

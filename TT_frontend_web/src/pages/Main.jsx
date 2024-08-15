@@ -1,4 +1,6 @@
 import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Login from "./Login";
 import promoImage from '../img/ipn-main.webp'; // Import your image here
 import enlace from '../img/enlace.png';
 
