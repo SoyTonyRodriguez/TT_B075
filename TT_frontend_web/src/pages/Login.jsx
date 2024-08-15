@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function Login() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-400 to-purple-600">
-      <div className="bg-white bg-opacity-10 p-8 rounded-lg shadow-lg backdrop-filter backdrop-blur-md max-w-md w-full">
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <div className="bg-black bg-opacity-30 p-8 rounded-lg shadow-lg backdrop-filter backdrop-blur-md max-w-md w-full">
         <h2 className="text-center text-2xl font-bold text-white mb-6">Inicio de sesión</h2>
         <form>
           <div className="mb-4">
@@ -14,7 +15,7 @@ function Login() {
               id="username"
               type="text"
               placeholder="Ingrese su número de empleado"
-              className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-30 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg bg-white text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="mb-6">
@@ -25,7 +26,7 @@ function Login() {
               id="password"
               type="password"
               placeholder="Contraseña"
-              className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-30 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg bg-white text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <a href="#RecuperarContraseña" className="text-blue-100 hover:text-blue-800 text-sm float-left mt-2">
               ¿Olvidó su contraseña?
@@ -33,16 +34,16 @@ function Login() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg mt-2"
+            className="w-full bg-blue-900 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg mt-2"
           >
             Ingresar
           </button>
         </form>
         <div className="text-center mt-4 text-white">
           ¿Aún no tiene una cuenta?{' '}
-          <a href="#" className="text-blue-300 hover:text-blue-500">
+          <Link to="/Registro" className="text-blue-300 hover:text-blue-500">
             Registrarse
-          </a>
+          </Link>
         </div>
       </div>
       <div className="text-center mt-8 text-white max-w-2xl mx-4">
