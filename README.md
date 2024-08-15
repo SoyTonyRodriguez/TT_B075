@@ -124,3 +124,33 @@ Ahora solo queda escanear el codigo QR para poder visualizar la aplicación en e
 Para poder ejecutar el proyecto en una version web podemos acceder al link del localhost generada en la terminal
 
 ### Ejecucion en [emulador android/iOS](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=simulated)
+
+## Backend
+
+**Para configurar el backend se debera tener python instalado**
+
+En la carpeta **TT_Backend** crear un entorno virtual
+```shell
+python3 -m venv env
+```
+
+Se creará una carpeta con el nombre **env/**
+Para activar el entorno virtual se debera ejecutar el siguiente comando
+```shell
+source env/bin/activate
+```
+
+Sabremos que estamos en el entorno virtual debido a que el prompt de la terminal cambiará, y se mostrara el nombre de la carpeta o el del entorno virtual dependiendo el S.O
+
+![terminal_prompt](./images/terminal_prompt.png)
+
+### Instalacion de dependencias
+
+Para instalar los dependencias se deberá ejecutar el siguiente comando
+
+```shell
+pip install -r requirements.txt
+```
+
+Este comando instalará en automatico django y todo lo relacionado a ello, para solo proceder a ejecutar el servidor
+
