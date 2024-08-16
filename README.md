@@ -154,3 +154,30 @@ pip install -r requirements.txt
 
 Este comando instalará en automatico django y todo lo relacionado a ello, para solo proceder a ejecutar el servidor
 
+### Instalación de mongo
+#### Linux (Fedora)
+
+```shell
+sudo dnf install -y mongodb-org mongodb-mongosh-shared-openssl3
+systemctl start mongod
+mongosh --version
+
+```
+
+Despues de ejecutar los comandos anteriores con exito instalar [mongodb compas](https://www.mongodb.com/docs/compass/current/install/)
+
+### Migraciones de bases de datos
+Ejecutar los siguientes comandos para tener la base de datos localmente
+
+```shell
+python manage.py makemigration
+python manage.py migrate
+
+```
+
+### Ejecución del proyecto
+
+Ejecutar el siguiente comando y hacer clic sobre la URL proporcionada 
+```shell
+python manage.py runserver
+```
