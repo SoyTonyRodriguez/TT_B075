@@ -36,3 +36,9 @@ yarn-error.*
 
 # Python virtaul enviroment
 env/
+
+# Byte-compiled / optimized / DLL files
+TT_Backend/**/__pycache__/
+*.py[cod]
+TT_Backend/django_API_TT/__pycache__
+TT_Backend/teachers/__pycache__
