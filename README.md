@@ -21,12 +21,13 @@
    * [Backend](#backend)
       * [Instalacion de dependencias](#instalacion-de-dependencias)
       * [Instalación de mongo](#instalación-de-mongo)
+         * [Windows](#windows)
          * [Linux (Fedora)](#linux-fedora)
       * [Migraciones de bases de datos](#migraciones-de-bases-de-datos)
       * [Ejecución del proyecto](#ejecución-del-proyecto)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: antonio, at: Fri Aug 16 02:46:43 PM CST 2024 -->
+<!-- Added by: antonio, at: Fri Aug 16 05:17:25 PM CST 2024 -->
 
 <!--te-->
 
@@ -182,7 +183,7 @@ pip install -r requirements.txt
 Este comando instalará en automatico django y todo lo relacionado a ello, para solo proceder a ejecutar el servidor
 
 ### Instalación de mongo
-### Windows 
+#### Windows 
 Descargar la version correspondiente a windows de [MongoDB Community Server](https://www.mongodb.com/try/download/community)
 
 #### Linux (Fedora)
