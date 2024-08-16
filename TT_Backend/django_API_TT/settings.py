@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'teachers'
+    'accounts'
 ]
 
 MIDDLEWARE = [
@@ -89,7 +89,6 @@ DATABASES = {
   'default': {
       'ENGINE': 'djongo',
       'NAME': 'TT_DB',  # Replace with your MongoDB database name
-      'ENFORCE_SCHEMA': False,  # Optional: If you want to enforce Django model schemas, set to True
       'host': 'localhost',  # Replace with your MongoDB host
       'port': 27017,  # Replace with your MongoDB port
   }
@@ -141,4 +140,4 @@ CORS_ALLOWED_ORIGINS = [
 
 ]
 
-AUTH_USER_MODEL='teachers.Teachers'
+AUTH_USER_MODEL='accounts.Accounts'
