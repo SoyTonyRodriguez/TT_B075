@@ -16,6 +16,7 @@ import Calendar from './pages/Calendar';
 import Account from './pages/Account';
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
 
       </Routes>
       <Footer />
+      <Toaster />
     </div>
     </BrowserRouter>
   );
