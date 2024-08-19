@@ -11,7 +11,7 @@ function App() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <Routes>
-        // Redirigiendo la pagina principar(/) a /welcome con Navigate
+        // Redirigiendo la pagina principal(/) a /welcome con Navigate
         <Route path='/' element={<Navigate to="/welcome" />} />
 
         // Asignando que paginas mostrar cuando se visite cierta url
