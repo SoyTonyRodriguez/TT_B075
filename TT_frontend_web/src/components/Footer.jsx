@@ -1,5 +1,5 @@
 import React from 'react';
-
+// 1B365D 003DA5
 function Footer() {
   return (
     <footer className="relative bg-gradient-to-r from-blue-800 to-blue-500 text-white mt-10">
@@ -15,7 +15,7 @@ function Footer() {
           />
         </svg>
       </div>
-      <div className="relative container mx-auto py-10 flex flex-col items-center">
+      <div className="relative container mx-auto py-10 flex flex-col items-center w-5/6 mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center w-full text-center md:text-left">
           <p className="text-xs">
             High level experience in web design and development knowledge, producing quality work.
@@ -54,5 +54,4 @@ function Footer() {
 }
 
 export default Footer;
-
 

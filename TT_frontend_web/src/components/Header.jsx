@@ -6,7 +6,7 @@ import logo from "../img/logoescom.png";
 function Header() {
   return (
     <header className="bg-gradient-to-r from-blue-950 via-sky-700  to-sky-600 text-white py-4">
-      <div className="container mx-auto flex justify-between items-center">
+      <div className="container mx-auto flex justify-between items-center w-5/6 mx-auto">
         <div className="text-3xl font-bold">
           <img className="py-1 w-40 h-25 inline-block" src={logo} alt="logo" />
         </div>
@@ -15,10 +15,10 @@ function Header() {
           <Link to='/welcome' className="hover:underline">
             Inicio
           </Link>
-          <Link to='/conocer-mas' href="#conocer-mas" className="hover:underline">
+          <Link to='/ConocerMas' className="hover:underline">
             Conocer más
           </Link>
-          <Link to='/nosotros' className="hover:underline">
+          <Link to='/Nosotros' className="hover:underline">
             Nosotros
           </Link>
         </nav>

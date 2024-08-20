@@ -15,7 +15,7 @@ const Registro = () => {
     };
 
     return (
-        <div className="flex flex-col w-3/5 mx-auto p-10 bg-black bg-opacity-30 rounded-3xl shadow-lg mt-10">
+        <div className="flex flex-col w-3/5 mx-auto p-10 bg-black bg-opacity-40 rounded-3xl shadow-lg mt-10">
             <h2 className="text-left text-white text-2xl mb-4">Nuevo Usuario</h2>
             <div className="mx-auto container justify-between items-center bg-white h-0.5 mb-6"></div>
             <form className="w-full" onSubmit={handleSubmit}>
