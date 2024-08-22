@@ -23,7 +23,6 @@
       * [Instalación de mongo](#instalación-de-mongo)
          * [Windows](#windows)
          * [Linux (Fedora)](#linux-fedora)
-      * [Migraciones de bases de datos](#migraciones-de-bases-de-datos)
       * [Ejecución del proyecto](#ejecución-del-proyecto)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
@@ -199,28 +198,15 @@ Despues de ejecutar los comandos anteriores con exito instalar [mongodb compas](
 
 **En windows esté se instalara por defecto al terminar la instalación de MongoDB Community Server**
 
-Al abrir mongo compass, crear una conexion en localhost con los datos por defecto
+### Acceder a la base de datos
 
-```js
-mongodb://localhost:27017
-```
-
-![mongo-compass](./images/mongo-compass.png)
-
-
-Al crear una conexión, lo siguiente será crear una Base de Datos con el nombre ***TT_DB***
-
-![db_create](./images/db_create.png)
-
-### Migraciones de bases de datos
-
-Dentro de la carpeta **TT_Backend/** ejecutar los siguientes comandos para poder hacer las migraciones y que Django haga la base de datos localmente
+Ingresar la siguiente conexion en mongo db compass, con los datos correspondientes de cada usuario
 
 ```shell
-python manage.py makemigration
-python manage.py migrate
-
+mongodb+srv://<user>:<password>@clustertt.txd45.mongodb.net/
 ```
+
+![monog-compas](./images/mongo-compass.png)
 
 ### Ejecución del proyecto
 
