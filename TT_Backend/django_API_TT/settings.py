@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,14 +86,40 @@ WSGI_APPLICATION = 'django_API_TT.wsgi.application'
 #     }
 # }
 
+# Local host conection
+#DATABASES = {
+#  'default': {
+#      'ENGINE': 'djongo',
+#      'NAME': 'TT_DB',  # Replace with your MongoDB database name
+#      'host': 'localhost',  # Replace with your MongoDB host
+#      'port': 27017,  # Replace with your MongoDB port
+#  }
+#}
+
+# Cluster conection
 DATABASES = {
-  'default': {
-      'ENGINE': 'djongo',
-      'NAME': 'TT_DB',  # Replace with your MongoDB database name
-      'host': 'localhost',  # Replace with your MongoDB host
-      'port': 27017,  # Replace with your MongoDB port
-  }
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'TT_DB',  # The name of your MongoDB database
+        'CLIENT': {
+            'host': 'mongodb+srv://rodriguezfloresantonioo:<db_password>@clustertt.txd45.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTT',
+            'username': 'rodriguezfloresantonioo',  # Replace with your MongoDB username
+            'password': 'FXue6Nm47gbDniW3',  # Replace with your MongoDB password
+        }
+    }
 }
+
+# Initialise environment variables
+env = environ.Env()
+
+# Specify the path to the database.env file
+env_file = os.path.join(os.path.dirname(__file__), 'database.env')
+
+environ.Env.read_env(env_file)  # Reads the .env file
+
+# Example of getting the connection string
+MONGO_CONNECTION_STRING = env('MONGO_CONNECTION_STRING')
+DB_CLIENT = env('DB_CLIENT')
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
