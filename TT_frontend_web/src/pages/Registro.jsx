@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import perfilImage from '../img/perfi.png';
+import { Link } from 'react-router-dom';
 
 const Registro = () => {
     const [nombre, setNombre] = useState('');
@@ -111,8 +112,18 @@ const Registro = () => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-end space-x-0 sm:space-x-2 space-y-2 sm:space-y-0">
-                    <button type="button" className="bg-red-800 text-white px-6 py-3 rounded-2xl hover:bg-red-600 w-full sm:w-auto min-w-[200px] text-lg">Cancelar</button>
-                    <button type="submit" className="bg-blue-900 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full sm:w-auto min-w-[200px] text-lg">Ingresar</button>
+                <Link
+                    to="/Login"
+                    className="bg-red-800 text-white px-6 py-3 rounded-2xl hover:bg-red-600 w-full sm:w-auto min-w-[200px] text-lg flex items-center justify-center"
+                >
+                    Cancelar
+                </Link>
+                <Link
+                        to="/home"
+                        className="bg-blue-900 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full sm:w-auto min-w-[200px] text-lg flex items-center justify-center"
+                    >
+                        Ingresar
+                    </Link>
                 </div>
             </form>
         </div>
