@@ -31,7 +31,7 @@ const Registro = () => {
           await createAccount(accountData);
           toast.success('Cuenta creada exitosamente');
           reset();            // Reset form fields after successful submission
-          navigate('/Login'); // Redirect to login or another page
+          navigate('/home'); // Redirect to login or another page
       } catch (error) {
         console.error('Error creating account:', error);
 
@@ -43,7 +43,7 @@ const Registro = () => {
             toast.error(apiErrors.email)
           }
         } else {
-          toast.error('Error al crear la cuenta. Inténtalo nuevamente.');
+          toast.error("Error al crear cuenta: " + error.message);
         }
       }
   });
@@ -158,12 +158,12 @@ const Registro = () => {
                 >
                     Cancelar
                 </Link>
-                <Link
+                <button
                         to="/home"
                         className="bg-blue-900 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full sm:w-auto min-w-[200px] text-lg flex items-center justify-center"
                     >
                         Ingresar
-                    </Link>
+                    </button>
                 </div>
             </form>
         </div>

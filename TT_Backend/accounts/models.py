@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from pymongo import MongoClient
 from rest_framework.exceptions import ValidationError
+from django.conf import settings
 
 
 class AccountManager(BaseUserManager):
@@ -54,13 +55,16 @@ class Accounts(AbstractBaseUser):
   class Meta:
     verbose_name = _('account')
     verbose_name_plural = _('accounts')
+    db_table = 'accounts'  # This sets the table name to 'accounts'
+
 
   def save(self, *args, **kwargs):
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client['TT_DB']
-    collection = db['accounts_accounts']
+    client = MongoClient(settings.MONGO_CONNECTION_STRING)
+    #db = client['TT_DB']
+    db = client[settings.DB_CLIENT]
+    #collection = db['accounts']
     # Manually check if email is unique
-    if collection.find_one({"email": self.email}):
+    if db.accounts.find_one({"email": self.email}):
         raise ValidationError({"email": "El email ya ha sido registrado"})
     
     # If email is unique, save using Djongo
