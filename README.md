@@ -23,10 +23,11 @@
       * [Instalación de mongo](#instalación-de-mongo)
          * [Windows](#windows)
          * [Linux (Fedora)](#linux-fedora)
+      * [Acceder a la base de datos](#acceder-a-la-base-de-datos)
       * [Ejecución del proyecto](#ejecución-del-proyecto)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: antonio, at: Fri Aug 16 05:17:25 PM CST 2024 -->
+<!-- Added by: antonio, at: Wed Aug 21 11:23:32 PM CST 2024 -->
 
 <!--te-->
 
