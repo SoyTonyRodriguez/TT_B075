@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,16 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
-    'rest_framework',
+    'corsheaders',    # To coneect backend and frontend
+    'rest_framework', # To create API
     'accounts'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -78,21 +79,47 @@ WSGI_APPLICATION = 'django_API_TT.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# Local host conection
 #DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
+#  'default': {
+#      'ENGINE': 'djongo',
+#      'NAME': 'TT_DB',  # Replace with your MongoDB database name
+#      'host': 'localhost',  # Replace with your MongoDB host
+#      'port': 27017,  # Replace with your MongoDB port
+#  }
 #}
 
+# Cluster conection
 DATABASES = {
-  'default': {
-      'ENGINE': 'djongo',
-      'NAME': 'TT_DB',  # Replace with your MongoDB database name
-      'host': 'localhost',  # Replace with your MongoDB host
-      'port': 27017,  # Replace with your MongoDB port
-  }
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'TT_DB',  # The name of your MongoDB database
+        'CLIENT': {
+            'host': 'mongodb+srv://rodriguezfloresantonioo:<db_password>@clustertt.txd45.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTT',
+            'username': 'rodriguezfloresantonioo',  # Replace with your MongoDB username
+            'password': 'FXue6Nm47gbDniW3',  # Replace with your MongoDB password
+        }
+    }
 }
+
+# Initialise environment variables
+env = environ.Env()
+
+# Specify the path to the database.env file
+env_file = os.path.join(os.path.dirname(__file__), 'database.env')
+
+environ.Env.read_env(env_file)  # Reads the .env file
+
+# Example of getting the connection string
+MONGO_CONNECTION_STRING = env('MONGO_CONNECTION_STRING')
+DB_CLIENT = env('DB_CLIENT')
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -137,7 +164,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Put the url from frontend here
 CORS_ALLOWED_ORIGINS = [
-
+  "http://localhost:5173",
 ]
+
+ALLOWED_HOSTS = ["*"]
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL='accounts.Accounts'
