@@ -17,6 +17,7 @@ import Account from './pages/Account';
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
 import { Toaster } from "react-hot-toast";
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -37,9 +38,10 @@ function App() {
         <Route path='/welcome' element={<MainContent className="flex-grow" />} />
         <Route path='/ConocerMas' element={<ConocerMas />} />
         <Route path='/Nosotros' element={<Nosotros />} />
-        <Route path="/Login" element={<Login/>} />
+        <Route path="/login" element={<Login/>} />
         <Route path="/Registro" element={<Registro/>} />
-        <Route path="/home" element={<HomeScreen />} />
+        {/* <Route path="/home" element={<HomeScreen />} /> */}
+        <Route path="/home" element={<ProtectedRoute component={HomeScreen} />} />
         <Route path="/projection" element={<Projection />} />
         <Route path="/links" element={<Links />} />
         <Route path="/documents" element={<Documents />} />
