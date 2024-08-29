@@ -2,9 +2,6 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, BrowserRouter } from 'react-router-dom';
 import Header from "./components/Header";
 import MainContent from "./pages/Main";
-<<<<<<< HEAD
-import Login from "./pages/Login";
-=======
 import ConocerMas from './pages/ConocerMas'; 
 import Nosotros from './pages/Nosotros'; 
 import Login from "./pages/Login";
@@ -17,7 +14,7 @@ import Links from './pages/Links';
 import Documents from './pages/Documents';
 import Calendar from './pages/Calendar';
 import Account from './pages/Account';
->>>>>>> a616ad00ee63b913a8c658c45b0a199a640fb990
+import Convocatoria from "./pages/Convocatoria";
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
 import { Toaster } from "react-hot-toast";
@@ -25,9 +22,6 @@ import { Toaster } from "react-hot-toast";
 function App() {
   return (
     <BrowserRouter>
-<<<<<<< HEAD
-    <div className="min-h-screen flex flex-col">
-=======
     <div className="min-h-screen flex flex-col"
       style={{
         backgroundImage: `url(${fondo})`,
@@ -35,7 +29,6 @@ function App() {
         backgroundPosition: 'center',
       }}
     >
->>>>>>> a616ad00ee63b913a8c658c45b0a199a640fb990
       <Header />
       <Routes>
         // Redirigiendo la pagina principal(/) a /welcome con Navigate
@@ -43,9 +36,6 @@ function App() {
 
         // Asignando que paginas mostrar cuando se visite cierta url
         <Route path='/welcome' element={<MainContent className="flex-grow" />} />
-<<<<<<< HEAD
-        <Route path="/Login" element={<Login/>} />
-=======
         <Route path='/ConocerMas' element={<ConocerMas />} />
         <Route path='/Nosotros' element={<Nosotros />} />
         <Route path="/Login" element={<Login/>} />
@@ -58,7 +48,7 @@ function App() {
         <Route path="/account" element={<Account />} />
         <Route path="/new-projection" element={<NewProjection />} />
         <Route path="/unidades-promocion" element={<UnidadesPromocion />} />
->>>>>>> a616ad00ee63b913a8c658c45b0a199a640fb990
+        <Route path="/Convocatoria" element={<Convocatoria/>}/>
 
       </Routes>
       <Footer />

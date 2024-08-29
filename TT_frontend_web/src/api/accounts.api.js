@@ -7,3 +7,4 @@ const accountsAPI = axios.create({
 
 // Accounts mehods
 export const createAccount = (account) => accountsAPI.post('/', account)
+export const login = (credentials) => accountsAPI.post('login/', credentials)
