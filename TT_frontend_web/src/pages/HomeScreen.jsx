@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Projection from '../img/proyeccion.png';
 import Links from '../img/enlace.png';
@@ -6,12 +7,60 @@ import Documents from '../img/documentos.png';
 import Calendar from '../img/calendario.png';
 import Account from '../img/miPerfil.png';
 
+import { jwtDecode } from "jwt-decode";
+import { getAccount } from "../api/accounts.api";
+
 function MainContent() {
+    const [userName, setUserName] = useState('');
+    const [userId, setUserId] = useState(null);
+    const [loading, setLoading] = useState(true); // Loading state
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+    
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                setUserId(decodedToken.user_id); // Assuming the token has an 'id' field
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (userId) {
+            const fetchAccountDetails = async () => {
+                try {
+                    const response = await getAccount(userId);
+                    setUserName(response.data.name); // Assuming the API response has a 'name' field
+                } catch (error) {
+                    console.error('Error fetching account details:', error);
+                    if (error.response && error.response.status === 401) {
+                        console.error('Unauthorized: Invalid or expired token');
+                    }
+                } finally {
+                    setLoading(false)
+                }
+            };
+            fetchAccountDetails();
+        }
+    }, [userId]);
+
+    if (loading) {
+        // Show a loading spinner or any placeholder until the data is fetched
+        return (
+        <div className='min-h-screen flex flex-col items-center justify-center'>
+            <div className="text-center mt-16 w-full h-full text-white text-3xl">Cargando...</div>
+        </div>
+        );
+    }
+    
   return (
     <main className="min-h-screen bg-cover bg-center">
       <div className="container mx-auto p-8">
         <div className="text-center mt-16">
-          <h1 className="text-5xl font-bold mb-12">BIENVENIDO</h1>
+          <h1 className="text-5xl font-bold mb-12">BIENVENIDO {`${userName}`}</h1>
         </div>
 
         <div className="flex flex-wrap justify-center mb-12 mt-16 gap-8">
