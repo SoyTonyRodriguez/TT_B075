@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework', # To create API
     'rest_framework_simplejwt', # Create token authentication
     'rest_framework_simplejwt.token_blacklist', #  List of tokens that have been revoked or expired
-    'accounts'
+    'accounts',
+    'tasks'
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
