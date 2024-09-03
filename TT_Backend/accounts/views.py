@@ -1,6 +1,7 @@
 from rest_framework import viewsets
-from .serializer import RegisterSerializer, CustomTokenObtainPairSerializer, CustomTokenRefreshSerializer, AccountSerializer
+from .serializer import RegisterSerializer, CustomTokenObtainPairSerializer, CustomTokenRefreshSerializer, AccountSerializer, TaskSerializer
 from .models import Accounts
+from .models import Task
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response

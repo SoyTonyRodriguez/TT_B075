@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
+
 class AccountManager(BaseUserManager):
  def create_user(self, email, password=None, **extra_fields):
     if not email:
