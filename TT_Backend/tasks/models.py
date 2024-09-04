@@ -20,6 +20,7 @@ class Task(models.Model):
         default=generate_task_id,
         editable=False
     )
+    account_id = models.CharField(max_length=40, editable=False, null=False, default="id not provided")
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     status = models.CharField(
