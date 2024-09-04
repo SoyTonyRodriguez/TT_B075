@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
+
+import { createTask, getTasks } from "../api/tasks.api";
 
 function KanbanBoard() {
     const [tasks, setTasks] = useState([]);
+    const [userId, setUserId] = useState(null);
+    const [loading, setLoading] = useState(true); // Loading state
+
     const [newTask, setNewTask] = useState({
         title: '',
         description: '',
@@ -12,17 +17,45 @@ function KanbanBoard() {
     });
 
     useEffect(() => {
-       // fetchTasks();
-    }, []);
-
-    const fetchTasks = async () => {
-        try {
-            const response = await axios.get('/api/v1/tasks/');
-            setTasks(response.data);
-        } catch (error) {
-            console.error('Error fetching tasks:', error);
+        const token = localStorage.getItem('token');
+    
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                setUserId(decodedToken.user_id); // Assuming the token has an 'id' field
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
         }
-    };
+    }, []);
+    
+    useEffect(() => {
+        if (userId) {
+            const fetchTasks = async () => {
+                try {
+                    const response = await getTasks(userId);
+                    setTasks(response.data); // Assuming the API response has a 'name' field
+                } catch (error) {
+                    console.error('Error fetching tasks, details:', error);
+                    if (error.response && error.response.status === 401) {
+                        console.error('Unauthorized: Invalid or expired token');
+                    }
+                } finally {
+                    setLoading(false)
+                }
+            };
+            fetchTasks();
+        }
+    }, [userId]);
+
+    if (loading) {
+        // Show a loading spinner or any placeholder until the data is fetched
+        return (
+        <div className='min-h-screen flex flex-col items-center justify-center'>
+            <div className="text-center mt-16 w-full h-full text-white text-3xl">Cargando...</div>
+        </div>
+        );
+    }
 
     const handleTaskChange = (e) => {
         setNewTask({
@@ -33,7 +66,8 @@ function KanbanBoard() {
 
     const handleCreateTask = async () => {
         try {
-            const response = await axios.post('/api/v1/task/register/', newTask);
+            const response = await createTask(newTask);
+            //const response = await axios.post('http://localhost:8000/api/v1/task/register/', newTask);
             setTasks([...tasks, response.data]);
             setNewTask({
                 title: '',
