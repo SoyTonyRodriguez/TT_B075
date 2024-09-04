@@ -15,7 +15,6 @@ function KanbanBoard() {
         start_date: '',
         end_date: ''
     });
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
