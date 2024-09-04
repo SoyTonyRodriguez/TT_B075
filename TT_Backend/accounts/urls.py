@@ -1,14 +1,13 @@
 from rest_framework import routers
 from django.urls import path, include
 from accounts import views
-from .views import RegisterAccountsView, CustomTokenObtainPairView, CustomTokenRefreshView, AccountView, TaskViewSet
+from .views import RegisterAccountsView, CustomTokenObtainPairView, CustomTokenRefreshView, AccountView
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # api versioning
 router = routers.DefaultRouter()
 router.register(r'accounts', views.AccountsView, 'accounts')
-router.register(r'tasks', TaskViewSet)
 
 urlpatterns = [
     path('api/v1/', include(router.urls)),
