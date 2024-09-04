@@ -10,11 +10,13 @@ const ProfileScreen = ({ navigation }) => {
       resizeMode="cover"
     >
 
-      <TouchableOpacity 
-        style={styles.settingsIcon}     
-        >
-        <Ionicons name="settings-outline" size={40} color="#000" />
-      </TouchableOpacity>
+    <TouchableOpacity 
+      style={styles.settingsIcon} 
+      onPress={() => navigation.navigate('Settings')} // Navegar a la pantalla de Settings
+    >
+      <Ionicons name="settings-outline" size={40} color="#000" />
+    </TouchableOpacity>
+
 
       <View style={styles.header}>
         <Ionicons name="person-circle-outline" size={100} color="#000" />
@@ -22,7 +24,9 @@ const ProfileScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.gridContainer}>
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem}
+          onPress={() => navigation.navigate('OfficialLinksScreen')}
+        >
           <Ionicons name="link-outline" size={40} color="#fff" />
           <Text style={styles.gridText}>Enlaces oficiales</Text>
         </TouchableOpacity>
