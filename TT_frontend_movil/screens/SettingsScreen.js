@@ -9,6 +9,7 @@ export default function SettingsScreen({ navigation }) {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
+
       <View style={styles.container}>
         {/* Ícono de regresar */}
         <TouchableOpacity 
@@ -62,6 +63,7 @@ export default function SettingsScreen({ navigation }) {
     </ImageBackground>
   );
 }
+
 
 const styles = StyleSheet.create({
   backgroundImage: {
