@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
-
-import { createTask, getTasks } from "../api/tasks.api";
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { createTask, getTasks, updateTaskStatus } from "../api/tasks.api";  // Ensure you have the updateTaskStatus API
 
 function KanbanBoard() {
     const [tasks, setTasks] = useState([]);
     const [userId, setUserId] = useState(null);
-    const [loading, setLoading] = useState(true); // Loading state
-
+    const [loading, setLoading] = useState(true);
     const [newTask, setNewTask] = useState({
         title: '',
         description: '',
-        status: 'todo',  // Default status is 'todo'
+        status: 'todo',  // Default status
         start_date: '',
         end_date: ''
     });
@@ -19,44 +19,31 @@ function KanbanBoard() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-    
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
-                setUserId(decodedToken.user_id); // Assuming the token has an 'id' field
+                setUserId(decodedToken.user_id);  // Decode the token to get user ID
             } catch (error) {
                 console.error('Invalid token:', error);
             }
         }
     }, []);
-    
+
     useEffect(() => {
         if (userId) {
             const fetchTasks = async () => {
                 try {
                     const response = await getTasks(userId);
-                    setTasks(response.data); // Assuming the API response has a 'name' field
+                    setTasks(response.data);  // Assuming API returns tasks associated with the user
                 } catch (error) {
-                    console.error('Error fetching tasks, details:', error);
-                    if (error.response && error.response.status === 401) {
-                        console.error('Unauthorized: Invalid or expired token');
-                    }
+                    console.error('Error fetching tasks:', error);
                 } finally {
-                    setLoading(false)
+                    setLoading(false);
                 }
             };
             fetchTasks();
         }
     }, [userId]);
-
-    if (loading) {
-        // Show a loading spinner or any placeholder until the data is fetched
-        return (
-        <div className='min-h-screen flex flex-col items-center justify-center'>
-            <div className="text-center mt-16 w-full h-full text-white text-3xl">Cargando...</div>
-        </div>
-        );
-    }
 
     const handleTaskChange = (e) => {
         setNewTask({
@@ -68,7 +55,6 @@ function KanbanBoard() {
     const handleCreateTask = async () => {
         try {
             const response = await createTask(newTask);
-            //const response = await axios.post('http://localhost:8000/api/v1/task/register/', newTask);
             setTasks([...tasks, response.data]);
             setNewTask({
                 title: '',
@@ -76,10 +62,54 @@ function KanbanBoard() {
                 status: 'todo',
                 start_date: '',
                 end_date: ''
-            });  // Reset the form
+            });
         } catch (error) {
             console.error('Error creating task:', error);
         }
+    };
+
+    const handleDrop = async (id, newStatus) => {
+        try {
+            await updateTaskStatus(id, { status: newStatus });
+            const updatedTasks = tasks.map(task =>
+                task.id === id ? { ...task, status: newStatus } : task
+            );
+            setTasks(updatedTasks);
+        } catch (error) {
+            console.error('Error updating task status:', error);
+        }
+    };
+
+    const TaskCard = ({ task }) => {
+        const [, drag] = useDrag({
+            type: 'task',
+            item: { id: task.id, status: task.status }
+        });
+
+        return (
+            <div ref={drag} className="task-card" style={{ padding: '10px', margin: '5px 0', backgroundColor: '#fff', border: '1px solid #ddd' }}>
+                <h3>{task.title}</h3>
+                <p>{task.description}</p>
+            </div>
+        );
+    };
+
+    const Column = ({ status, children }) => {
+        const [, drop] = useDrop({
+            accept: 'task',
+            drop: (draggedItem) => {
+                if (draggedItem.status !== status) {
+                    handleDrop(draggedItem.id, status);
+                }
+            },
+        });
+
+        return (
+            <div ref={drop} className="column" style={{ margin: '10px', padding: '10px', border: '1px solid #ccc', width: '300px', backgroundColor: '#f4f4f4' }}>
+                <h2>{status.toUpperCase()}</h2>
+                <div className="task-list">{children}</div>
+            </div>
+        );
     };
 
     if (loading) {
@@ -90,28 +120,26 @@ function KanbanBoard() {
         return <div>{error}</div>;
     }
 
-    const Column = ({ status }) => (
-        <div className="column" style={{ margin: '10px', padding: '10px', border: '1px solid #ccc', width: '300px', backgroundColor: '#f4f4f4' }}>
-            <h2>{status.toUpperCase()}</h2>
-            <div className="task-list">
-                {tasks.filter(task => task.status === status).map(task => (
-                    <div key={task.id} className="task-card" style={{ padding: '10px', margin: '5px 0', backgroundColor: '#fff', border: '1px solid #ddd' }}>
-                        <h3>{task.title}</h3>
-                        <p>{task.description}</p>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-
     return (
-        <div>
+        <DndProvider backend={HTML5Backend}>
             <div className="kanban-board flex" style={{ display: 'flex', justifyContent: 'space-around' }}>
-                <Column status="todo" />
-                <Column status="in-progress" />
-                <Column status="done" />
+                <Column status="todo">
+                    {tasks.filter(task => task.status === 'todo').map(task => (
+                        <TaskCard key={task.id} task={task} />
+                    ))}
+                </Column>
+                <Column status="in-progress">
+                    {tasks.filter(task => task.status === 'in-progress').map(task => (
+                        <TaskCard key={task.id} task={task} />
+                    ))}
+                </Column>
+                <Column status="done">
+                    {tasks.filter(task => task.status === 'done').map(task => (
+                        <TaskCard key={task.id} task={task} />
+                    ))}
+                </Column>
             </div>
-            <div className="new-task-form" style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc', width: '300px' }}>
+            <div className="new-task-form" style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc', width: '350px' }}>
                 <h3>Create a New Task</h3>
                 <input
                     type="text"
@@ -148,7 +176,7 @@ function KanbanBoard() {
                     Create Task
                 </button>
             </div>
-        </div>
+        </DndProvider>
     );
 }
 
