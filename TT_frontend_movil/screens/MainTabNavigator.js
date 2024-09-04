@@ -5,7 +5,7 @@ import HomeScreen from './HomeScreen';
 import CalendarScreen from './CalendarScreen';
 import FilesScreen from './FilesScreen';
 import ProjectionScreen from './ProjectionScreen';
-import ProfileStackNavigator from './ProfileStackNavigator';  // Importa el nuevo ProfileStackNavigator
+import ProfileStackNavigator from './ProfileStackNavigator';  
 
 const Tab = createBottomTabNavigator();
 
@@ -40,7 +40,6 @@ export default function MainTabNavigator() {
       <Tab.Screen name="Calendar" component={CalendarScreen} options={{ tabBarLabel: 'Calendario' }} />
       <Tab.Screen name="Files" component={FilesScreen} options={{ tabBarLabel: 'Documentos' }} />
       <Tab.Screen name="Projection" component={ProjectionScreen} options={{ tabBarLabel: 'Proyección' }} />
-      {/* Aquí se usa el nuevo Stack Navigator para Profile */}
       <Tab.Screen name="Profile" component={ProfileStackNavigator} options={{ tabBarLabel: 'Perfil' }} />
     </Tab.Navigator>
   );

@@ -26,12 +26,14 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.gridContainer}>
         <TouchableOpacity style={styles.gridItem}
           onPress={() => navigation.navigate('OfficialLinksScreen')}
-        >
+         >
           <Ionicons name="link-outline" size={40} color="#fff" />
           <Text style={styles.gridText}>Enlaces oficiales</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem}
+          onPress={() => navigation.navigate('ProjectScreen')}
+        >
           <Ionicons name="people-outline" size={40} color="#fff" />
           <Text style={styles.gridText}>Nuestro proyecto</Text>
         </TouchableOpacity>
@@ -41,10 +43,14 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={styles.gridText}>Convocatoria</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity 
+          style={styles.gridItem} 
+          onPress={() => navigation.navigate('MoreInfo')} // Navigate to MoreInfoScreen
+        >
           <Ionicons name="information-circle-outline" size={40} color="#fff" />
           <Text style={styles.gridText}>Más información</Text>
         </TouchableOpacity>
+
 
         <TouchableOpacity style={styles.gridItem}>
           <Ionicons name="log-out-outline" size={40} color="#fff" />
