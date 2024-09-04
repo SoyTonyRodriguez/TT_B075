@@ -4,9 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from './HomeScreen';
 import CalendarScreen from './CalendarScreen';
 import FilesScreen from './FilesScreen';
-import ProfileScreen from './ProfileScreen';
 import ProjectionScreen from './ProjectionScreen';
-import SettingsScreen from './SettingsScreen';
+import ProfileStackNavigator from './ProfileStackNavigator';  // Importa el nuevo ProfileStackNavigator
 
 const Tab = createBottomTabNavigator();
 
@@ -28,7 +27,8 @@ export default function MainTabNavigator() {
             iconName = focused ? 'eye' : 'eye-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
-          } 
+          }
+
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -41,7 +41,9 @@ export default function MainTabNavigator() {
       <Tab.Screen name="Calendar" component={CalendarScreen} options={{ tabBarLabel: 'Calendario' }} />
       <Tab.Screen name="Files" component={FilesScreen} options={{ tabBarLabel: 'Documentos' }} />
       <Tab.Screen name="Projection" component={ProjectionScreen} options={{ tabBarLabel: 'Proyección' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Perfil' }} />
+      {/* Aquí se usa el nuevo Stack Navigator para Profile */}
+      <Tab.Screen name="Profile" component={ProfileStackNavigator} options={{ tabBarLabel: 'Perfil' }} />
+
     </Tab.Navigator>
   );
 }

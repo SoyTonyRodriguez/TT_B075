@@ -10,7 +10,7 @@ function Header() {
         <div className="text-3xl font-bold">
           <img className="py-1 w-40 h-25 inline-block" src={logo} alt="logo" />
         </div>
-        <nav className="space-x-8">
+        <nav className="space-x-8 mx-auto">
           {/* Link to para enlazar con Route */}
           <Link to='/welcome' className="hover:underline">
             Inicio
@@ -22,9 +22,6 @@ function Header() {
             Nosotros
           </Link>
         </nav>
-        <Link to= "/Login" className="bg-black px-4 py-2 rounded-3xl hover:bg-gray-800">
-          Iniciar Sesión
-        </Link>
       </div>
       <div className="mx-auto container justify-between items-center bg-white h-0.5"></div>
       {/* White underline */}
