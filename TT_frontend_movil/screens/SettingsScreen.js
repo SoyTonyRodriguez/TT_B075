@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
     position: 'absolute', 
     top: 45, 
     left: 20, 
+    zIndex: 1,
   },
   headerText: {
     fontSize: 28,

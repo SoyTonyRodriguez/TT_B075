@@ -9,16 +9,11 @@ export default function OfficialLinksScreen({ navigation }) {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-
-      <TouchableOpacity 
-        style={styles.backIcon} 
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons name="arrow-back-outline" size={30} color="black" />
-      </TouchableOpacity>
-
-      {/* Título de la pantalla */}
-      <Text style={styles.headerText}>Enlaces oficiales</Text>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Más información</Text>
+          <Ionicons name="link" size={40} color="#000" style={styles.icon} />
+        </View>
 
       {/* Grid de enlaces */}
       <View style={styles.gridContainer}>
@@ -42,6 +37,7 @@ export default function OfficialLinksScreen({ navigation }) {
           <Text style={styles.gridText}>Valoración de actividades</Text>
         </TouchableOpacity>
       </View>
+      </View>
     </ImageBackground>
   );
 }
@@ -52,25 +48,29 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  backIcon: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 1,
+  container: {
+    flex: 1,
+    paddingTop: 50, 
+    paddingHorizontal: 20, 
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   headerText: {
-    fontSize: 28, 
+    fontSize: 28,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 20,
-    color: 'black',
+    color: '#000',
   },
   gridContainer: {
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    padding: 10,
+    justifyContent: 'space-evenly', 
+    alignItems: 'center',  
+    paddingVertical: 40,  
   },
   gridItem: {
     width: 150, 
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 80, 
   },
   gridText: {
     marginTop: 10,
