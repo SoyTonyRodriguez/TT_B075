@@ -8,12 +8,15 @@ import Login from "./pages/Login";
 import Registro from './pages/Registro'; 
 import HomeScreen from './pages/HomeScreen';
 import Projection from './pages/Projection';
+import KanbanBoard from './pages/KanbanBoard';
 import NewProjection from "./pages/NewProjection";
 import UnidadesPromocion from './pages/UnidadesPromocion';
 import Links from './pages/Links';
 import Documents from './pages/Documents';
 import Calendar from './pages/Calendar';
 import Account from './pages/Account';
+import Guia from './pages/Guia';
+import Convocatoria from "./pages/Convocatoria";
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
 import { Toaster } from "react-hot-toast";
@@ -49,7 +52,9 @@ function App() {
         <Route path="/account" element={<Account />} />
         <Route path="/new-projection" element={<NewProjection />} />
         <Route path="/unidades-promocion" element={<UnidadesPromocion />} />
-
+        <Route path="/Convocatoria" element={<Convocatoria/>}/>
+        <Route path="/Guia" element={<Guia/>}/>
+        <Route path="/KanbanBoard" element={<KanbanBoard/>}/>
       </Routes>
       <Footer />
       <Toaster />

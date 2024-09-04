@@ -82,21 +82,8 @@ function Login() {
           </Link>
         </div>
       </div>
-      <div className="text-center mt-10 text-black max-w-2xl mx-4">
-        <h3 className="text-xl font-bold mb-4">¿Por qué tener una cuenta?</h3>
-      </div>
-      <div className="max-w-4xl mx-4 text-black">
-        <p className="text-justify leading-relaxed">
-          El propósito de crear una cuenta en este sistema es para tener acceso a las funcionalidades,
-          un mejor control de la información y obtener un poco de ayuda extra para este proceso que 
-          puede llegar a ser muy pesado. Con una cuenta se podrá tener acceso a las funciones de creación 
-          de proyecciones para la promoción y acompañamiento; así como un puntaje aproximado de las unidades 
-          de promoción con base en esta proyección, reunión de documentos para este mismo proceso y recordatorios 
-          para no olvidar los puntos más importantes del proceso.
-        </p>
-      </div>
     </div>
   );
-}
+};
 
 export default Login;

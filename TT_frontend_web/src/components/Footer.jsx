@@ -2,7 +2,7 @@ import React from 'react';
 // 1B365D 003DA5
 function Footer() {
   return (
-    <footer className="relative bg-gradient-to-r from-blue-800 to-blue-500 text-white mt-10">
+    <footer className="relative bg-gradient-to-r from-blue-800 to-blue-500 text-white mt-0">
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <svg
           className="absolute bottom-0 w-full h-auto"
