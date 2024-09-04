@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Registro from './pages/Registro'; 
 import HomeScreen from './pages/HomeScreen';
 import Projection from './pages/Projection';
+import KanbanBoard from './pages/KanbanBoard';
 import NewProjection from "./pages/NewProjection";
 import UnidadesPromocion from './pages/UnidadesPromocion';
 import VerProyeccion from './pages/VerProyeccion';
@@ -15,9 +16,13 @@ import Links from './pages/Links';
 import Documents from './pages/Documents';
 import Calendar from './pages/Calendar';
 import Account from './pages/Account';
+import Guia from './pages/Guia';
+import Convocatoria from "./pages/Convocatoria";
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
 import { Toaster } from "react-hot-toast";
+
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -38,9 +43,10 @@ function App() {
         <Route path='/welcome' element={<MainContent className="flex-grow" />} />
         <Route path='/ConocerMas' element={<ConocerMas />} />
         <Route path='/Nosotros' element={<Nosotros />} />
-        <Route path="/Login" element={<Login/>} />
+        <Route path="/login" element={<Login/>} />
         <Route path="/Registro" element={<Registro/>} />
-        <Route path="/home" element={<HomeScreen />} />
+        {/* <Route path="/home" element={<HomeScreen />} /> */}
+        <Route path="/home" element={<ProtectedRoute component={HomeScreen} />} />
         <Route path="/projection" element={<Projection />} />
         <Route path="/links" element={<Links />} />
         <Route path="/documents" element={<Documents />} />
@@ -49,6 +55,9 @@ function App() {
         <Route path="/new-projection" element={<NewProjection />} />
         <Route path="/unidades-promocion" element={<UnidadesPromocion />} />
         <Route path="/observe-projection" element={<VerProyeccion />} />
+        <Route path="/Convocatoria" element={<Convocatoria/>}/>
+        <Route path="/Guia" element={<Guia/>}/>
+        <Route path="/KanbanBoard" element={<KanbanBoard/>}/>
 
       </Routes>
       <Footer />
