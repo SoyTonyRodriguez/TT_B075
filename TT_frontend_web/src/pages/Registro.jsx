@@ -31,7 +31,7 @@ const Registro = () => {
           await createAccount(accountData);
           toast.success('Cuenta creada exitosamente');
           reset();            // Reset form fields after successful submission
-          navigate('/home'); // Redirect to login or another page
+          navigate('/login'); // Redirect to login or another page
       } catch (error) {
         console.error('Error creating account:', error);
 

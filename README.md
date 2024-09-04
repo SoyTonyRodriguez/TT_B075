@@ -1,7 +1,35 @@
 # Instrucciones para configurar el TT
 
 ## **Tabla de contenido**
-[TOC]
+
+<!--ts-->
+* [Instrucciones para configurar el TT](#instrucciones-para-configurar-el-tt)
+   * [<strong>Tabla de contenido</strong>](#tabla-de-contenido)
+   * [Node js](#node-js)
+         * [Instalacion en windows](#instalacion-en-windows)
+         * [Instalacion en MacOS](#instalacion-en-macos)
+         * [Instalacion en Linux](#instalacion-en-linux)
+   * [Frontend WEB](#frontend-web)
+         * [Dependencias extras](#dependencias-extras)
+   * [Frontend Movil Android/iOS](#frontend-movil-androidios)
+      * [Ejecutar en Android/iOS](#ejecutar-en-androidios)
+         * [Android](#android)
+            * [NOTA](#nota)
+         * [iOS](#ios)
+      * [Ejecución Web](#ejecución-web)
+      * [Ejecucion en <a href="https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&amp;device=simulated" rel="nofollow">emulador android/iOS</a>](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&amp;device=simulated)
+   * [Backend](#backend)
+      * [Instalacion de dependencias](#instalacion-de-dependencias)
+      * [Instalación de mongo](#instalación-de-mongo)
+         * [Windows](#windows)
+         * [Linux (Fedora)](#linux-fedora)
+      * [Acceder a la base de datos](#acceder-a-la-base-de-datos)
+      * [Ejecución del proyecto](#ejecución-del-proyecto)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: antonio, at: Wed Aug 21 11:23:32 PM CST 2024 -->
+
+<!--te-->
 
 ## Node js
 #### Instalacion en windows
@@ -124,3 +152,72 @@ Ahora solo queda escanear el codigo QR para poder visualizar la aplicación en e
 Para poder ejecutar el proyecto en una version web podemos acceder al link del localhost generada en la terminal
 
 ### Ejecucion en [emulador android/iOS](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=simulated)
+
+## Backend
+
+**Para configurar el backend se debera tener python instalado**
+
+En la carpeta principal del repositorio crear un entorno virtual
+```shell
+python3 -m venv env
+```
+
+Se creará una carpeta con el nombre **env/**
+Para activar el entorno virtual se debera ejecutar el siguiente comando
+```shell
+source env/bin/activate
+```
+
+Sabremos que estamos en el entorno virtual debido a que el prompt de la terminal cambiará, y se mostrara el nombre de la carpeta o el del entorno virtual dependiendo el S.O
+
+![terminal_prompt](./images/terminal_prompt.png)
+
+### Instalacion de dependencias
+
+Para instalar los dependencias se deberá ejecutar el siguiente comando, dentro de la carpeta **TT_Backend/**
+
+```shell
+pip install -r requirements.txt
+```
+
+Este comando instalará en automatico django y todo lo relacionado a ello, para solo proceder a ejecutar el servidor
+
+### Instalación de mongo
+#### Windows 
+Descargar la version correspondiente a windows de [MongoDB Community Server](https://www.mongodb.com/try/download/community)
+
+#### Linux (Fedora)
+
+```shell
+sudo dnf install -y mongodb-org mongodb-mongosh-shared-openssl3
+systemctl start mongod
+mongosh --version
+
+```
+
+Despues de ejecutar los comandos anteriores con exito instalar [mongodb compas](https://www.mongodb.com/docs/compass/current/install/)
+
+**En windows esté se instalara por defecto al terminar la instalación de MongoDB Community Server**
+
+### Acceder a la base de datos
+
+Ingresar la siguiente conexion en mongo db compass, con los datos correspondientes de cada usuario
+
+```shell
+mongodb+srv://<user>:<password>@clustertt.txd45.mongodb.net/
+```
+
+![monog-compas](./images/mongo-compass.png)
+
+### Ejecución del proyecto
+
+Ejecutar el siguiente comando y hacer clic sobre la URL proporcionada
+
+```shell
+python manage.py runserver
+```
+
+![django_runserver](./images/django_runserver.png)
+
+Acceder a la siguiente URL dentro del navegador
+http://127.0.0.1:8000/api/v1/
