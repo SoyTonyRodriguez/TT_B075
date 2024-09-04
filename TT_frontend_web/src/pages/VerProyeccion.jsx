@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Guia from '../img/guia.png';
 import Links from '../img/enlace.png';
 import Documents from '../img/documentos.png';
 import Calendar from '../img/calendario.png';
 import Account from '../img/miPerfil.png';
-import CrearProyeccion from '../img/editardocumento.png';
-import VerProyeccion from '../img/binoculares.png';
 import MenuIcon from '../img/menu-icon.png'; // Icono para el botón compacto
 
-function ProyeccionSeguimiento() {
+// Importa los componentes del tablero Kanban
+import Board from '../components/Board';
+
+function VerProyeccion() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -22,7 +22,7 @@ function ProyeccionSeguimiento() {
       {/* Navegación Secundaria */}
       <div className="p-4 flex justify-between items-center">
         {/* Título y Menú Secundario */}
-        <h2 className="text-2xl md:text-3xl font-bold mb-0">Proyección y seguimiento</h2>
+        <h2 className="text-2xl md:text-3xl font-bold mb-0">Mi proyección</h2>
 
         {/* Botones normales en pantallas grandes, botón compacto en pantallas pequeñas */}
         <div className="hidden md:flex space-x-4">
@@ -82,25 +82,12 @@ function ProyeccionSeguimiento() {
       {/* Línea de separación */}
       <hr className="border-t-2 border-black my-4" />
 
-      {/* Contenido Principal */}
-      <div className="container mx-auto mt-8">
-        <div className="flex justify-center space-x-8">
-          <Link to="/new-projection" className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
-            <img src={CrearProyeccion} alt="Crear proyección" className="mb-4 w-20 h-20" />
-            <p className="text-center text-lg font-semibold">Crear proyección</p>
-          </Link>
-          <Link to="/observe-projection" className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
-            <img src={VerProyeccion} alt="Ver mi proyección" className="mb-4 w-20 h-20" />
-            <p className="text-center text-lg font-semibold">Ver mi proyección</p>
-          </Link>
-          <Link to="/guide" className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
-            <img src={Guia} alt="Guía" className="mb-4 w-20 h-20" />
-            <p className="text-center text-lg font-semibold">Guía</p>
-          </Link>
-        </div>
+      {/* Tablero Kanban */}
+      <div className="p-4">
+        <Board />
       </div>
     </div>
   );
 }
 
-export default ProyeccionSeguimiento;
+export default VerProyeccion;

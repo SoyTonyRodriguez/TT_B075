@@ -10,12 +10,14 @@ import HomeScreen from './pages/HomeScreen';
 import Projection from './pages/Projection';
 import NewProjection from "./pages/NewProjection";
 import UnidadesPromocion from './pages/UnidadesPromocion';
+import VerProyeccion from './pages/VerProyeccion';
 import Links from './pages/Links';
 import Documents from './pages/Documents';
 import Calendar from './pages/Calendar';
 import Account from './pages/Account';
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -46,9 +48,11 @@ function App() {
         <Route path="/account" element={<Account />} />
         <Route path="/new-projection" element={<NewProjection />} />
         <Route path="/unidades-promocion" element={<UnidadesPromocion />} />
+        <Route path="/observe-projection" element={<VerProyeccion />} />
 
       </Routes>
       <Footer />
+      <Toaster />
     </div>
     </BrowserRouter>
   );
