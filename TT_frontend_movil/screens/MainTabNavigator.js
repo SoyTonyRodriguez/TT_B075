@@ -29,6 +29,7 @@ export default function MainTabNavigator() {
             iconName = focused ? 'person' : 'person-outline';
           }
 
+
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: 'blue',
@@ -42,6 +43,7 @@ export default function MainTabNavigator() {
       <Tab.Screen name="Projection" component={ProjectionScreen} options={{ tabBarLabel: 'Proyección' }} />
       {/* Aquí se usa el nuevo Stack Navigator para Profile */}
       <Tab.Screen name="Profile" component={ProfileStackNavigator} options={{ tabBarLabel: 'Perfil' }} />
+
     </Tab.Navigator>
   );
 }
