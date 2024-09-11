@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';  
+import { useNavigation } from '@react-navigation/native';
 
 const ProjectionScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <ImageBackground 
       source={require('../assets/images/fondo.jpg')}  
@@ -18,7 +21,9 @@ const ProjectionScreen = () => {
       {/* Contenido de la pantalla */}
       <View style={styles.gridContainer}>
         {/* Opción Crear Proyección */}
-        <TouchableOpacity style={styles.row}>
+        <TouchableOpacity style={styles.row}
+          onPress={() => navigation.navigate('ProjectionCreationScreen')}
+          >
           <View style={styles.iconContainer}>
             <Ionicons name="pencil-outline" size={50} color="#fff" />
           </View>
