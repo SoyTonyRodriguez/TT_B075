@@ -38,7 +38,9 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={styles.gridText}>Nuestro proyecto</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem}
+          onPress={() => navigation.navigate('ConvocatoriaScreen')}
+        >
           <Ionicons name="megaphone-outline" size={40} color="#fff" />
           <Text style={styles.gridText}>Convocatoria</Text>
         </TouchableOpacity>

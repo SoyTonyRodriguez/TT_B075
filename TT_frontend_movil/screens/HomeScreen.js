@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { View, Text, Image, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   return (
     <ImageBackground 
       source={require('../assets/images/fondo.jpg')} 
@@ -14,23 +14,56 @@ const HomeScreen = () => {
           <Ionicons name="home" size={40} color="black" style={styles.homeIcon}/>
       </View>
 
-      <View style={styles.contentContainer}>
-        <View style={styles.imageContainer}>
-          <Image 
-            source={require('../assets/images/ipn-main.webp')}
-            style={styles.image}
-          />
-          <Text style={styles.imageText}>Promoción docente en el Instituto Politécnico Nacional</Text>
-        </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('News1Screen')}>
+          <View style={styles.imageContainer}>
+            <Image 
+              source={require('../assets/images/ipn-main.webp')}
+              style={styles.image}
+            />
+            <Text style={styles.imageText}>Promoción docente en el Instituto Politécnico Nacional.</Text>
+          </View>
+        </TouchableOpacity>
 
-        <View style={styles.imageContainer}>
-          <Image 
-            source={require('../assets/images/sistema.jpg')}
-            style={styles.image}
-          />
-          <Text style={styles.imageText}>Sobre este sistema</Text>
-        </View>
-      </View>
+        <TouchableOpacity onPress={() => navigation.navigate('News5Screen')}>
+          <View style={styles.imageContainer}>
+            <Image 
+              source={require('../assets/images/convo_2.jpg')}
+              style={styles.image}
+            />
+            <Text style={styles.imageText}>Nacimiento de la promoción docente.</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate('News2Screen')}>
+          <View style={styles.imageContainer}>
+            <Image 
+              source={require('../assets/images/sistema.jpg')}
+              style={styles.image}
+            />
+            <Text style={styles.imageText}>¡Da el siguiente paso en tu carrera!</Text>
+          </View>
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => navigation.navigate('News3Screen')}>
+          <View style={styles.imageContainer}>
+            <Image 
+              source={require('../assets/images/sistema.jpg')}
+              style={styles.image}
+            />
+            <Text style={styles.imageText}>Sobre este sistema.</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('News4Screen')}>
+          <View style={styles.imageContainer}>
+            <Image 
+              source={require('../assets/images/main_3.jpg')}
+              style={styles.image}
+            />
+            <Text style={styles.imageText}>Visita la plataforma oficial.</Text>
+          </View>
+        </TouchableOpacity>
+      </ScrollView>
     </ImageBackground>
   );
 };
@@ -57,9 +90,7 @@ const styles = StyleSheet.create({
   homeIcon: {
     marginLeft: 10,
   },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  scrollContainer: {
     paddingHorizontal: 16,
   },
   imageContainer: {

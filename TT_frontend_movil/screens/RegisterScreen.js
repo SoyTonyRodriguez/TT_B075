@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, ImageBackground, TouchableOpacity, Modal, FlatList, StyleSheet } from "react-native";
+import { View, Text, TextInput, ImageBackground, TouchableOpacity, Modal, FlatList } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import tw from 'twrnc'; // Importamos twrnc para usar Tailwind
 
 const RegisterScreen = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -52,56 +53,62 @@ const RegisterScreen = () => {
   return (
     <ImageBackground 
       source={require('../assets/images/fondologin.jpg')} 
-      style={styles.background}
+      style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Regístrate</Text>
-          <Ionicons name="person-outline" size={24} color="black" style={{ marginLeft: 5 }} />
-        </View>
-        <Text style={styles.subtitle}>Introduce los datos solicitados</Text>
+      <View style={tw`flex-1 justify-center px-5`}>
 
+        {/* Header */}
+        <View style={tw`absolute top-10 left-5`}>
+          <View style={tw`flex-row items-center`}>
+            <Text style={tw`text-2xl font-bold text-black`}>Regístrate</Text>
+            <Ionicons name="person-outline" size={30} color="black" style={tw`ml-2`} />
+          </View>
+          <Text style={tw`text-lg text-gray-500 mt-2`}>Introduce los datos solicitados</Text>
+          <View style={tw`h-0.5 bg-black mt-3 mb-5`} />
+        </View>
+
+        {/* Form Fields */}
         <TextInput 
           placeholder="Ingresa tu nombre completo"
-          style={styles.input}
+          style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
           onChangeText={(value) => handleInputChange('name', value)}
         />
 
         <TextInput 
           placeholder="Ingresa tu correo electrónico"
-          style={styles.input}
+          style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
           keyboardType="email-address"
           onChangeText={(value) => handleInputChange('email', value)}
         />
 
-        <TouchableOpacity onPress={() => setCategoryModalVisible(true)} style={styles.input}>
-          <Text style={{ color: form.category ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0.8)" }}>
+        <TouchableOpacity onPress={() => setCategoryModalVisible(true)} style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 flex-row justify-between items-center`}>
+          <Text style={tw`${form.category ? "text-black" : "text-gray-500"}`}>
             {form.category || "Selecciona tu categoría"}
           </Text>
-          <Ionicons name="chevron-down" size={24} color="rgba(0, 0, 0, 0.8)" style={styles.iconRight} />
+          <Ionicons name="chevron-down" size={24} color="rgba(0, 0, 0, 0.8)" />
         </TouchableOpacity>
 
         <TextInput 
           placeholder="Ingresa tu número de empleado"
-          style={styles.input}
+          style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
           keyboardType="numeric"
           onChangeText={(value) => handleInputChange('employeeNumber', value)}
         />
 
-        <View style={styles.inputContainer}>
+        <View style={tw`relative w-full mb-3`}>
           <TextInput 
             placeholder="Contraseña"
-            style={styles.input}
+            style={tw`w-full p-4 border border-gray-700 rounded-lg text-base bg-transparent text-black`}
             placeholderTextColor="rgba(0, 0, 0, 0.8)"
             secureTextEntry={!passwordVisible}
             onChangeText={(value) => handleInputChange('password', value)}
           />
           <TouchableOpacity 
-            style={styles.iconContainer} 
+            style={tw`absolute right-4 top-4`} 
             onPress={() => setPasswordVisible(!passwordVisible)}
           >
             <Ionicons 
@@ -112,16 +119,16 @@ const RegisterScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.inputContainer}>
+        <View style={tw`relative w-full mb-5`}>
           <TextInput 
             placeholder="Confirma tu contraseña"
-            style={styles.input}
+            style={tw`w-full p-4 border border-gray-700 rounded-lg text-base bg-transparent text-black`}
             placeholderTextColor="rgba(0, 0, 0, 0.8)"
             secureTextEntry={!confirmPasswordVisible}
             onChangeText={(value) => handleInputChange('confirmPassword', value)}
           />
           <TouchableOpacity 
-            style={styles.iconContainer} 
+            style={tw`absolute right-4 top-4`} 
             onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
           >
             <Ionicons 
@@ -133,30 +140,31 @@ const RegisterScreen = () => {
         </View>
 
         <TouchableOpacity 
-          style={styles.button}
+          style={tw`bg-[#003366] p-4 rounded-lg items-center mt-8 mb-10`}
           onPress={handleRegister}
         >
-          <Text style={styles.buttonText}>Ingresar</Text>
+          <Text style={tw`text-white font-bold text-lg`}>Ingresar</Text>
         </TouchableOpacity>
 
+        {/* Modal */}
         <Modal
           visible={categoryModalVisible}
           transparent={true}
           animationType="slide"
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
+          <View style={tw`flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]`}>
+            <View style={tw`w-4/5 bg-white rounded-lg p-5`}>
               <FlatList 
                 data={categories}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
-                  <TouchableOpacity style={styles.modalItem} onPress={() => selectCategory(item)}>
+                  <TouchableOpacity style={tw`py-3 border-b border-gray-300`} onPress={() => selectCategory(item)}>
                     <Text>{item}</Text>
                   </TouchableOpacity>
                 )}
               />
-              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setCategoryModalVisible(false)}>
-                <Text style={styles.modalCloseText}>Cerrar</Text>
+              <TouchableOpacity style={tw`mt-5 items-center`} onPress={() => setCategoryModalVisible(false)}>
+                <Text style={tw`text-blue-700 text-base`}>Cerrar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -166,100 +174,5 @@ const RegisterScreen = () => {
     </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: '100%',
-    height: '100%'
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  header: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'black',
-    marginRight: 10
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#000',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    padding: 15,
-    borderColor: 'rgba(0, 0, 0, 0.8)',
-    borderWidth: 1,
-    borderRadius: 8,
-    fontSize: 16,
-    marginBottom: 10,
-    backgroundColor: 'transparent', 
-    color: 'rgba(0, 0, 0, 0.8)'
-  },
-  inputContainer: {
-    position: 'relative',
-    width: '100%',
-    marginBottom: 10
-  },
-  iconContainer: {
-    position: 'absolute',
-    right: 15,
-    top: 15
-  },
-  iconRight: {
-    position: 'absolute',
-    right: 15,
-    top: 15
-  },
-  button: {
-    backgroundColor: '#1E40AF',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 80, 
-    marginTop: 40,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold'
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 20
-  },
-  modalItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc'
-  },
-  modalCloseButton: {
-    marginTop: 20,
-    alignItems: 'center'
-  },
-  modalCloseText: {
-    color: 'blue',
-    fontSize: 16
-  }
-});
 
 export default RegisterScreen;

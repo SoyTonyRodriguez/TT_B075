@@ -5,6 +5,7 @@ import SettingsScreen from './SettingsScreen';
 import OfficialLinksScreen from './OfficialLinksScreen';
 import MoreInfoScreen from './MoreInfoScreen';
 import ProjectScreen from './ProjectScreen';
+import ConvocatoriaScreen from './ConvocatoriaScreen';
 
 const ProfileStack = createStackNavigator();
 
@@ -13,7 +14,7 @@ export default function ProfileStackNavigator() {
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
       {/* Pantalla de Perfil */}
       <ProfileStack.Screen 
-        name="Profile" 
+        name="UserProfile" 
         component={ProfileScreen} 
       />
       {/* Pantalla de Configuración */}
@@ -31,6 +32,12 @@ export default function ProfileStackNavigator() {
         name="MoreInfo" 
         component={MoreInfoScreen} 
       />
+
+      <ProfileStack.Screen 
+        name="ConvocatoriaScreen" 
+        component={ConvocatoriaScreen} 
+      />
+
       <ProfileStack.Screen 
         name="ProjectScreen" 
         component={ProjectScreen} 
