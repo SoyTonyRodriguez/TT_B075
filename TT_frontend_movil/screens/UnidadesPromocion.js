@@ -68,15 +68,18 @@ const CrearProyeccionScreen = () => {
 
   const handleActividadChange = (value) => {
     setActividad(value);
-    const actividadInfo = actividadesPorFuncion[funcion].find(item => item.actividad === value);
-    if (actividadInfo) {
-      setDocumentoRequerido(actividadInfo.documento);
-      setUp(actividadInfo.up.toString());
-    } else {
-      setDocumentoRequerido('');
-      setUp('');
+    if (funcion && actividadesPorFuncion[funcion]) {
+      const actividadInfo = actividadesPorFuncion[funcion].find(item => item.actividad === value);
+      if (actividadInfo) {
+        setDocumentoRequerido(actividadInfo.documento);
+        setUp(actividadInfo.up.toString());
+      } else {
+        setDocumentoRequerido('');
+        setUp('');
+      }
     }
   };
+  
 
   const getColorForPriority = (priority) => {
     switch (priority) {
@@ -125,9 +128,13 @@ const CrearProyeccionScreen = () => {
           enabled={!!funcion}
         >
           <Picker.Item label="Selecciona una actividad" value="" />
-          {funcion && actividadesPorFuncion[funcion].map((item, index) => (
-            <Picker.Item key={index} label={item.actividad} value={item.actividad} />
-          ))}
+          {funcion && actividadesPorFuncion[funcion]?.length > 0 ? (
+            actividadesPorFuncion[funcion].map((item, index) => (
+              <Picker.Item key={index} label={item.actividad} value={item.actividad} />
+            ))
+          ) : (
+            <Picker.Item label="No hay actividades" value="" />
+          )}
         </Picker>
 
         {/* Fecha Proyectada */}

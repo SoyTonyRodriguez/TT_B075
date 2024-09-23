@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';  
 import { useNavigation } from '@react-navigation/native';
+import tw from 'twrnc'; 
 
 const ProjectionScreen = () => {
   const navigation = useNavigation();
@@ -9,49 +10,56 @@ const ProjectionScreen = () => {
   return (
     <ImageBackground 
       source={require('../assets/images/fondo.jpg')}  
-      style={styles.backgroundImage}
+      style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
       {/* Encabezado */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Proyección y seguimiento</Text>
-        <Ionicons name="eye-outline" size={40} color="#000" style={styles.eyeIcon} />
+      <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
+        <Text style={tw`text-2xl font-bold text-black`}>Proyección y seguimiento</Text>
+        <Ionicons name="eye-outline" size={40} color="#000" style={tw`ml-2`} />
       </View>
 
       {/* Contenido de la pantalla */}
-      <View style={styles.gridContainer}>
+      <View style={tw`flex-1 justify-evenly px-2`}>
         {/* Opción Crear Proyección */}
-        <TouchableOpacity style={styles.row}
+        <TouchableOpacity 
+          style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-10 h-40`}
           onPress={() => navigation.navigate('ProjectionCreationScreen')}
-          >
-          <View style={styles.iconContainer}>
+        >
+          <View style={tw`w-25 h-25 justify-center items-center bg-blue-500 rounded-3xl mr-5`}>
             <Ionicons name="pencil-outline" size={50} color="#fff" />
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.gridText}>Crear proyección</Text>
-            <Text style={styles.gridDescription}>Inicia una proyección en cualquiera de las dos modalidades disponibles</Text>
+          <View style={tw`flex-1`}>
+            <Text style={tw`text-2xl text-white font-bold`}>Crear proyección</Text>
+            <Text style={tw`mt-2 text-lg text-white`}>
+              Inicia una proyección en cualquiera de las dos modalidades disponibles
+            </Text>
           </View>
         </TouchableOpacity>
 
         {/* Opción Ver mi Proyección */}
-        <TouchableOpacity style={styles.row}>
-          <View style={styles.iconContainer}>
+        <TouchableOpacity style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-10 h-40`}>
+          <View style={tw`w-25 h-25 justify-center items-center bg-blue-500 rounded-3xl mr-5`}>
             <Ionicons name="glasses-outline" size={50} color="#fff" />
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.gridText}>Ver mi proyección</Text>
-            <Text style={styles.gridDescription}>Ve todos los detalles de tu proyección actual</Text>
+          <View style={tw`flex-1`}>
+            <Text style={tw`text-2xl text-white font-bold`}>Ver mi proyección</Text>
+            <Text style={tw`mt-2 text-lg text-white`}>
+              Ve todos los detalles de tu proyección actual
+            </Text>
           </View>
         </TouchableOpacity>
 
         {/* Opción Guía */}
-        <TouchableOpacity style={styles.row}>
-          <View style={styles.iconContainer}>
+        <TouchableOpacity style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-10 h-40`}>
+          <View style={tw`w-25 h-25 justify-center items-center bg-blue-500 rounded-3xl mr-5`}>
             <Ionicons name="help-circle-outline" size={50} color="#fff" />
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.gridText}>Guía</Text>
-            <Text style={styles.gridDescription}>¿No sabes cómo iniciar una proyección? Consulta nuestra guía.</Text>
+          <View style={tw`flex-1`}>
+            <Text style={tw`text-2xl text-white font-bold`}>Guía</Text>
+            <Text style={tw`mt-2 text-lg text-white`}>
+              ¿No sabes cómo iniciar una proyección? Consulta nuestra guía.
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -59,64 +67,6 @@ const ProjectionScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',  
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  eyeIcon: {
-    marginLeft: 10,
-  },
-  gridContainer: {
-    flex: 1,
-    justifyContent: 'space-evenly', 
-    paddingHorizontal: 10,  
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',  
-    borderRadius: 20,
-    paddingHorizontal: 40,  
-    height: 160,  
-  },
-  iconContainer: {
-    width: 100,  
-    height: 100, 
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#4A90E2',
-    borderRadius: 20,
-    marginRight: 20,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  gridText: {
-    fontSize: 23,  
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  gridDescription: {
-    marginTop: 8,
-    fontSize: 16,
-    color: '#fff',
-  },
-});
-
 export default ProjectionScreen;
+
 

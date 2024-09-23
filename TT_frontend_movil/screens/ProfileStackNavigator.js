@@ -6,6 +6,9 @@ import OfficialLinksScreen from './OfficialLinksScreen';
 import MoreInfoScreen from './MoreInfoScreen';
 import ProjectScreen from './ProjectScreen';
 import ConvocatoriaScreen from './ConvocatoriaScreen';
+import EditProfileScreen from './EditProfileScreen';
+import PrivacyScreen from './PrivacyScreen';
+import NotificationScreen from './NotificationScreen';
 
 const ProfileStack = createStackNavigator();
 
@@ -21,6 +24,11 @@ export default function ProfileStackNavigator() {
       <ProfileStack.Screen 
         name="Settings" 
         component={SettingsScreen} 
+      />
+
+      <ProfileStack.Screen 
+        name="EditProfileScreen" 
+        component={EditProfileScreen} 
       />
 
       <ProfileStack.Screen 
@@ -41,6 +49,16 @@ export default function ProfileStackNavigator() {
       <ProfileStack.Screen 
         name="ProjectScreen" 
         component={ProjectScreen} 
+      />
+
+      <ProfileStack.Screen 
+        name="PrivacyScreen" 
+        component={PrivacyScreen} 
+      />
+
+      <ProfileStack.Screen 
+        name="NotificationScreen" 
+        component={NotificationScreen} 
       />
 
     </ProfileStack.Navigator>
