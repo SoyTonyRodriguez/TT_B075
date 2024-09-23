@@ -1,72 +1,81 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import tw from 'twrnc'; 
 
 const MoreInfoScreen = ({ navigation }) => {
   return (
     <ImageBackground
       source={require('../assets/images/fondo.jpg')}  
-      style={styles.backgroundImage}
+      style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Más información</Text>
-          <Ionicons name="information-circle-outline" size={40} color="#000" style={styles.icon} />
+      <View style={tw`flex-1 pt-12 px-5`}>
+        <View style={tw`flex-row justify-between items-center mb-5`}>
+          <Text style={tw`text-2xl font-bold text-black`}>Más información</Text>
+          <Ionicons name="information-circle-outline" size={40} color="#000" style={tw`mr-2`} />
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/* First card */}
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.card}>
-              <Text style={styles.cardTitle}>Noticia</Text>
-              <Text style={styles.cardSubtitle}>Mario Barbosa</Text>
+        <ScrollView contentContainerStyle={tw`pb-5`}>
+          {/* Primera tarjeta */}
+          <View style={tw`flex-row justify-between mb-5`}>
+            <TouchableOpacity style={tw`w-42 h-38 bg-blue-900 rounded-3xl justify-center items-center`}>
+              <Text style={tw`text-lg font-bold text-white text-center`}>Noticia</Text>
+              <Text style={tw`text-sm text-gray-400 text-center`}>Mario Barbosa</Text>
             </TouchableOpacity>
-            <View style={styles.infoBox}>
-              <Text style={styles.infoText}>¿Conoces las condiciones para que acepten tu promoción?</Text>
+            <View style={tw`w-42 h-38 bg-teal-100 border border-teal-600 rounded-3xl justify-center items-center`}>
+              <Text style={tw`text-base text-teal-800 text-center mb-3`}>
+                ¿Conoces las condiciones para que acepten tu promoción?
+              </Text>
               <TouchableOpacity>
-                <Text style={styles.readMore}>Leer →</Text>
+                <Text style={tw`text-sm text-teal-800 underline text-center`}>Leer →</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Second card */}
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.card}>
-              <Text style={styles.cardTitle}>Noticia</Text>
+          {/* Segunda tarjeta */}
+          <View style={tw`flex-row justify-between mb-5`}>
+            <TouchableOpacity style={tw`w-42 h-38 bg-blue-900 rounded-3xl justify-center items-center`}>
+              <Text style={tw`text-lg font-bold text-white text-center`}>Noticia</Text>
             </TouchableOpacity>
-            <View style={styles.infoBox}>
-              <Text style={styles.infoText}>¿Sabes las condiciones sobre tutorados para ser válidas?</Text>
+            <View style={tw`w-42 h-38 bg-teal-100 border border-teal-600 rounded-3xl justify-center items-center`}>
+              <Text style={tw`text-base text-teal-800 text-center mb-3`}>
+                ¿Sabes las condiciones sobre tutorados para ser válidas?
+              </Text>
               <TouchableOpacity>
-                <Text style={styles.readMore}>Leer →</Text>
+                <Text style={tw`text-sm text-teal-800 underline text-center`}>Leer →</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Third card */}
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.card}>
-              <Text style={styles.cardTitle}>Artículo</Text>
-              <Text style={styles.cardSubtitle}>Liferay</Text>
+          {/* Tercera tarjeta */}
+          <View style={tw`flex-row justify-between mb-5`}>
+            <TouchableOpacity style={tw`w-42 h-38 bg-blue-900 rounded-3xl justify-center items-center`}>
+              <Text style={tw`text-lg font-bold text-white text-center`}>Artículo</Text>
+              <Text style={tw`text-sm text-gray-400 text-center`}>Liferay</Text>
             </TouchableOpacity>
-            <View style={styles.infoBox}>
-              <Text style={styles.infoText}>Docentes aceptados durante los procesos de años anteriores</Text>
+            <View style={tw`w-42 h-38 bg-teal-100 border border-teal-600 rounded-3xl justify-center items-center`}>
+              <Text style={tw`text-base text-teal-800 text-center mb-3`}>
+                Docentes aceptados durante los procesos de años anteriores
+              </Text>
               <TouchableOpacity>
-                <Text style={styles.readMore}>Leer →</Text>
+                <Text style={tw`text-sm text-teal-800 underline text-center`}>Leer →</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Fourth card */}
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.card}>
-              <Text style={styles.cardTitle}>Base</Text>
-              <Text style={styles.cardSubtitle}>Alianza</Text>
+          {/* Cuarta tarjeta */}
+          <View style={tw`flex-row justify-between mb-5`}>
+            <TouchableOpacity style={tw`w-42 h-38 bg-blue-900 rounded-3xl justify-center items-center`}>
+              <Text style={tw`text-lg font-bold text-white text-center`}>Base</Text>
+              <Text style={tw`text-sm text-gray-400 text-center`}>Alianza</Text>
             </TouchableOpacity>
-            <View style={styles.infoBox}>
-              <Text style={styles.infoText}>Reglamento de promoción docente</Text>
+            <View style={tw`w-42 h-38 bg-teal-100 border border-teal-600 rounded-3xl justify-center items-center`}>
+              <Text style={tw`text-base text-teal-800 text-center mb-3`}>
+                Reglamento de promoción docente
+              </Text>
               <TouchableOpacity>
-                <Text style={styles.readMore}>Leer →</Text>
+                <Text style={tw`text-sm text-teal-800 underline text-center`}>Leer →</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -75,81 +84,6 @@ const MoreInfoScreen = ({ navigation }) => {
     </ImageBackground>
   );
 };
-const styles = StyleSheet.create({
-    backgroundImage: {
-      flex: 1,
-      width: '100%',
-      height: '100%',
-    },
-    container: {
-      flex: 1,
-      paddingTop: 50, 
-      paddingHorizontal: 20, 
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    headerText: {
-      fontSize: 28,
-      fontWeight: 'bold',
-      color: '#000',
-    },
-    icon: {
-      marginRight: 10,
-    },
-    scrollContainer: {
-      paddingBottom: 20,
-    },
-    row: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 20,
-    },
-    card: {
-      width: 170,  
-      height: 150,
-      backgroundColor: '#003366',
-      borderRadius: 15,
-      justifyContent: 'center', 
-      alignItems: 'center', 
-    },
-    cardTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: '#fff',
-      textAlign: 'center',
-    },
-    cardSubtitle: {
-      fontSize: 14,
-      color: '#ccc',
-      textAlign: 'center',
-    },
-    infoBox: {
-      width: 170,   
-      height: 150, 
-      backgroundColor: '#e0f7fa',
-      borderColor: '#00838f',
-      borderWidth: 1,
-      borderRadius: 10,
-      justifyContent: 'center',  
-      alignItems: 'center',  
-    },
-    infoText: {
-      fontSize: 16,
-      color: '#006064',
-      textAlign: 'center',
-      marginBottom: 10,
-    },
-    readMore: {
-      fontSize: 14,
-      color: '#006064',
-      textDecorationLine: 'underline',
-      textAlign: 'center',
-    },
-  });
-  
-  export default MoreInfoScreen;
-  
+
+export default MoreInfoScreen;
+

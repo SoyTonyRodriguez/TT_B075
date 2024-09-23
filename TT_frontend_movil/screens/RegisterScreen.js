@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, ImageBackground, TouchableOpacity, Modal, FlatList } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import tw from 'twrnc'; // Importamos twrnc para usar Tailwind
+import tw from 'twrnc'; 
 
 const RegisterScreen = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);

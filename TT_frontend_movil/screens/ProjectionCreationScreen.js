@@ -1,33 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, ImageBackground, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import tw from 'twrnc';
 
-const ProjectionCreationScreen = ({ navigation }) => {  // Aquí agregamos 'navigation' como prop
+const ProjectionCreationScreen = ({ navigation }) => {
   return (
     <ImageBackground
       source={require('../assets/images/fondo.jpg')} 
-      style={styles.backgroundImage}
+      style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
       {/* Encabezado */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Crear proyección</Text>
-        <Ionicons name="eye-outline" size={40} color="#000" style={styles.eyeIcon} />
+      <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
+        <Text style={tw`text-2xl font-bold text-black`}>Crear proyección</Text>
+        <Ionicons name="eye-outline" size={40} color="#000" style={tw`ml-2`} />
       </View>
 
       {/* Contenido de la pantalla */}
-      <View style={styles.contentContainer}>
-        {/* Unidades de Promoción - Evento de clic para navegar */}
+      <View style={tw`flex-1 justify-center px-5`}>
+        {/* Unidades de Promoción */}
         <TouchableOpacity 
-          style={styles.optionContainer}
-          onPress={() => navigation.navigate('UnidadesPromocion')} // Usamos 'navigation' directamente
+          style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-5 py-7 mb-5`}
+          onPress={() => navigation.navigate('UnidadesPromocion')}
         >
-          <View style={styles.optionIcon}>
+          <View style={tw`mr-5 bg-blue-500 p-5 rounded-3xl`}>
             <Ionicons name="star-outline" size={50} color="#fff" />
           </View>
-          <View style={styles.optionTextContainer}>
-            <Text style={styles.optionTitle}>Unidades de promoción</Text>
-            <Text style={styles.optionDescription}>
+          <View style={tw`flex-1`}>
+            <Text style={tw`text-xl font-bold text-white`}>Unidades de promoción</Text>
+            <Text style={tw`mt-2 text-lg text-white`}>
               Las Unidades de Promoción (U.P.) son un sistema de reconocimiento al desempeño docente...
             </Text>
           </View>
@@ -35,15 +36,15 @@ const ProjectionCreationScreen = ({ navigation }) => {  // Aquí agregamos 'navi
 
         {/* Grado Académico */}
         <TouchableOpacity 
-          style={styles.optionContainer}
-          onPress={() => navigation.navigate('GradoAcademico')} // Usamos 'navigation' directamente
+          style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-5 py-7`}
+          onPress={() => navigation.navigate('GradoAcademico')}
         >
-          <View style={styles.optionIcon}>
+          <View style={tw`mr-5 bg-blue-500 p-5 rounded-3xl`}>
             <Ionicons name="school-outline" size={50} color="#fff" />
           </View>
-          <View style={styles.optionTextContainer}>
-            <Text style={styles.optionTitle}>Obtención de grado académico</Text>
-            <Text style={styles.optionDescription}>
+          <View style={tw`flex-1`}>
+            <Text style={tw`text-xl font-bold text-white`}>Obtención de grado académico</Text>
+            <Text style={tw`mt-2 text-lg text-white`}>
               La obtención del grado de maestro o doctor concede al académico la promoción al nivel superior...
             </Text>
           </View>
@@ -52,62 +53,5 @@ const ProjectionCreationScreen = ({ navigation }) => {  // Aquí agregamos 'navi
     </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  eyeIcon: {
-    marginLeft: 10,
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  optionContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 30,
-    marginBottom: 20,
-  },
-  optionIcon: {
-    marginRight: 20,
-    backgroundColor: '#4A90E2',
-    padding: 20,
-    borderRadius: 20,
-  },
-  optionTextContainer: {
-    flex: 1,
-  },
-  optionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  optionDescription: {
-    marginTop: 8,
-    fontSize: 16,
-    color: '#fff',
-  },
-});
 
 export default ProjectionCreationScreen;

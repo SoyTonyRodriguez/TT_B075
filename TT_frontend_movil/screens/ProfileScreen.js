@@ -1,113 +1,78 @@
 import * as React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';  
+import tw from 'twrnc'; 
 
 const ProfileScreen = ({ navigation }) => {
   return (
     <ImageBackground 
       source={require('../assets/images/fondo.jpg')} 
-      style={styles.backgroundImage}
+      style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
+      {/* Icono de configuración */}
+      <TouchableOpacity 
+        style={tw`absolute top-10 right-5 z-10`} 
+        onPress={() => navigation.navigate('Settings')}
+      >
+        <Ionicons name="settings-outline" size={40} color="#000" />
+      </TouchableOpacity>
 
-    <TouchableOpacity 
-      style={styles.settingsIcon} 
-      onPress={() => navigation.navigate('Settings')} // Navegar a la pantalla de Settings
-    >
-      <Ionicons name="settings-outline" size={40} color="#000" />
-    </TouchableOpacity>
-
-
-      <View style={styles.header}>
+      {/* Encabezado del perfil */}
+      <View style={tw`items-center mt-20 mb-5`}>
         <Ionicons name="person-circle-outline" size={100} color="#000" />
-        <Text style={styles.userName}>Usuario</Text>
+        <Text style={tw`text-2xl font-bold mt-3`}>Usuario</Text>
       </View>
 
-      <View style={styles.gridContainer}>
-        <TouchableOpacity style={styles.gridItem}
+      {/* Contenedor de botones en cuadrícula */}
+      <View style={tw`flex-1 flex-row flex-wrap justify-around p-2`}>
+        {/* Enlaces Oficiales */}
+        <TouchableOpacity 
+          style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-5`}
           onPress={() => navigation.navigate('OfficialLinksScreen')}
-         >
+        >
           <Ionicons name="link-outline" size={40} color="#fff" />
-          <Text style={styles.gridText}>Enlaces oficiales</Text>
+          <Text style={tw`mt-2 text-white text-center text-base`}>Enlaces oficiales</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.gridItem}
+        {/* Nuestro Proyecto */}
+        <TouchableOpacity 
+          style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-5`}
           onPress={() => navigation.navigate('ProjectScreen')}
         >
           <Ionicons name="people-outline" size={40} color="#fff" />
-          <Text style={styles.gridText}>Nuestro proyecto</Text>
+          <Text style={tw`mt-2 text-white text-center text-base`}>Nuestro proyecto</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.gridItem}
+        {/* Convocatoria */}
+        <TouchableOpacity 
+          style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-5`}
           onPress={() => navigation.navigate('ConvocatoriaScreen')}
         >
           <Ionicons name="megaphone-outline" size={40} color="#fff" />
-          <Text style={styles.gridText}>Convocatoria</Text>
+          <Text style={tw`mt-2 text-white text-center text-base`}>Convocatoria</Text>
         </TouchableOpacity>
 
+        {/* Más información */}
         <TouchableOpacity 
-          style={styles.gridItem} 
-          onPress={() => navigation.navigate('MoreInfo')} // Navigate to MoreInfoScreen
+          style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-5`}
+          onPress={() => navigation.navigate('MoreInfo')}
         >
           <Ionicons name="information-circle-outline" size={40} color="#fff" />
-          <Text style={styles.gridText}>Más información</Text>
+          <Text style={tw`mt-2 text-white text-center text-base`}>Más información</Text>
         </TouchableOpacity>
 
-
-        <TouchableOpacity style={styles.gridItem}>
+        {/* Cerrar sesión */}
+        <TouchableOpacity 
+          style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-5`}
+        >
           <Ionicons name="log-out-outline" size={40} color="#fff" />
-          <Text style={styles.gridText}>Cerrar sesión</Text>
+          <Text style={tw`mt-2 text-white text-center text-base`}>Cerrar sesión</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  settingsIcon: {
-    position: 'absolute',
-    top: 40,
-    right: 20,  
-    zIndex: 1,  
-  },
-  header: {
-    alignItems: 'center',
-    marginTop: 80, 
-    marginBottom: 20,
-  },
-  userName: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  gridContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    padding: 10,
-  },
-  gridItem: {
-    width: 150,
-    height: 150,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', 
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  gridText: {
-    marginTop: 10,
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-});
 
 export default ProfileScreen;
 
