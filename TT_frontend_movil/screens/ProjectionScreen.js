@@ -30,8 +30,8 @@ const ProjectionScreen = () => {
             <Ionicons name="pencil-outline" size={50} color="#fff" />
           </View>
           <View style={tw`flex-1`}>
-            <Text style={tw`text-2xl text-white font-bold`}>Crear proyección</Text>
-            <Text style={tw`mt-2 text-lg text-white`}>
+            <Text style={tw`text-2xl text-center text-white font-bold`}>Crear proyección</Text>
+            <Text style={tw`mt-2 text-lg text-justify text-white`}>
               Inicia una proyección en cualquiera de las dos modalidades disponibles
             </Text>
           </View>
@@ -43,21 +43,24 @@ const ProjectionScreen = () => {
             <Ionicons name="glasses-outline" size={50} color="#fff" />
           </View>
           <View style={tw`flex-1`}>
-            <Text style={tw`text-2xl text-white font-bold`}>Ver mi proyección</Text>
-            <Text style={tw`mt-2 text-lg text-white`}>
+            <Text style={tw`text-2xl text-center text-white font-bold`}>Ver mi proyección</Text>
+            <Text style={tw`mt-2 text-lg text-justify text-white`}>
               Ve todos los detalles de tu proyección actual
             </Text>
           </View>
         </TouchableOpacity>
 
         {/* Opción Guía */}
-        <TouchableOpacity style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-10 h-40`}>
+        <TouchableOpacity 
+          style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-10 h-40`}
+          onPress={() => navigation.navigate('GuideScreen')}  // Navegación a GuideScreen
+        >
           <View style={tw`w-25 h-25 justify-center items-center bg-blue-500 rounded-3xl mr-5`}>
             <Ionicons name="help-circle-outline" size={50} color="#fff" />
           </View>
           <View style={tw`flex-1`}>
-            <Text style={tw`text-2xl text-white font-bold`}>Guía</Text>
-            <Text style={tw`mt-2 text-lg text-white`}>
+            <Text style={tw`text-2xl text-center text-white font-bold`}>Guía</Text>
+            <Text style={tw`mt-2 text-lg text-justify text-white`}>
               ¿No sabes cómo iniciar una proyección? Consulta nuestra guía.
             </Text>
           </View>

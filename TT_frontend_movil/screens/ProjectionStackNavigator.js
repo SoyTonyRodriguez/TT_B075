@@ -3,6 +3,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import ProjectionScreen from './ProjectionScreen';  
 import ProjectionCreationScreen from './ProjectionCreationScreen';  
 import UnidadesPromocion from './UnidadesPromocion'
+import GradoAcademico from './GradoAcademico';
+import GuideScreen from './GuideScreen';
 
 const ProjectionStack = createStackNavigator();
 
@@ -25,6 +27,17 @@ const ProjectionStackNavigator = () => {
         name="UnidadesPromocion" 
         component={UnidadesPromocion} 
       />
+
+      <ProjectionStack.Screen 
+        name="GradoAcademico" 
+        component={GradoAcademico} 
+      />
+
+      <ProjectionStack.Screen 
+        name="GuideScreen" 
+        component={GuideScreen} 
+      />
+
     </ProjectionStack.Navigator>
   );
 };

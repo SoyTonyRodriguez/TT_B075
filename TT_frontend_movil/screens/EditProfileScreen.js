@@ -82,7 +82,7 @@ const EditProfileScreen = ({ navigation }) => {
       {/* ScrollView que solo incluye los campos y el botón */}
       <ScrollView contentContainerStyle={tw`p-5`}>
         {/* Campos de edición del perfil */}
-        <Text style={tw`text-lg font-bold text-black`}>Nombre</Text>
+        <Text style={tw`text-base font-bold text-black`}>Nombre</Text>
         <TextInput
           value={form.name}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
@@ -90,7 +90,7 @@ const EditProfileScreen = ({ navigation }) => {
           onChangeText={(value) => handleInputChange('name', value)}
         />
 
-        <Text style={tw`text-lg font-bold text-black`}>Email</Text>
+        <Text style={tw`text-base font-bold text-black`}>Email</Text>
         <TextInput
           value={form.email}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
@@ -98,7 +98,7 @@ const EditProfileScreen = ({ navigation }) => {
           onChangeText={(value) => handleInputChange('email', value)}
         />
 
-        <Text style={tw`text-lg font-bold text-black`}>Categoría</Text>
+        <Text style={tw`text-base font-bold text-black`}>Categoría</Text>
         <TextInput
           value={form.category}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
@@ -106,7 +106,7 @@ const EditProfileScreen = ({ navigation }) => {
           onChangeText={(value) => handleInputChange('category', value)}
         />
 
-        <Text style={tw`text-lg font-bold text-black`}>Número de empleado</Text>
+        <Text style={tw`text-base font-bold text-black`}>Número de empleado</Text>
         <TextInput
           value={form.employeeNumber}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
@@ -114,7 +114,7 @@ const EditProfileScreen = ({ navigation }) => {
           onChangeText={(value) => handleInputChange('employeeNumber', value)}
         />
 
-        <Text style={tw`text-lg font-bold text-black`}>Contraseña</Text>
+        <Text style={tw`text-base font-bold text-black`}>Contraseña</Text>
         <TextInput
           value={form.password}
           secureTextEntry
