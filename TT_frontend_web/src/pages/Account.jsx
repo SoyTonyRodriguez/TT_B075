@@ -206,5 +206,4 @@ function Profile() {
   );
 }
 
-export default Account;
 export default Profile;
