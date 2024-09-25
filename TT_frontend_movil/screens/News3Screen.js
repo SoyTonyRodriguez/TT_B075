@@ -15,32 +15,35 @@ const News1Screen = ({ navigation }) => {
       onPanResponderMove: (evt, gestureState) => {
         if (gestureState.dy > 0) {
           bounceAnim.setValue(gestureState.dy);
-          opacityAnim.setValue(1 - gestureState.dy / 300); 
+          opacityAnim.setValue(1 - gestureState.dy / 300);
         }
       },
       onPanResponderRelease: (evt, gestureState) => {
         if (gestureState.dy > 150) {
+          // Reducir la duración de la animación y el rebote
           Animated.parallel([
-            Animated.spring(bounceAnim, {
+            Animated.timing(bounceAnim, {
               toValue: 300,
+              duration: 20, // Duración reducida para cierre más rápido
               useNativeDriver: true,
             }),
             Animated.timing(opacityAnim, {
               toValue: 0,
-              duration: 300,
+              duration: 20, // Duración reducida para cierre más rápido
               useNativeDriver: true,
             }),
           ]).start(() => navigation.goBack());
         } else {
-          // Si no se desliza lo suficiente, regresa a su posición original
+          // Restaurar la animación sin rebote lento
           Animated.parallel([
             Animated.spring(bounceAnim, {
               toValue: 0,
               useNativeDriver: true,
+              speed: 50, // Aumentar la velocidad para que el rebote sea rápido
             }),
             Animated.timing(opacityAnim, {
               toValue: 1,
-              duration: 300,
+              duration: 200,
               useNativeDriver: true,
             }),
           ]).start();

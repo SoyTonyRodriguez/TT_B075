@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { View, Text, Image, Animated, PanResponder, Dimensions, ScrollView } from 'react-native';
 import tw from 'twrnc'; 
 
-const { height: screenHeight } = Dimensions.get('window'); // Obtiene la altura de la pantalla
+const { height: screenHeight } = Dimensions.get('window');
 
 const News1Screen = ({ navigation }) => {
   const bounceAnim = useRef(new Animated.Value(0)).current;
@@ -19,26 +19,30 @@ const News1Screen = ({ navigation }) => {
       },
       onPanResponderRelease: (evt, gestureState) => {
         if (gestureState.dy > 150) {
+          // Reducir la duración de la animación y el rebote
           Animated.parallel([
-            Animated.spring(bounceAnim, {
+            Animated.timing(bounceAnim, {
               toValue: 300,
+              duration: 20, // Duración reducida para cierre más rápido
               useNativeDriver: true,
             }),
             Animated.timing(opacityAnim, {
               toValue: 0,
-              duration: 300,
+              duration: 20, // Duración reducida para cierre más rápido
               useNativeDriver: true,
             }),
           ]).start(() => navigation.goBack());
         } else {
+          // Restaurar la animación sin rebote lento
           Animated.parallel([
             Animated.spring(bounceAnim, {
               toValue: 0,
               useNativeDriver: true,
+              speed: 50, // Aumentar la velocidad para que el rebote sea rápido
             }),
             Animated.timing(opacityAnim, {
               toValue: 1,
-              duration: 300,
+              duration: 200,
               useNativeDriver: true,
             }),
           ]).start();
@@ -84,4 +88,3 @@ const News1Screen = ({ navigation }) => {
 };
 
 export default News1Screen;
-
