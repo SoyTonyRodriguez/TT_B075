@@ -1,118 +1,91 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, Alert, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Notifications from 'expo-notifications'; // Para manejar permisos de notificaciones
+import tw from 'twrnc';
 
 export default function SettingsScreen({ navigation }) {
+  // Función para solicitar permisos de notificaciones
+  const askForNotificationPermission = async () => {
+    const { status } = await Notifications.getPermissionsAsync();  // Obtener permisos de notificación
+    if (status !== 'granted') {
+      const { status: newStatus } = await Notifications.requestPermissionsAsync();  // Solicitar permisos de notificación
+      if (newStatus !== 'granted') {
+        Alert.alert(
+          'Permiso Rechazado',
+          'No podrás recibir notificaciones si no activas los permisos.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+    }
+
+    // Si los permisos son concedidos, navega a la pantalla de notificaciones
+    navigation.navigate('NotificationScreen');
+  };
+
   return (
     <ImageBackground
       source={require('../assets/images/fondo.jpg')} 
-      style={styles.backgroundImage}
+      style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
-
-      <View style={styles.container}>
+      <View style={tw`flex-1 p-5`}>
         {/* Ícono de regresar */}
         <TouchableOpacity 
-          style={styles.backIcon} 
+          style={tw`absolute top-12 left-5 z-10`} 
           onPress={() => navigation.goBack()}
         >
           <Ionicons name="arrow-back-outline" size={30} color="black" />
         </TouchableOpacity>
 
         {/* Título */}
-        <Text style={styles.headerText}>Configuración</Text>
+        <Text style={tw`text-2xl font-bold text-center mt-5 mb-5 text-black`}>Configuración</Text>
 
-        {/* Título fuera del cuadro para la sección de cuenta */}
-        <Text style={styles.sectionTitle}>Cuenta</Text>
-        <View style={styles.section}>
-          <TouchableOpacity style={[styles.option, styles.border]}>
+        {/* sección de cuenta */}
+        <Text style={tw`text-lg font-bold mt-5 mb-2 text-black`}>Cuenta</Text>
+        <View style={tw`bg-[rgba(255,255,255,0.7)] rounded-xl py-2`}>
+          <TouchableOpacity 
+            style={tw`flex-row items-center py-3 px-2 border-b border-[rgba(0,0,0,0.2)]`} 
+            onPress={() => navigation.navigate('EditProfileScreen')} 
+          >
             <Ionicons name="person-outline" size={24} color="black" />
-            <Text style={styles.optionText}>Editar perfil</Text>
+            <Text style={tw`ml-2 text-black text-base`}>Editar perfil</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.option, styles.border]}>
-            <Ionicons name="shield-outline" size={24} color="black" />
-            <Text style={styles.optionText}>Seguridad</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.option, styles.border]}>
+
+          {/* Botón de Notificaciones */}
+          <TouchableOpacity 
+            style={tw`flex-row items-center py-3 px-2 border-b border-[rgba(0,0,0,0.2)]`}
+            onPress={askForNotificationPermission}  
+          >
             <Ionicons name="notifications-outline" size={24} color="black" />
-            <Text style={styles.optionText}>Notificaciones</Text>
+            <Text style={tw`ml-2 text-black text-base`}>Notificaciones</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.option}>
+
+          <TouchableOpacity 
+            style={tw`flex-row items-center py-3 px-2`} 
+            onPress={() => navigation.navigate('PrivacyScreen')} 
+          >
             <Ionicons name="lock-closed-outline" size={24} color="black" />
-            <Text style={styles.optionText}>Privacidad</Text>
+            <Text style={tw`ml-2 text-black text-base`}>Privacidad y seguridad</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Título fuera del cuadro para la sección de acciones */}
-        <Text style={styles.sectionTitle}>Acciones</Text>
-        <View style={styles.section}>
-          <TouchableOpacity style={[styles.option, styles.border]}>
-            <Ionicons name="flag-outline" size={24} color="black" />
-            <Text style={styles.optionText}>Reportar un problema</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.option, styles.border]}>
+        {/* sección de acciones */}
+        <Text style={tw`text-lg font-bold mt-5 mb-2 text-black`}>Acciones</Text>
+        <View style={tw`bg-[rgba(255,255,255,0.7)] rounded-xl py-2`}>
+          <TouchableOpacity style={tw`flex-row items-center py-3 px-2 border-b border-[rgba(0,0,0,0.2)]`}
+          // dejamos pendiente esto porque no se que tan conveniente sea tener dos perfiles 
+          >
             <Ionicons name="person-add-outline" size={24} color="black" />
-            <Text style={styles.optionText}>Añadir cuenta</Text>
+            <Text style={tw`ml-2 text-black text-base`}>Añadir cuenta</Text> 
           </TouchableOpacity>
-          <TouchableOpacity style={styles.option}>
+          <TouchableOpacity style={tw`flex-row items-center py-3 px-2`}>
             <Ionicons name="log-out-outline" size={24} color="black" />
-            <Text style={styles.optionText}>Cerrar sesión</Text>
+            <Text style={tw`ml-2 text-black text-base`}>Cerrar sesión</Text>
           </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>
   );
 }
-
-
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  backIcon: {
-    position: 'absolute', 
-    top: 45, 
-    left: 20, 
-  },
-  headerText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 20, 
-    marginBottom: 20,
-    color: 'black',
-  },
-  section: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    borderRadius: 20,
-    paddingVertical: 5,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    marginTop: 20,
-    color: 'black',
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-  },
-  optionText: {
-    fontSize: 16,
-    marginLeft: 10,
-    color: 'black',
-  },
-  border: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.2)', 
-  },
-});

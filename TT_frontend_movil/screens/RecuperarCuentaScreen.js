@@ -1,100 +1,82 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ImageBackground, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; 
+import { useNavigation } from '@react-navigation/native'; 
+import tw from 'twrnc'; // Importamos twrnc para usar Tailwind
 
-const RecuperarCuentaScreen = () => {
-  const [email, setEmail] = useState("");
+const ForgotPasswordScreen = () => {
+  const [email, setEmail] = useState('');
+  const navigation = useNavigation();
+
+  // Validación del correo
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  // Manejar la recuperación de contraseña
+  const handleRecover = () => {
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Por favor, introduce un correo electrónico válido');
+      return;
+    }
+
+    // Lógica placeholder para recuperación de contraseña
+    Alert.alert('Recuperación enviada', 'Se ha enviado un correo con instrucciones para restablecer tu contraseña.');
+    // Lógica para enviar la solicitud de recuperación (llamada a la API)
+  };
 
   return (
     <ImageBackground 
-      source={require('../assets/images/background.png')} 
-      style={styles.backgroundImage}
+      source={require('../assets/images/fondorecuperar.jpg')}
+      style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
-      <View style={styles.header}>
-        <Text style={styles.title}>Recupera tu cuenta</Text>
-        <Ionicons name="person-outline" size={28} color="black" style={{ marginLeft: 8 }} />
-      </View>
+      <View style={tw`flex-1 justify-center px-5`}>
+        {/* Sección del encabezado */}
+        <View style={tw`absolute top-10 left-5`}>
+          <View style={tw`flex-row items-center`}>
+            <Text style={tw`text-2xl font-bold text-black`}>Recupera tu cuenta</Text>
+            <Ionicons name="person-outline" size={30} color="black" style={tw`ml-2`} />
+          </View>
+          <Text style={tw`text-lg text-gray-500 mt-2`}>Introduce los datos solicitados</Text>
+          <View style={tw`h-0.5 bg-black mt-3 mb-5`} />
+        </View>
 
-      <View style={styles.content}>
-        <Text style={styles.instructions}>Introduce los datos solicitados</Text>
-        <View style={styles.line} />
+        {/* Campo de correo electrónico */}
         <TextInput 
           placeholder="Ingresa tu correo electrónico"
-          style={styles.input}
-          placeholderTextColor="#999"
-          keyboardType="email-address"
+          style={tw`w-full p-4 border border-gray-500 rounded mb-5 text-base bg-transparent text-black`}
+          placeholderTextColor="#555"
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
         />
-        <Text style={styles.instructions}>
+
+        {/* Texto informativo */}
+        <Text style={tw`text-center text-sm text-gray-500 mb-5`}>
           Te enviaremos un correo con indicaciones para restablecer tu contraseña
         </Text>
-        <TouchableOpacity style={styles.recoverButton}>
-          <Text style={styles.recoverButtonText}>Recuperar</Text>
+
+        {/* Botón de recuperar */}
+        <TouchableOpacity 
+          style={tw`bg-[#003366] p-4 rounded items-center mb-5`}
+          onPress={handleRecover}
+        >
+          <Text style={tw`text-white font-bold text-base`}>Recuperar</Text>
         </TouchableOpacity>
+
+        {/* Botón para volver a iniciar sesión */}
+        <TouchableOpacity 
+          style={tw`bg-gray-500 p-4 rounded items-center`}
+          onPress={() => navigation.navigate('Login')}
+        >
+          <Text style={tw`text-white font-bold text-base`}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+
       </View>
     </ImageBackground>
   );
 };
 
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    padding: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    marginTop: 60, 
-  },
-  instructions: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 10, 
-    textAlign: 'left',
-    width: '100%',
-  },
-  line: {
-    height: 1,
-    backgroundColor: '#003366',
-    marginBottom: 60, 
-  },
-  input: {
-    width: '100%',
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#003366', 
-    borderBottomWidth: 2,
-    borderRadius: 10,
-    marginBottom: 60,
-    fontSize: 16,
-    backgroundColor: 'transparent', 
-  },
-  recoverButton: {
-    backgroundColor: '#003366',
-    padding: 15,
-    borderRadius: 20,
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 60, 
-  },
-  recoverButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-});
-
-export default RecuperarCuentaScreen;
+export default ForgotPasswordScreen;

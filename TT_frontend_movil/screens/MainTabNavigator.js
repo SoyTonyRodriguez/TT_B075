@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import HomeScreen from './HomeScreen';
+import HomeStackNavigator from './HomeStackNavigator'; 
 import CalendarScreen from './CalendarScreen';
 import FilesScreen from './FilesScreen';
-import ProjectionScreen from './ProjectionScreen';
-import ProfileStackNavigator from './ProfileStackNavigator';  // Importa el nuevo ProfileStackNavigator
+import ProjectionStackNavigator from './ProjectionStackNavigator'; 
+import ProfileStackNavigator from './ProfileStackNavigator';  
 
 const Tab = createBottomTabNavigator();
 
@@ -13,7 +13,7 @@ export default function MainTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false,  
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -37,11 +37,10 @@ export default function MainTabNavigator() {
         tabBarStyle: { height: 60, paddingBottom: 10 },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Inicio' }} />
+      <Tab.Screen name="Home" component={HomeStackNavigator} options={{ tabBarLabel: 'Inicio' }} />
       <Tab.Screen name="Calendar" component={CalendarScreen} options={{ tabBarLabel: 'Calendario' }} />
       <Tab.Screen name="Files" component={FilesScreen} options={{ tabBarLabel: 'Documentos' }} />
-      <Tab.Screen name="Projection" component={ProjectionScreen} options={{ tabBarLabel: 'Proyección' }} />
-      {/* Aquí se usa el nuevo Stack Navigator para Profile */}
+      <Tab.Screen name="Projection" component={ProjectionStackNavigator} options={{ tabBarLabel: 'Proyección' }} />
       <Tab.Screen name="Profile" component={ProfileStackNavigator} options={{ tabBarLabel: 'Perfil' }} />
 
     </Tab.Navigator>

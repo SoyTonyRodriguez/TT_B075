@@ -1,10 +1,11 @@
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
+import tw from 'twrnc'; 
 
 const LoginButton = ({title, onPress, className1='', textClassName=''}) => {
   return (
-    <TouchableOpacity onPress={onPress} className={`py-4 rounded-full ${className1}`}>
-      <Text className={`text-center text-lg ${textClassName}`}>{title}</Text>
+    <TouchableOpacity onPress={onPress} style={tw`${className1}`}>
+      <Text style={tw`${textClassName} text-center text-lg`}>{title}</Text>
     </TouchableOpacity>
   );
 }
