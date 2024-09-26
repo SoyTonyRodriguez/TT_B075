@@ -1,82 +1,93 @@
-import * as React from 'react';
-import { View, Text, Image, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from "react"; 
+import { View, Text, TextInput, Image, ImageBackground, TouchableOpacity, ScrollView } from "react-native"; 
+import { Ionicons } from '@expo/vector-icons'; 
+import { useNavigation } from '@react-navigation/native';
+import tw from 'twrnc';
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <ImageBackground 
       source={require('../assets/images/fondo.jpg')} 
-      style={styles.backgroundImage}
+      style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
-      <View style={styles.header}>
-        <Text style={styles.title}>Bienvenido</Text>
-          <Ionicons name="home" size={40} color="black" style={styles.homeIcon}/>
+      {/* Encabezado */}
+      <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
+        <Text style={tw`text-2xl font-bold text-black`}>Bienvenido</Text>
+        <Ionicons name="home" size={40} color="black" style={tw`ml-2`} />
       </View>
 
-      <View style={styles.contentContainer}>
-        <View style={styles.imageContainer}>
-          <Image 
-            source={require('../assets/images/ipn-main.webp')}
-            style={styles.image}
-          />
-          <Text style={styles.imageText}>Promoción docente en el Instituto Politécnico Nacional</Text>
-        </View>
+      {/* Contenedor de imágenes */}
+      <ScrollView contentContainerStyle={tw`px-4`}>
+        {/* Primer artículo */}
+        <TouchableOpacity onPress={() => navigation.navigate('News1Screen')}>
+          <View style={tw`mb-5 items-center`}>
+            <Image 
+              source={require('../assets/images/ipn-main.webp')}
+              style={tw`w-full h-64 rounded-lg`}
+            />
+            <Text style={tw`mt-2 text-lg text-center text-black`}>
+              Promoción docente en el Instituto Politécnico Nacional.
+            </Text>
+          </View>
+        </TouchableOpacity>
 
-        <View style={styles.imageContainer}>
-          <Image 
-            source={require('../assets/images/sistema.jpg')}
-            style={styles.image}
-          />
-          <Text style={styles.imageText}>Sobre este sistema</Text>
-        </View>
-      </View>
+        {/* Segundo artículo */}
+        <TouchableOpacity onPress={() => navigation.navigate('News5Screen')}>
+          <View style={tw`mb-5 items-center`}>
+            <Image 
+              source={require('../assets/images/convo_2.jpg')}
+              style={tw`w-full h-64 rounded-lg`}
+            />
+            <Text style={tw`mt-2 text-lg text-center text-black`}>
+              Nacimiento de la promoción docente.
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Tercer artículo */}
+        <TouchableOpacity onPress={() => navigation.navigate('News2Screen')}>
+          <View style={tw`mb-5 items-center`}>
+            <Image 
+              source={require('../assets/images/sistema.jpg')}
+              style={tw`w-full h-64 rounded-lg`}
+            />
+            <Text style={tw`mt-2 text-lg text-center text-black`}>
+              ¡Da el siguiente paso en tu carrera!
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Cuarto artículo */}
+        <TouchableOpacity onPress={() => navigation.navigate('News3Screen')}>
+          <View style={tw`mb-5 items-center`}>
+            <Image 
+              source={require('../assets/images/sistema.jpg')}
+              style={tw`w-full h-64 rounded-lg`}
+            />
+            <Text style={tw`mt-2 text-lg text-center text-black`}>
+              Sobre este sistema.
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Quinto artículo */}
+        <TouchableOpacity onPress={() => navigation.navigate('News4Screen')}>
+          <View style={tw`mb-5 items-center`}>
+            <Image 
+              source={require('../assets/images/main_3.jpg')}
+              style={tw`w-full h-64 rounded-lg`}
+            />
+            <Text style={tw`mt-2 text-lg text-center text-black`}>
+              Visita la plataforma oficial.
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </ScrollView>
     </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',  
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  homeIcon: {
-    marginLeft: 10,
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  imageContainer: {
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: 250,
-    borderRadius: 10,
-  },
-  imageText: {
-    marginTop: 8,
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#000',
-  },
-});
 
 export default HomeScreen;
