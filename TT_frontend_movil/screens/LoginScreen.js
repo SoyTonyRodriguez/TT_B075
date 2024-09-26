@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Image, ImageBackground, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Image, ImageBackground, TouchableOpacity } from "react-native";
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native'; 
+import tw from 'twrnc'; 
 
 const LoginScreen = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -10,41 +11,46 @@ const LoginScreen = () => {
   return (
     <ImageBackground 
       source={require('../assets/images/fondologin.jpg')} 
-      style={styles.backgroundImage}
+      style={tw`flex-1 w-full h-full`} // Usamos clases de Tailwind para el fondo
       resizeMode="cover"
     >
-      <View style={styles.container}>
+      <View style={tw`flex-1 justify-center items-center px-5`}>
 
-        <View style={styles.headerContainer}>
-          <Text style={styles.title}>Iniciar Sesión</Text>
-          <Ionicons name="person-outline" size={28} color="black" />
+        {/* Header Section */}
+        <View style={tw`absolute top-10 left-5`}>
+          <View style={tw`flex-row items-center`}>
+            <Text style={tw`text-2xl font-bold text-black`}>Iniciar Sesión</Text>
+            <Ionicons name="person-outline" size={30} color="black" style={tw`ml-2`} />
+          </View>
+          <Text style={tw`text-lg text-black mt-1`}>¡Bienvenido de vuelta!</Text>
         </View>
-        <Text style={styles.subtitle}>¡Bienvenido de vuelta!</Text>
 
-
-
-        <View style={styles.logoContainer}>
+        {/* Logo Section */}
+        <View style={tw`bg-white p-4 rounded-full mb-10`}>
           <Image
             source={require('../assets/images/estudiar.png')}
-            style={styles.logo}
+            style={tw`w-30 h-30 rounded-full`}
           />
         </View>
 
+        {/* Input Fields */}
         <TextInput 
           placeholder="Número de empleado"
-          style={[styles.input, styles.transparentInput]}
+          style={tw`w-full py-4 px-3 border border-gray-500 rounded mb-5 text-base bg-transparent`}
           placeholderTextColor="#555"
           keyboardType="numeric"
         />
-        <View style={styles.passwordContainer}>
+
+        {/* Password Field with Eye Icon */}
+        <View style={tw`flex-row items-center w-full border border-gray-500 rounded px-2 mb-5`}>
           <TextInput 
             placeholder="Contraseña"
-            style={[styles.input, styles.transparentInput, styles.passwordInput]}
+            style={tw`flex-1 py-4 text-base bg-transparent`}
             placeholderTextColor="#555"
             secureTextEntry={!passwordVisible}
           />
           <TouchableOpacity 
-            style={styles.eyeIcon} 
+            style={tw`absolute right-4 p-2`} 
             onPress={() => setPasswordVisible(!passwordVisible)}
           >
             <Ionicons 
@@ -55,123 +61,33 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {/* Forgot Password */}
         <TouchableOpacity 
-          style={styles.forgotPasswordContainer}
+          style={tw`self-end mb-5`}
           onPress={() => navigation.navigate('RecuperarCuenta')}
         >
-          <Text style={styles.forgotPassword}>¿Olvidó su contraseña?</Text>
+          <Text style={tw`text-gray-500 text-sm`}>¿Olvidó su contraseña?</Text>
         </TouchableOpacity>
 
+        {/* Login Button */}
         <TouchableOpacity 
-          style={styles.loginButton}
+          style={tw`bg-[#003366] py-4 rounded w-full items-center mb-5`}
           onPress={() => navigation.navigate('HomeScreen')} 
         >
-          <Text style={styles.loginButtonText}>Ingresar</Text>
+          <Text style={tw`text-white font-bold text-base`}>Ingresar</Text>
         </TouchableOpacity>
 
-
-        <TouchableOpacity>
-          <Text style={styles.signUp}>¿No estás registrado? <Text style={styles.signUpBold}>Crear una cuenta</Text></Text>
+        {/* Sign Up Link */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('RegisterScreen')}
+        >
+          <Text style={tw`text-gray-500 text-sm`}>
+            ¿No estás registrado? <Text style={tw`font-bold text-black`}>Crear una cuenta</Text>
+          </Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
   );
 };
-
-
-
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  headerContainer: {
-    position: 'absolute',
-    top: 50,
-    left: 20, 
-    flexDirection: 'row',
-  },
-  logoContainer: {
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 100,
-    marginBottom: 30,
-  },
-  logo: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  subtitle: {
-    fontSize: 20,
-    flexDirection: 'row',
-    color: '#000',
-    marginTop: 4,
-  },
-  input: {
-    width: '100%',
-    padding: 12, 
-    borderWidth: 1,
-    borderColor: '#555',
-    borderRadius: 5,
-    marginBottom: 20, 
-    fontSize: 16, 
-  },
-  transparentInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0)', 
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-  },
-  passwordInput: {
-    flex: 1,
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 10,
-  },
-  forgotPasswordContainer: {
-    alignSelf: 'flex-end', 
-    marginBottom: 20,
-  },
-  forgotPassword: {
-    color: '#555',
-    fontSize: 14, 
-  },
-  loginButton: {
-    backgroundColor: '#003366',
-    padding: 15, 
-    borderRadius: 5,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  loginButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  signUp: {
-    color: '#555',
-  },
-  signUpBold: {
-    fontWeight: 'bold',
-    color: '#000',
-  }
-});
 
 export default LoginScreen;

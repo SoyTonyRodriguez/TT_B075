@@ -91,19 +91,19 @@ function ProyeccionSeguimiento() {
           </Link>
           <Link to="/observe-projection" className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
             <img src={VerProyeccion} alt="Ver mi proyección" className="mb-4 w-20 h-20" />
-            <p className="text-center text-lg font-semibold">Ver mi proyección</p>
+            <p className="text-center text-lg font-semibold">Ver mi proyección (version gustavo)</p>
           </Link>
 
           {/*Fix /guide or /Guia*/}
-          <Link to="/guide" className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
+          {/* <Link to="/guide" className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
             <img src={Guia} alt="Guía" className="mb-4 w-20 h-20" />
             <p className="text-center text-lg font-semibold">Guía</p>
-          </Link>
+          </Link> */}
 
 
           <Link to="/KanbanBoard" className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
             <img src={VerProyeccion} alt="Ver mi proyección" className="mb-4 w-20 h-20" />
-            <p className="text-center text-lg font-semibold">Ver mi proyección</p>
+            <p className="text-center text-lg font-semibold">Ver mi proyección (Backend funcionando)</p>
             </Link>
           
           <div>
