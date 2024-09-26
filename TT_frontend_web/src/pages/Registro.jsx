@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { createAccount } from "../api/accounts.api";
+
+// new path:
+import { createAccount } from '../../../api/accounts.api';
 
 const Registro = () => {
 

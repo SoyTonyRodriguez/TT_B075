@@ -9,8 +9,12 @@ import Nosotros from '../img/proyecto.png';
 import login from '../img/miPerfil.png';
 import convo_2 from '../img/convo_2.jpg';
 import Main_3 from '../img/main_3.jpg';
+import inicio from '../img/inicio.png';
 
 function MainContent() {
+  // Verifica si el token JWT está en el almacenamiento local
+  const isAuthenticated = !!localStorage.getItem('token');
+
   return (
     <main className="min-h-screen bg-cover bg-center">
       <div className="container mx-auto p-8">
@@ -34,10 +38,18 @@ function MainContent() {
             <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Nuestro Proyecto</p>
           </Link>
           
-          <Link to="/Login" className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center">
-            <img src={login} alt="Inicio de sesión en el sitio" className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
-            <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Iniciar sesión</p>
-          </Link>
+          {/* Condicionalmente renderiza "Inicio" si está autenticado, de lo contrario "Iniciar sesión" */}
+          {isAuthenticated ? (
+            <Link to="/Home" className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center">
+              <img src={inicio} alt="Inicio" className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
+              <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Inicio</p>
+            </Link>
+          ) : (
+            <Link to="/Login" className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center">
+              <img src={login} alt="Iniciar sesión" className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
+              <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Iniciar sesión</p>
+            </Link>
+          )}
         </div>
 
         <div className="flex flex-wrap justify-center">

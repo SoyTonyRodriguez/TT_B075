@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import perfilImage from '../img/perfi.png'; // Default profile image
 import Projection from '../img/proyeccion.png';
@@ -12,6 +12,31 @@ function Account() {
   const [profileImage, setProfileImage] = useState(perfilImage); // Initialize with default image
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+
+  const [userName, setUserName] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [category, setCategory] = useState('');
+  const [phone, setPhone] = useState('');
+
+  // Load account data from localStorage on component mount
+  useEffect(() => {
+    try {
+      const storedAccountData = localStorage.getItem('accountDetails');
+      if (storedAccountData) {
+        const { userName, fullName, email, category, phone } = JSON.parse(storedAccountData);
+        setUserName(userName);
+        setFullName(fullName);
+        setEmail(email);
+        setCategory(category);
+        setPhone(phone);
+      }
+    } catch (error) {
+      console.error("Error accessing or parsing account details from localStorage:", error);
+      // You can clear invalid data if necessary
+      localStorage.removeItem('accountDetails');
+    }
+  }, []);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -123,25 +148,33 @@ function Account() {
             <input type="checkbox" className="mr-2" checked />
             <label className="text-sm">Recibir notificaciones</label>
           </div>
-          <div className="mt-4">
+          {/* <div className="mt-4">
             <label className="block text-sm mb-2">Celular</label>
-            <input type="text" className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" value="" />
-          </div>
+            <input type="text" 
+              className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              value={phone} />
+          </div> */}
         </div>
         {/* Formulario de información */}
         <div className="w-2/3 ml-8">
           <form>
             <div className="mb-4">
               <label className="block text-sm mb-2">Nombre Completo</label>
-              <input type="text" className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" value="" disabled />
+              <input type="text" 
+                className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                value={fullName} disabled />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-2">E-mail</label>
-              <input type="email" className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" value="" disabled />
+              <input type="email" 
+                className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={email} disabled />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-2">Categoría</label>
-              <input type="text" className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" value="" disabled />
+              <input type="text" 
+                className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                value={category} disabled />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-2">Contraseña</label>

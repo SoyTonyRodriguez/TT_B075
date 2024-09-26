@@ -45,20 +45,20 @@ function App() {
         <Route path='/Nosotros' element={<Nosotros />} />
         <Route path="/login" element={<Login/>} />
         <Route path="/Registro" element={<Registro/>} />
-        {/* <Route path="/home" element={<HomeScreen />} /> */}
-        <Route path="/home" element={<ProtectedRoute component={HomeScreen} />} />
-        <Route path="/projection" element={<Projection />} />
-        <Route path="/links" element={<Links />} />
-        <Route path="/documents" element={<Documents />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/new-projection" element={<NewProjection />} />
-        <Route path="/unidades-promocion" element={<UnidadesPromocion />} />
-        <Route path="/observe-projection" element={<VerProyeccion />} />
-        <Route path="/Convocatoria" element={<Convocatoria/>}/>
-        <Route path="/Guia" element={<Guia/>}/>
-        <Route path="/KanbanBoard" element={<KanbanBoard/>}/>
 
+        // ProtectedRoute pages, only accessible when logged in
+        <Route path="/home" element={<ProtectedRoute component={HomeScreen} />} />
+        <Route path="/projection" element={<ProtectedRoute component={Projection} />} />
+        <Route path="/links" element={<ProtectedRoute component={Links} />} />
+        <Route path="/documents" element={<ProtectedRoute component={Documents} />} />
+        <Route path="/calendar" element={<ProtectedRoute component={Calendar} />} />
+        <Route path="/account" element={<ProtectedRoute component={Account} />} />
+        <Route path="/new-projection" element={<ProtectedRoute component={NewProjection} />} />
+        <Route path="/unidades-promocion" element={<ProtectedRoute component={UnidadesPromocion} />} />
+        <Route path="/observe-projection" element={<ProtectedRoute component={VerProyeccion} />} />
+        <Route path="/Convocatoria" element={<ProtectedRoute component={Convocatoria} />} />
+        <Route path="/Guia" element={<ProtectedRoute component={Guia} />} />
+        <Route path="/KanbanBoard" element={<ProtectedRoute component={KanbanBoard} />} />
       </Routes>
       <Footer />
       <Toaster />
