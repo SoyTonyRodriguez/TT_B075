@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { createTask, getTasks, updateTaskStatus } from "../api/tasks.api";
+import { createTask, getTasks, updateTaskStatus } from "../../../api/tasks.api";
+
+import LoadingAnimation from "../components/LoadingAnimation";  
 
 function KanbanBoard() {
     const [tasks, setTasks] = useState([]);
@@ -131,8 +133,9 @@ function KanbanBoard() {
         );
     };
 
+    // Show loading animation while fetching the account details
     if (loading) {
-        return <div>Loading...</div>;
+        return <LoadingAnimation />;
     }
 
     if (error) {

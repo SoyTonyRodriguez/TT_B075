@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { login } from '../api/accounts.api';
+
+// new path:
+import { login } from '../../../api/accounts.api';
+
+import LoadingAnimation from "../components/LoadingAnimation";  
+
 
 function Login() {
     const [loading, setLoading] = useState(false); // Loading state
@@ -32,6 +37,10 @@ function Login() {
             setLoading(false); // Set loading to false after the operation is complete
         }
     });
+
+    if (loading) {
+      return <LoadingAnimation />;
+    }
     
     return (
     <div className="min-h-screen flex flex-col items-center justify-center">
