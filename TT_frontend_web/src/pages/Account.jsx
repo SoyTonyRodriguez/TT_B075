@@ -1,61 +1,13 @@
-import React, { useState } from 'react';
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import perfilImage from '../img/perfi.png'; // Default profile image
 import Projection from '../img/proyeccion.png';
+import Links from '../img/enlace.png';
 import Documents from '../img/documentos.png';
 import Calendar from '../img/calendario.png';
 import MenuIcon from '../img/menu-icon.png';
-import Account from '../img/miPerfil.png';
 
-function Profile() {
-  const [isEditing, setIsEditing] = useState(false); // Toggle edit mode
-  const [profile, setProfile] = useState({
-    name: 'Manuel Alejandro Soto Ramos',
-    email: 'xxxxxxxxx@ipn.mx',
-    category: 'Profesor titular A',
-    phone: '5555555555',
-    notifications: true,
-    password: '**********',
-  });
-
-  const [profileImage, setProfileImage] = useState(null); // Profile image state
-  const [imagePreview, setImagePreview] = useState('https://via.placeholder.com/100'); // Default profile image
-
-  // Handle text input and checkbox changes
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setProfile({
-      ...profile,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-  };
-
-  // Toggle between edit and view mode
-  const handleEdit = () => {
-    setIsEditing(!isEditing);
-  };
-
-  // Save profile data (and possibly send API call)
-  const handleSave = () => {
-    setIsEditing(false);
-    console.log('Profile saved:', profile);
-    // Implement the API logic to save the profile changes here
-  };
-
-  // Handle profile image change
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfileImage(file); // Store the selected file
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result); // Show image preview
-      };
-      reader.readAsDataURL(file); // Convert the file to base64 string for preview
-    }
-  };
-
+function Account() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileImage, setProfileImage] = useState(perfilImage); // Initialize with default image
   const [imagePreview, setImagePreview] = useState(null);
@@ -206,4 +158,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default Account;

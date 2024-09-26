@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'; // Default CSS, but will soften with Tailwind classes
 import Projection from '../img/proyeccion.png';
 import Links from '../img/enlace.png';
-import CalendarIcon from '../img/calendario.png';
+import Documents from '../img/documentos.png';
 import Account from '../img/miPerfil.png';
 import MenuIcon from '../img/menu-icon.png';
 import { format, startOfMonth, startOfWeek, addDays, setMonth, setYear, addMonths, subMonths, isSameDay, isSameMonth } from 'date-fns';
