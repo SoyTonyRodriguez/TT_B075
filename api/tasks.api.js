@@ -35,3 +35,10 @@ export const updateTaskStatus = (taskId, updatedData) => {
         },
     });
 };
+
+export const deleteTask = (taskId) => {
+    const token = localStorage.getItem('token');
+    return TasksAPI.delete(`tasks/${taskId}/delete/`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+};
