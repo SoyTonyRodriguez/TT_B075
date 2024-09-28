@@ -5,6 +5,8 @@ import * as ImagePicker from 'expo-image-picker';
 import tw from 'twrnc'; 
 
 const EditProfileScreen = ({ navigation }) => {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [form, setForm] = useState({
     name: '',      
     email: '',    
@@ -59,8 +61,6 @@ const EditProfileScreen = ({ navigation }) => {
 
         {/* Título */}
         <Text style={tw`text-3xl font-bold text-center text-black`}>Editar Perfil</Text>
-
-        {/* Espacio vacío para mantener el layout centrado */}
         <View style={tw`w-8`} />
       </View>
 
@@ -79,7 +79,6 @@ const EditProfileScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* ScrollView que solo incluye los campos y el botón */}
       <ScrollView contentContainerStyle={tw`p-5`}>
         {/* Campos de edición del perfil */}
         <Text style={tw`text-base font-bold text-black`}>Nombre</Text>
@@ -111,17 +110,51 @@ const EditProfileScreen = ({ navigation }) => {
           value={form.employeeNumber}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
+          keyboardType="numeric"
           onChangeText={(value) => handleInputChange('employeeNumber', value)}
         />
 
         <Text style={tw`text-base font-bold text-black`}>Contraseña</Text>
-        <TextInput
-          value={form.password}
-          secureTextEntry
-          style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
-          placeholderTextColor="rgba(0, 0, 0, 0.8)"
-          onChangeText={(value) => handleInputChange('password', value)}
-        />
+        <View style={tw`relative w-full mb-3`}>
+          <TextInput
+            value={form.password}
+            secureTextEntry={!passwordVisible} 
+            style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
+            placeholderTextColor="rgba(0, 0, 0, 0.8)"
+            onChangeText={(value) => handleInputChange('password', value)}
+          />
+          <TouchableOpacity 
+            style={tw`absolute right-4 top-4`} 
+            onPress={() => setPasswordVisible(!passwordVisible)}
+          >
+            <Ionicons 
+              name={passwordVisible ? "eye-off" : "eye"} 
+              size={24} 
+              color="rgba(0, 0, 0, 0.8)" 
+            />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={tw`text-base font-bold text-black`}>Confirmar contraseña</Text>
+        <View style={tw`relative w-full mb-3`}>
+          <TextInput
+            value={form.passwordVisible}
+            secureTextEntry={!passwordVisible} 
+            style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
+            placeholderTextColor="rgba(0, 0, 0, 0.8)"
+            onChangeText={(value) => handleInputChange('confirmPassword', value)}
+          />
+          <TouchableOpacity 
+            style={tw`absolute right-4 top-4`} 
+            onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+          >
+            <Ionicons 
+              name={passwordVisible ? "eye-off" : "eye"} 
+              size={24} 
+              color="rgba(0, 0, 0, 0.8)" 
+            />
+          </TouchableOpacity>
+        </View>
 
         {/* Botón para guardar cambios */}
         <TouchableOpacity 

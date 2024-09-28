@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { View, Text, Image, Animated, PanResponder, ScrollView, Dimensions } from 'react-native';
 import tw from 'twrnc'; 
 
-const { height: screenHeight } = Dimensions.get('window'); // Obtén la altura de la pantalla
+const { height: screenHeight } = Dimensions.get('window'); 
 
 const News1Screen = ({ navigation }) => {
   const bounceAnim = useRef(new Animated.Value(0)).current;
@@ -55,11 +55,11 @@ const News1Screen = ({ navigation }) => {
     <View style={tw`flex-1 justify-end bg-[rgba(0,0,0,0.3)]`}>
       <Animated.View
         style={[
-          tw`bg-[rgba(15,32,39,0.9)] p-5 rounded-t-3xl`,
+          tw`bg-[rgba(15,32,39,0.9)] p-5 rounded-t-xl`,
           {
+            height: screenHeight * 0.75, 
             transform: [{ translateY: bounceAnim }],
             opacity: opacityAnim,
-            height: screenHeight * 0.75,
           },
         ]}
         {...panResponder.panHandlers} // Asigna el panResponder al Animated.View

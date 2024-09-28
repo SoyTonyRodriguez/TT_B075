@@ -20,17 +20,44 @@ const CalendarScreen = () => {
   const today = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(null);
   const [currentDate, setCurrentDate] = useState(today);
-  const [calendarKey, setCalendarKey] = useState(0); // Nueva clave para forzar la actualización
+  const [calendarKey, setCalendarKey] = useState(0); 
 
   // Fechas de inicio y final
   const inicioConvocatoria = '2024-01-17';
   const finalConvocatoria = '2024-05-30';
 
+  // Realizamos la limitacion de 2 años atras y 2 adelante
+  const currentYear = new Date().getFullYear();
+  const minDate = `${currentYear - 2}-01-01`; 
+  const maxDate = `${currentYear + 2}-12-31`; //Tiene un bug aveces y se queda en noviembre, luego vemos como se soluciona
+
   // Función para cambiar la fecha y marcarla
   const changeDate = (date) => {
-    setCurrentDate(date); // Cambia la fecha actual del calendario
-    setSelectedDate(date); // Selecciona y marca la fecha
-    setCalendarKey(prevKey => prevKey + 1); // Cambia la clave para refrescar el calendario
+    setCurrentDate(date); 
+    setSelectedDate(date); 
+    setCalendarKey(prevKey => prevKey + 1); 
+  };
+
+  // Función para controlar el avance al presionar la flecha derecha
+  const handlePressArrowRight = (addMonth) => {
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+    if (nextMonth <= new Date(maxDate)) {
+      addMonth(); 
+      setCurrentDate(nextMonth.toISOString().split('T')[0]); 
+    }
+  };
+
+  // Función para controlar el retroceso al presionar la flecha izquierda
+  const handlePressArrowLeft = (subtractMonth) => {
+    const prevMonth = new Date(currentDate);
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+
+    if (prevMonth >= new Date(minDate)) {
+      subtractMonth(); 
+      setCurrentDate(prevMonth.toISOString().split('T')[0]); 
+    }
   };
 
   return (
@@ -50,7 +77,7 @@ const CalendarScreen = () => {
         {/* Botón de Inicio */}
         <TouchableOpacity 
           style={tw`flex-row items-center bg-blue-600 py-2 px-5 rounded-full`}
-          onPress={() => changeDate(inicioConvocatoria)} // Llama a changeDate con la fecha de inicio
+          onPress={() => changeDate(inicioConvocatoria)} 
         >
           <Ionicons name="arrow-back" size={20} color="#fff" style={tw`mr-3`} />
           <Text style={tw`text-white text-lg`}>Inicio</Text>
@@ -59,7 +86,7 @@ const CalendarScreen = () => {
         {/* Botón de Final */}
         <TouchableOpacity 
           style={tw`flex-row items-center bg-blue-600 py-2 px-5 rounded-full`}
-          onPress={() => changeDate(finalConvocatoria)} // Llama a changeDate con la fecha de final
+          onPress={() => changeDate(finalConvocatoria)} 
         >
           <Text style={tw`text-white text-lg mr-3`}>Final</Text>
           <Ionicons name="arrow-forward" size={20} color="#fff" />
@@ -70,8 +97,10 @@ const CalendarScreen = () => {
       <View style={tw`flex-1 justify-center items-center mt-10`}>
         <View style={tw`shadow-lg rounded-lg bg-white p-3`}>
           <Calendar
-            key={calendarKey} // Se agrega la clave para forzar el refresco
+            key={calendarKey} 
             current={currentDate}
+            minDate={minDate} // Fecha mínima para limitar el retroceso
+            maxDate={maxDate} // Fecha máxima para limitar el avance
             onDayPress={(day) => setSelectedDate(day.dateString)}
             markedDates={{
               [selectedDate]: { selected: true, marked: true, selectedColor: 'purple' },
@@ -86,7 +115,10 @@ const CalendarScreen = () => {
               arrowColor: '#1e293b',
               monthTextColor: '#1e293b',
             }}
-            style={tw`border rounded-lg`}
+            // Limitar la navegación con flechas
+            onPressArrowRight={handlePressArrowRight} 
+            onPressArrowLeft={handlePressArrowLeft} 
+            style={[tw`border rounded-lg`, { width: 330, height: 380 }]} 
           />
         </View>
       </View>
@@ -106,7 +138,6 @@ const CalendarScreen = () => {
             </Text>
           </View>
 
-          
           {/* Información adicional */}
           <View style={tw`flex-row mb-3`}>
             <Text style={tw`font-bold text-gray-600 mr-2`}>Actividad:</Text>
