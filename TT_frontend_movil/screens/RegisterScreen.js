@@ -152,7 +152,10 @@ const RegisterScreen = (route) => {
       <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View style={tw`px-5`}>
           <View style={tw`pt-12`}>
-            <Text style={tw`text-2xl font-bold text-black`}>Regístrate</Text>
+            <View style={tw`flex-row items-center`}>
+              <Text style={tw`text-2xl font-bold text-black`}>Regístrate</Text>
+              <Ionicons name="person-outline" size={30} color="black" style={tw`ml-2`} />
+            </View>
             <Text style={tw`text-lg text-gray-500 mt-2`}>Introduce los datos solicitados</Text>
             <View style={tw`h-0.5 bg-black mt-3 mb-5`} />
           </View>
