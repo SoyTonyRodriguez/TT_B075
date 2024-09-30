@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt', # Create token authentication
     'rest_framework_simplejwt.token_blacklist', #  List of tokens that have been revoked or expired
     'accounts',
-    'tasks'
+    'tasks',
+    'calendar_dates',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -60,7 +61,7 @@ REST_FRAMEWORK = {
 
 # Settigs for JWT
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,

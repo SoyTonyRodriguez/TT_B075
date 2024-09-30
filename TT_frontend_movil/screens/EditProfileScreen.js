@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ImageBackground, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'; 
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 import tw from 'twrnc'; 
 
 const EditProfileScreen = ({ navigation }) => {
+  const [userName, setUserName] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [category, setCategory] = useState('');
+  const [password, setPassword] = useState('');
+
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [form, setForm] = useState({
@@ -12,10 +19,30 @@ const EditProfileScreen = ({ navigation }) => {
     email: '',    
     category: '',  
     password: '',  
-    employeeNumber: ''
   });
 
-  const [profileImage, setProfileImage] = useState(null); 
+  const [profileImage, setProfileImage] = useState(null);
+  
+  // Load account data from localStorage on component mount
+  useEffect(() => {
+    const loadAccountData = async () => {
+      try {
+        const storedAccountData =  await AsyncStorage.getItem('accountDetails');
+        if (storedAccountData) {
+          const { userName, fullName, email, category } = JSON.parse(storedAccountData);
+          setUserName(userName);
+          setFullName(fullName);
+          setEmail(email);
+          setCategory(category);
+        }
+      } catch (error) {
+        console.error("Error accessing or parsing account details from localStorage:", error);
+        // You can clear invalid data if necessary
+        localStorage.removeItem('accountDetails');
+      }
+    };
+    loadAccountData();
+  }, []);
 
   const handleInputChange = (name, value) => {
     setForm({ ...form, [name]: value });
@@ -83,7 +110,7 @@ const EditProfileScreen = ({ navigation }) => {
         {/* Campos de edición del perfil */}
         <Text style={tw`text-base font-bold text-black`}>Nombre</Text>
         <TextInput
-          value={form.name}
+          value={fullName}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
           onChangeText={(value) => handleInputChange('name', value)}
@@ -91,7 +118,7 @@ const EditProfileScreen = ({ navigation }) => {
 
         <Text style={tw`text-base font-bold text-black`}>Email</Text>
         <TextInput
-          value={form.email}
+          value={email}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
           onChangeText={(value) => handleInputChange('email', value)}
@@ -99,25 +126,15 @@ const EditProfileScreen = ({ navigation }) => {
 
         <Text style={tw`text-base font-bold text-black`}>Categoría</Text>
         <TextInput
-          value={form.category}
+          value={category}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
           onChangeText={(value) => handleInputChange('category', value)}
         />
 
-        <Text style={tw`text-base font-bold text-black`}>Número de empleado</Text>
-        <TextInput
-          value={form.employeeNumber}
-          style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
-          placeholderTextColor="rgba(0, 0, 0, 0.8)"
-          keyboardType="numeric"
-          onChangeText={(value) => handleInputChange('employeeNumber', value)}
-        />
-
         <Text style={tw`text-base font-bold text-black`}>Contraseña</Text>
         <View style={tw`relative w-full mb-3`}>
           <TextInput
-            value={form.password}
             secureTextEntry={!passwordVisible} 
             style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
             placeholderTextColor="rgba(0, 0, 0, 0.8)"

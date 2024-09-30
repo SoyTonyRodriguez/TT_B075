@@ -145,12 +145,11 @@ const RegisterScreen = (route) => {
   const inputStyle = (hasError) => tw`w-full p-4 border ${hasError ? 'border-red-500' : 'border-gray-700'} rounded-lg text-base bg-transparent text-black mb-4`;
 
   return (
-    <ImageBackground source={require('../assets/images/fondologin.jpg')} style={{ width: width, height: height, flex: 1 }} resizeMode="cover">
+    <ImageBackground source={require('../assets/images/fondologin.jpg')} style={{ width: width, height: height + 30, flex: 1 }} resizeMode="cover">
       {/* Show LoadingScreen with a dynamic message */}
       {loading && <LoadingScreen message={loadingMessage} />}
 
-      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View style={tw`px-5`}>
+      <View style={tw`px-5`}>
           <View style={tw`pt-12`}>
             <View style={tw`flex-row items-center`}>
               <Text style={tw`text-2xl font-bold text-black`}>Regístrate</Text>
@@ -159,6 +158,10 @@ const RegisterScreen = (route) => {
             <Text style={tw`text-lg text-gray-500 mt-2`}>Introduce los datos solicitados</Text>
             <View style={tw`h-0.5 bg-black mt-3 mb-5`} />
           </View>
+      </View>
+
+      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <View style={tw`px-5`}>
 
           {/* Form inputs */}
           <Controller

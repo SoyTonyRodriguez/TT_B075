@@ -1,4 +1,5 @@
 import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 
 // Initial set-up
 const accountsAPI = axios.create({
@@ -12,11 +13,12 @@ export const createAccount = (account) => accountsAPI.post('register/', account)
 export const login = (credentials) => accountsAPI.post('login/', credentials)
 
 // getAccount method
-export const getAccount = (id) => {
-    const token = localStorage.getItem('token');
+export const getAccount = async (id) => {
+    const token = await AsyncStorage.getItem('token');
+    const cleanToken = token.trim(); // Elimina espacios en blanco adicionales
     return accountsAPI.get(`account/${id}/`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+      headers: {
+        Authorization: `Bearer ${cleanToken}`,
+      },
     });
-};
+  };  
