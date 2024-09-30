@@ -251,6 +251,42 @@ const CalendarWithDetails = () => {
         </div>
       </div>
 
+      {/* Botón Compacto para pantallas pequeñas */}
+      <div className="md:hidden relative">
+        <button
+          onClick={toggleMenu}
+          className="text-white p-4 transition-transform transform hover:scale-125 w-30 h-30 flex items-center justify-center"
+        >
+          <img src={MenuIcon} alt="Menú" className="w-10 h-10" />
+        </button>
+
+      {/* Menú Desplegable */}
+      {menuOpen && (
+        <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg">
+          <div className="p-4 flex flex-col space-y-4">
+            <Link to="/projection" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
+              <img src={Projection} alt="Proyección y seguimiento" className="w-12 h-12 mb-2" />
+              <p className="text-sm font-semibold">Proyección y seguimiento</p>
+            </Link>
+            <Link to="/links" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
+              <img src={Links} alt="Enlaces y bases" className="w-12 h-12 mb-2" />
+              <p className="text-sm font-semibold">Enlaces y bases</p>
+            </Link>
+            <Link to="/documents" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
+              <img src={Documents} alt="Mis documentos" className="w-12 h-12 mb-2" />
+              <p className="text-sm font-semibold">Mis documentos</p>
+            </Link>
+            <Link to="/account" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
+              <img src={Account} alt="Mi cuenta" className="w-12 h-12 mb-2" />
+              <p className="text-sm font-semibold">Mi cuenta</p>
+            </Link>
+          </div>
+        </div>
+      )}
+      </div>
+      
+
+      {/* Línea de separación */}
       <hr className="border-t-2 border-black my-4" />
 
       {/* Contenido del Calendario */}
