@@ -1,39 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Projection from '../img/proyeccion.png';
-import Links from '../img/enlace.png';
-import Documents from '../img/documentos.png';
-import Account from '../img/miPerfil.png';
-import MenuIcon from '../img/menu-icon.png';
-import { format, startOfMonth, startOfWeek, addDays, setMonth, setYear, addMonths, subMonths, isSameDay, isSameMonth, parseISO } from 'date-fns';
+import { format, startOfMonth, startOfWeek, addDays, setMonth, setYear, addMonths, subMonths, isSameDay, isSameMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
-import {getAllDates} from '../../../api/calendar_dates.api';
+import Navigation from './Navigation/Navigation';  
+import { getAllDates } from '../../../api/calendar_dates.api';
 
 const CalendarWithDetails = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [activities, setActivities] = useState([]);
   const [activityDetails, setActivityDetails] = useState(null);
 
+  const currentYear = new Date().getFullYear();
+  const minYear = currentYear - 2;
+  const maxYear = currentYear + 2;
+
+  // Fechas de inicio y final de la convocatoria
+  const inicioConvocatoria = new Date(`${currentYear}-01-18`); //Aqui tambien pasa un bug :((
+  const finalConvocatoria = new Date(`${currentYear}-05-31`); //Aqui tambien JAJAJAJAJA
+
   // Fetch activities from API
   useEffect(() => {
     const fetchActivities = async () => {
       const response = await getAllDates();
-      setActivities(response.data); // Asegúrate de que la respuesta sea el array de actividades
+      setActivities(response.data); 
     };
 
     fetchActivities();
   }, []);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
   // Función para ajustar la fecha a la zona horaria local
   const adjustToLocaleDate = (dateString) => {
     const date = new Date(dateString);
-    return new Date(date.getTime() + date.getTimezoneOffset() * 60000); // Ajusta el tiempo a la zona local
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000); 
   };
 
   // Nueva función para verificar si una fecha está dentro del rango de una actividad
@@ -69,7 +67,19 @@ const CalendarWithDetails = () => {
 
   const handleYearChange = (event) => {
     const newYear = parseInt(event.target.value);
-    setCurrentMonth(setYear(currentMonth, newYear));
+    if (newYear >= minYear && newYear <= maxYear) {
+      setCurrentMonth(setYear(currentMonth, newYear));
+    }
+  };
+
+  const goToStart = () => {
+    setSelectedDate(inicioConvocatoria);
+    setCurrentMonth(inicioConvocatoria);
+  };
+
+  const goToEnd = () => {
+    setSelectedDate(finalConvocatoria);
+    setCurrentMonth(finalConvocatoria);
   };
 
   const renderHeader = () => {
@@ -77,8 +87,8 @@ const CalendarWithDetails = () => {
       return format(setMonth(new Date(), i), 'MMMM', { locale: es });
     });
 
-    const years = Array.from({ length: 21 }, (e, i) => {
-      return new Date().getFullYear() - 10 + i;
+    const years = Array.from({ length: 5 }, (e, i) => {
+      return minYear + i;
     });
 
     return (
@@ -225,69 +235,28 @@ const CalendarWithDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center p-8">
-      {/* Navegación Secundaria */}
-      <div className="p-4 flex justify-between items-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-0">Calendario</h2>
+    <div className="min-h-screen bg-cover bg-center">
+      {/* navegación fija */}
+      <Navigation />
 
-        {/* Botones normales en pantallas grandes, botón compacto en pantallas pequeñas */}
-        <div className="hidden md:flex space-x-4">
-          <Link to="/projection" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-            <img src={Projection} alt="Proyección y seguimiento" className="w-12 h-12 mb-2" />
-            <p className="text-sm font-semibold">Proyección y seguimiento</p>
-          </Link>
-          <Link to="/links" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-            <img src={Links} alt="Enlaces y bases" className="w-12 h-12 mb-2" />
-            <p className="text-sm font-semibold">Enlaces y bases</p>
-          </Link>
-          <Link to="/documents" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-            <img src={Documents} alt="Mis documentos" className="w-12 h-12 mb-2" />
-            <p className="text-sm font-semibold">Mis documentos</p>
-          </Link>
-          <Link to="/account" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-            <img src={Account} alt="Mi cuenta" className="w-12 h-12 mb-2" />
-            <p className="text-sm font-semibold">Mi cuenta</p>
-          </Link>
-        </div>
-      </div>
-
-      {/* Botón Compacto para pantallas pequeñas */}
-      <div className="md:hidden relative">
-        <button
-          onClick={toggleMenu}
-          className="text-white p-4 transition-transform transform hover:scale-125 w-30 h-30 flex items-center justify-center"
-        >
-          <img src={MenuIcon} alt="Menú" className="w-10 h-10" />
-        </button>
-
-      {/* Menú Desplegable */}
-      {menuOpen && (
-        <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg">
-          <div className="p-4 flex flex-col space-y-4">
-            <Link to="/projection" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-              <img src={Projection} alt="Proyección y seguimiento" className="w-12 h-12 mb-2" />
-              <p className="text-sm font-semibold">Proyección y seguimiento</p>
-            </Link>
-            <Link to="/links" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-              <img src={Links} alt="Enlaces y bases" className="w-12 h-12 mb-2" />
-              <p className="text-sm font-semibold">Enlaces y bases</p>
-            </Link>
-            <Link to="/documents" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-              <img src={Documents} alt="Mis documentos" className="w-12 h-12 mb-2" />
-              <p className="text-sm font-semibold">Mis documentos</p>
-            </Link>
-            <Link to="/account" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-              <img src={Account} alt="Mi cuenta" className="w-12 h-12 mb-2" />
-              <p className="text-sm font-semibold">Mi cuenta</p>
-            </Link>
-          </div>
-        </div>
-      )}
-      </div>
-      
-
-      {/* Línea de separación */}
       <hr className="border-t-2 border-black my-4" />
+
+      {/* Botones de Inicio y Final */}
+      <div className="flex justify-center space-x-6 mb-4">
+        <button
+          onClick={goToStart}
+          className="bg-blue-600 text-white py-2 px-6 rounded transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:bg-blue-700"
+        >
+          Inicio
+        </button>
+        <button
+          onClick={goToEnd}
+          className="bg-blue-600 text-white py-2 px-6 rounded transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:bg-blue-700"
+        >
+          Final
+        </button>
+      </div>
+
 
       {/* Contenido del Calendario */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Projection from '../img/proyeccion.png';
-import Documents from '../img/documentos.png';
-import Calendar from '../img/calendario.png';
-import Account from '../img/miPerfil.png';
+import Navigation from './Navigation/Navigation'; 
 
 function CreateProjection() {
   const [activityName, setActivityName] = useState('');
@@ -20,40 +17,11 @@ function CreateProjection() {
   };
 
   return (
-    <div>
-    {/* Navegación Secundaria */}
     <div className="min-h-screen bg-cover bg-center">
-      {/* Navegación Secundaria */}
-      <div className="p-4 flex justify-end space-x-4 mr-14">
-        <Link
-          to="/projection"
-          className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center"
-        >
-          <img src={Projection} alt="Proyección y seguimiento" className="w-12 h-12 mb-2" />
-          <p className="text-sm font-semibold">Proyección y seguimiento</p>
-        </Link>
-        <Link
-          to="/documents"
-          className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center"
-        >
-          <img src={Documents} alt="Mis documentos" className="w-12 h-12 mb-2" />
-          <p className="text-sm font-semibold">Mis documentos</p>
-        </Link>
-        <Link
-          to="/calendar"
-          className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center"
-        >
-          <img src={Calendar} alt="Calendario" className="w-12 h-12 mb-2" />
-          <p className="text-sm font-semibold">Calendario</p>
-        </Link>
-        <Link
-          to="/account"
-          className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center"
-        >
-          <img src={Account} alt="Mi cuenta" className="w-12 h-12 mb-2" />
-          <p className="text-sm font-semibold">Mi cuenta</p>
-        </Link>
-      </div>
+      {/* navegación fija */}
+      <Navigation />
+
+      <hr className="border-t-2 border-black my-4" />
 
       {/* Main Content */}
         <h1 className="text-3xl font-bold text-center mb-6 text-black">¿Crear proyección?</h1>
@@ -149,7 +117,6 @@ function CreateProjection() {
             propuesto y el acumulado de unidades de promoción.
           </p>
         </div>
-      </div>
       </div>
   );
 }

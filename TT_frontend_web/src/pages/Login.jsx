@@ -72,9 +72,9 @@ function Login() {
               className="w-full px-5 py-3 rounded-lg text-white bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.password && <span className="text-red-500">{errors.password.message}</span>}
-            <a href="#RecuperarContraseña" className="text-blue-100 hover:text-blue-800 text-sm float-left mt-3">
+            <Link to="/RecuperarCuenta" className="text-blue-100 hover:text-blue-800 text-sm float-left mt-3">
               ¿Olvidó su contraseña?
-            </a>
+            </Link>
           </div>
           <button
             type="submit"
