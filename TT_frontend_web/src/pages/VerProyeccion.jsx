@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Links from '../img/enlace.png';
-import Documents from '../img/documentos.png';
-import Calendar from '../img/calendario.png';
-import Account from '../img/miPerfil.png';
-import MenuIcon from '../img/menu-icon.png'; // Icono para el botón compacto
+
 
 // Importa los componentes del tablero Kanban
 import Board from '../components/Board';

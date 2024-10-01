@@ -1,11 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import perfilImage from '../img/perfi.png'; // Default profile image
-import Projection from '../img/proyeccion.png';
-import Links from '../img/enlace.png';
-import Documents from '../img/documentos.png';
-import Calendar from '../img/calendario.png';
-import MenuIcon from '../img/menu-icon.png';
+import perfilImage from '../img/perfi.png'; 
 import Navigation from './Navigation/Navigation'; 
 
 function Account() {
