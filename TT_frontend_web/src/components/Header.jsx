@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react"; 
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa"; // Icono de usuario
-import { FiMenu, FiX } from "react-icons/fi"; // Iconos de menú hamburguesa
-import { motion } from "framer-motion"; // <-- Importa motion desde framer-motion
+import { FaUserCircle } from "react-icons/fa"; 
+import { FiMenu, FiX } from "react-icons/fi"; 
+import { motion } from "framer-motion"; 
 import logo from "../img/logoescom.png";
 
 function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [email, setEmail] = useState(""); // Estado para almacenar el email
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para el menú desplegable
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Estado para el menú en móviles
+  const [email, setEmail] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
   const navigate = useNavigate();
 
   // Verificar si el usuario está autenticado y cargar los datos del localStorage
   useEffect(() => {
-    const accountData = localStorage.getItem("accountDetails"); // Obtiene los datos almacenados en 'accountDetails'
+    const accountData = localStorage.getItem("accountDetails"); 
     if (accountData) {
       const { email } = JSON.parse(accountData); // Extraer el email de los datos almacenados
       setEmail(email); // Establecer el email en el estado
-      setIsAuthenticated(true); // Si hay datos, el usuario está autenticado
+      setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
     }
@@ -26,16 +26,16 @@ function Header() {
 
   const handleLogout = () => {
     // Lógica para cerrar sesión
-    localStorage.removeItem("token"); // Eliminar token si se usa
+    localStorage.removeItem("token"); 
     localStorage.removeItem("accountDetails"); // Eliminar los detalles de la cuenta
-    setIsAuthenticated(false); // Cambiar el estado de autenticación
-    setEmail(""); // Limpiar el estado del email
-    setIsMenuOpen(false); // Cerrar el menú
-    navigate("/login"); // Redirigir al login
+    setIsAuthenticated(false); 
+    setEmail(""); 
+    setIsMenuOpen(false); 
+    navigate("/login"); 
   };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen); // Alternar el menú móvil
+    setIsMobileMenuOpen(!isMobileMenuOpen); 
   };
 
   return (
@@ -45,14 +45,13 @@ function Header() {
           <img className="py-1 w-40 h-auto" src={logo} alt="logo" />
         </div>
 
-        {/* Botón de menú para pantallas pequeñas */}
         <div className="md:hidden">
           <button onClick={toggleMobileMenu} className="text-3xl focus:outline-none">
             {isMobileMenuOpen ? <FiX /> : <FiMenu />}
           </button>
         </div>
 
-        {/* Menú de navegación para pantallas medianas y grandes */}
+        {/* Menú de navegación principal */}
         <nav className="hidden md:flex space-x-8 mx-auto">
           <Link to="/welcome" className="hover:underline transition duration-300 ease-in-out">
             Inicio
@@ -65,18 +64,17 @@ function Header() {
           </Link>
         </nav>
 
-        {/* Mostrar el ícono y el email del usuario si está autenticado */}
+        {/* Mostrar al usuario si está autenticado */}
         {isAuthenticated && (
           <div className="relative hidden md:inline-block text-left">
             <div
               className="flex items-center cursor-pointer space-x-2 hover:bg-blue-800 px-3 py-1 rounded-lg transition duration-300 ease-in-out"
-              onClick={() => setIsMenuOpen(!isMenuOpen)} // Alternar el menú al hacer clic
+              onClick={() => setIsMenuOpen(!isMenuOpen)} 
             >
               <FaUserCircle className="text-2xl" />
               <span>{email}</span>
             </div>
 
-            {/* Menú desplegable solo si isMenuOpen es true */}
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition-all duration-300 ease-in-out">
                 <button
@@ -91,7 +89,7 @@ function Header() {
         )}
       </div>
 
-      {/* Menú de navegación móvil (solo se muestra cuando está abierto) */}
+      {/* Menú responsivo */}
       {isMobileMenuOpen && (
         <motion.nav
           initial={{ opacity: 0, y: -10 }}
