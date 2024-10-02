@@ -5,6 +5,7 @@ import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
+import Navigation from './Navigation/Navigation'; 
 
 // Componente de Spinner discreto
 const LoadingSpinner = () => (
@@ -356,6 +357,11 @@ function KanbanBoard() {
 
     return (
         <main className="min-h-screen bg-cover bg-center">
+            {/* navegación fija */}
+            <Navigation />
+
+            <hr className="border-t-2 border-black my-4" />
+            
             <Toaster /> {/* Añade el contenedor de toast */}
             <div className="container mx-auto p-8">
                 <DndProvider backend={HTML5Backend}>

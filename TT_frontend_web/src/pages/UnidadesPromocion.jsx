@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Links from '../img/enlace.png';
-import Documents from '../img/documentos.png';
-import Calendar from '../img/calendario.png';
-import Account from '../img/miPerfil.png';
-import MenuIcon from '../img/menu-icon.png';
+import { IoStarOutline, IoSchoolOutline } from "react-icons/io5";
+import Navigation from './Navigation/Navigation'; 
 
 function UnidadesPromocion() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,73 +113,21 @@ function UnidadesPromocion() {
 
   return (
     <div className="min-h-screen bg-cover bg-center">
-      
-      {/* Navegación Secundaria y Título */}
-      <div className="p-4 flex justify-between items-center">
-        <h2 className="text-3xl font-bold mb-0">Crear proyección</h2>
-        
-        {/* Botones normales en pantallas grandes, botón compacto en pantallas pequeñas */}
-        <div className="hidden md:flex space-x-4 mr-14">
-          <Link to="/links" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-            <img src={Links} alt="Enlaces y bases" className="w-12 h-12 mb-2" />
-            <p className="text-sm font-semibold">Enlaces y bases</p>
-          </Link>
-          <Link to="/documents" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-            <img src={Documents} alt="Mis documentos" className="w-12 h-12 mb-2" />
-            <p className="text-sm font-semibold">Mis documentos</p>
-          </Link>
-          <Link to="/calendar" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-            <img src={Calendar} alt="Calendario" className="w-12 h-12 mb-2" />
-            <p className="text-sm font-semibold">Calendario</p>
-          </Link>
-          <Link to="/account" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-            <img src={Account} alt="Mi cuenta" className="w-12 h-12 mb-2" />
-            <p className="text-sm font-semibold">Mi cuenta</p>
-          </Link>
-        </div>
+    {/* Incluye la navegación */}
+    <Navigation />
 
-        {/* Botón Compacto para pantallas pequeñas */}
-        <div className="md:hidden relative">
-          <button
-            onClick={toggleMenu}
-            className="text-white p-4 transition-transform transform hover:scale-125 w-30 h-30 flex items-center justify-center"
-          >
-            <img src={MenuIcon} alt="Menú" className="w-10 h-10" />
-          </button>
-
-          {/* Menú Desplegable */}
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg">
-              <div className="p-4 flex flex-col space-y-4">
-                <Link to="/links" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-                  <img src={Links} alt="Enlaces y bases" className="w-12 h-12 mb-2" />
-                  <p className="text-sm font-semibold">Enlaces y bases</p>
-                </Link>
-                <Link to="/documents" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-                  <img src={Documents} alt="Mis documentos" className="w-12 h-12 mb-2" />
-                  <p className="text-sm font-semibold">Mis documentos</p>
-                </Link>
-                <Link to="/calendar" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-                  <img src={Calendar} alt="Calendario" className="w-12 h-12 mb-2" />
-                  <p className="text-sm font-semibold">Calendario</p>
-                </Link>
-                <Link to="/account" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-                  <img src={Account} alt="Mi cuenta" className="w-12 h-12 mb-2" />
-                  <p className="text-sm font-semibold">Mi cuenta</p>
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      <hr className="border-t-2 border-black mt-0 mb-8" />
+    {/* Línea de separación */}
+    <hr className="border-t-2 border-black my-4" />
 
       {/* Contenido Principal */}
-      <div className="container mx-auto mt-8">
+      <div className="container mx-auto mt-8 mb-8">
         <div className="flex flex-wrap justify-between">
           {/* Formulario de Actividad */}
           <form onSubmit={handleSubmit} className="bg-gray-800 bg-opacity-40 p-6 rounded-lg shadow-lg w-full md:w-1/2 lg:w-1/3">
-            <h3 className="text-lg font-bold text-white mb-4">Actividad</h3>
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-2xl font-bold text-white">Obtención grado académico</h1>
+              <IoStarOutline size={40} color="#fff" />
+            </div>
             <div className="mb-4">
               <label className="block text-white text-sm font-semibold mb-2">Función</label>
               <select
