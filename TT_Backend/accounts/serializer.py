@@ -51,7 +51,7 @@ class AccountSerializer(serializers.ModelSerializer):
         model = Accounts
         fields = "__all__"
 
-# Custom serializer to get an token
+# Custom serializer to get a token
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'email'
 
@@ -64,10 +64,16 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         client = MongoClient(settings.MONGO_CONNECTION_STRING)
         db = client[settings.DB_CLIENT]
         account = db.accounts.find_one({"email": email})
+
+        # Check if the account exists
+        if account is None:
+            raise serializers.ValidationError('Correo y/o contraseña inválidos\nIntente nuevamente')
+
+        # Authenticate the user
         user = authenticate(id=account['id'], password=password)
 
         if user is None:
-            raise serializers.ValidationError('Correo y/o contraseña invalidos\nIntente nuevamente')
+            raise serializers.ValidationError('Correo y/o contraseña inválidos\nIntente nuevamente')
         
         # Manually generate tokens
         refresh = RefreshToken.for_user(user)
