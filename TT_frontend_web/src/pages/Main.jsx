@@ -1,16 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import promoImage from '../img/ipn-main.webp';
-import enlace from '../img/enlace.png';
+import { IoLinkOutline, IoMegaphoneOutline, IoPeopleOutline, IoPersonOutline, IoHomeOutline } from 'react-icons/io5';
+import { motion } from 'framer-motion';
+import promoImage from '../img/ipn-main.webp'
 import Main_1 from '../img/Main_1.jpg';
 import Main_2 from '../img/descriptiva.jpg';
-import Convocatoria from '../img/megafono.png';
-import Nosotros from '../img/proyecto.png';
-import login from '../img/miPerfil.png';
 import convo_2 from '../img/convo_2.jpg';
 import Main_3 from '../img/main_3.jpg';
 
 function MainContent() {
+  // Verifica si el token JWT está en el almacenamiento local
+  const isAuthenticated = !!localStorage.getItem('token');
+
+  const iconVariants = {
+    hover: { scale: 1, rotate: 5, color: "#ADD8E6" }, 
+    tap: { scale: 0.9, opacity: 1 }, 
+  };
+
   return (
     <main className="min-h-screen bg-cover bg-center">
       <div className="container mx-auto p-8">
@@ -19,26 +25,67 @@ function MainContent() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 mb-12">
-          <div className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center">
-            <img src={enlace} alt="Enlaces oficiales" className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
-            <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Enlaces oficiales</p>
-          </div>
-          
-          <Link to="/Convocatoria" className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center">
-            <img src={Convocatoria} alt="Convocatoria" className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
-            <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Convocatoria</p>
-          </Link>
-          
-          <Link to="/Nosotros" className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center">
-            <img src={Nosotros} alt="Nosotros" className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
-            <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Nuestro Proyecto</p>
-          </Link>
-          
-          <Link to="/Login" className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center">
-            <img src={login} alt="Inicio de sesión en el sitio" className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
+      
+      <motion.div
+        className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center"
+        whileHover="hover"
+        whileTap="tap"
+        variants={iconVariants}
+      >
+        <IoLinkOutline className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
+        <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Enlaces oficiales</p>
+      </motion.div>
+      
+      <Link to="/Convocatoria">
+        <motion.div
+          className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center"
+          whileHover="hover"
+          whileTap="tap"
+          variants={iconVariants}
+        >
+          <IoMegaphoneOutline className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
+          <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Convocatoria</p>
+        </motion.div>
+      </Link>
+      
+      <Link to="/Nosotros">
+        <motion.div
+          className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center"
+          whileHover="hover"
+          whileTap="tap"
+          variants={iconVariants}
+        >
+          <IoPeopleOutline className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
+          <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Nuestro Proyecto</p>
+        </motion.div>
+      </Link>
+      
+      {isAuthenticated ? (
+        <Link to="/Home">
+          <motion.div
+            className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center"
+            whileHover="hover"
+            whileTap="tap"
+            variants={iconVariants}
+          >
+            <IoHomeOutline className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
+            <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Inicio</p>
+          </motion.div>
+        </Link>
+      ) : (
+        <Link to="/Login">
+          <motion.div
+            className="bg-blue-500 text-white p-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors w-32 h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 flex flex-col items-center justify-center"
+            whileHover="hover"
+            whileTap="tap"
+            variants={iconVariants}
+          >
+            <IoPersonOutline className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
             <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Iniciar sesión</p>
-          </Link>
-        </div>
+          </motion.div>
+        </Link>
+      )}
+    </div>
 
         <div className="flex flex-wrap justify-center">
           <div className="w-full md:w-2/3 mb-8">

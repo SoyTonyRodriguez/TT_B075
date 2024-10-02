@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Links from '../img/enlace.png';
-import Documents from '../img/documentos.png';
-import Calendar from '../img/calendario.png';
-import Account from '../img/miPerfil.png';
-import PromotionIcon from '../img/estrella.png';  
-import DegreeIcon from '../img/alumno.png';  
-import MenuIcon from '../img/menu-icon.png'; // Icono para el botón compacto
+import { IoStarOutline, IoSchoolOutline } from "react-icons/io5";
+import Navigation from './Navigation/Navigation'; 
 
 function NewProjection() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -18,70 +13,13 @@ function NewProjection() {
     return (
         <div className="min-h-screen bg-cover bg-center">
           
-          {/* Navegación Secundaria */}
-          <div className="p-4 flex justify-between items-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-0">Crear proyección</h2>
+          {/* navegación fija */}
+          <Navigation />
 
-            {/* Botones normales en pantallas grandes, botón compacto en pantallas pequeñas */}
-            <div className="hidden md:flex space-x-4">
-              <Link to="/links" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-                <img src={Links} alt="Enlaces y bases" className="w-12 h-12 mb-2" />
-                <p className="text-sm font-semibold">Enlaces y bases</p>
-              </Link>
-              <Link to="/documents" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-                <img src={Documents} alt="Mis documentos" className="w-12 h-12 mb-2" />
-                <p className="text-sm font-semibold">Mis documentos</p>
-              </Link>
-              <Link to="/calendar" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-                <img src={Calendar} alt="Calendario" className="w-12 h-12 mb-2" />
-                <p className="text-sm font-semibold">Calendario</p>
-              </Link>
-              <Link to="/account" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-36 h-36 flex flex-col items-center justify-center">
-                <img src={Account} alt="Mi cuenta" className="w-12 h-12 mb-2" />
-                <p className="text-sm font-semibold">Mi cuenta</p>
-              </Link>
-            </div>
-
-            {/* Botón Compacto para pantallas pequeñas */}
-            <div className="md:hidden relative">
-              <button
-                onClick={toggleMenu}
-                className="text-white p-4 transition-transform transform hover:scale-125 w-30 h-30 flex items-center justify-center"
-              >
-                <img src={MenuIcon} alt="Menú" className="w-10 h-10" />
-              </button>
-
-              {/* Menú Desplegable */}
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg">
-                  <div className="p-4 flex flex-col space-y-4">
-                    <Link to="/links" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-                      <img src={Links} alt="Enlaces y bases" className="w-12 h-12 mb-2" />
-                      <p className="text-sm font-semibold">Enlaces y bases</p>
-                    </Link>
-                    <Link to="/documents" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-                      <img src={Documents} alt="Mis documentos" className="w-12 h-12 mb-2" />
-                      <p className="text-sm font-semibold">Mis documentos</p>
-                    </Link>
-                    <Link to="/calendar" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-                      <img src={Calendar} alt="Calendario" className="w-12 h-12 mb-2" />
-                      <p className="text-sm font-semibold">Calendario</p>
-                    </Link>
-                    <Link to="/account" className="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 flex flex-col items-center justify-center">
-                      <img src={Account} alt="Mi cuenta" className="w-12 h-12 mb-2" />
-                      <p className="text-sm font-semibold">Mi cuenta</p>
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Línea de separación */}
           <hr className="border-t-2 border-black my-4" />
     
           {/* Contenido Principal */}
-          <div className="container mx-auto mt-8">
+          <div className="container mx-auto mt-8 mb-8">
             <div className="grid grid-cols-1 gap-6">
               {/* Por unidades de promoción */}
               <div className="flex items-center justify-between bg-black bg-opacity-40 p-6 rounded-lg shadow-lg">
@@ -91,11 +29,11 @@ function NewProjection() {
                   </p>
                 </div>
                 <Link to="/unidades-promocion" className="bg-blue-500 text-white p-10 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
-                  <img src={PromotionIcon} alt="Por unidades de promoción" className="mb-2 w-24 h-24" />
+                  <IoStarOutline className="mb-2 w-24 h-24" /> {/* Icono Unidades de Promoción */}
                   <p className="text-center text-lg font-semibold">Por unidades de promoción</p>
                 </Link>
               </div>
-    
+
               {/* Por obtención de grado académico */}
               <div className="flex items-center justify-between bg-black bg-opacity-40 p-6 rounded-lg shadow-lg">
                 <div className="flex-1 mr-4">
@@ -104,7 +42,7 @@ function NewProjection() {
                   </p>
                 </div>
                 <Link to="/promocion-grado" className="bg-blue-500 text-white p-10 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center">
-                  <img src={DegreeIcon} alt="Por obtención de grado académico" className="mb-2 w-24 h-24" />
+                  <IoSchoolOutline className="mb-2 w-24 h-24" /> {/* Icono Grado Académico */}
                   <p className="text-center text-lg font-semibold">Por obtención de grado académico</p>
                 </Link>
               </div>

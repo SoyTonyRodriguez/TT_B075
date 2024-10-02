@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { createAccount } from "../api/accounts.api";
+
+// new path:
+import { createAccount } from '../../../api/accounts.api';
 
 const Registro = () => {
 
@@ -52,7 +54,7 @@ const Registro = () => {
   const password = watch('password');  
   
     return (
-        <div className="flex flex-col w-3/5 mx-auto p-10 bg-black bg-opacity-40 rounded-3xl shadow-lg mt-10">
+        <div className="flex flex-col w-3/5 mx-auto p-10 bg-black bg-opacity-40 rounded-3xl shadow-lg mt-10 mb-10">
             <h2 className="text-left text-white text-2xl mb-4">Nuevo Usuario</h2>
             <div className="mx-auto container justify-between items-center bg-white h-0.5 mb-6"></div>
             <form className="w-full" onSubmit={onSubmit}>
@@ -158,12 +160,12 @@ const Registro = () => {
                 >
                     Cancelar
                 </Link>
-                <button
+                <Link
                         to="/home"
-                        className="bg-blue-900 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full sm:w-auto min-w-[200px] text-lg flex items-center justify-center"
+                        className="bg-blue-700 text-white px-6 py-3 rounded-2xl hover:bg-blue-800 w-full sm:w-auto min-w-[200px] text-lg flex items-center justify-center"
                     >
                         Ingresar
-                    </button>
+                </Link>
                 </div>
             </form>
         </div>

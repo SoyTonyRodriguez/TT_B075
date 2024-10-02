@@ -12,13 +12,11 @@ const GuideScreen = () => {
       resizeMode="cover"
     >
       <ScrollView>
-        {/* Main Content */}
         <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
           <Text style={tw`text-2xl font-bold text-black text-center`}>¿Crear proyección?</Text>
           <Ionicons name="document" size={40} color="black" />
         </View>
 
-        {/* Instructional Text Section */}
         <View style={tw`max-w-xl mx-auto text-center px-5`}>
           <Text style={tw`text-xl mb-6 leading-relaxed text-black`}>
             Crear una proyección te permitirá establecer y controlar todas aquellas actividades que te propongas cumplir en un
@@ -32,7 +30,6 @@ const GuideScreen = () => {
           </Text>
         </View>
 
-        {/* Closing Instructional Text */}
         <View style={tw`max-w-xl mx-auto mt-8 text-center px-5`}>
           <Text style={tw`text-lg text-white leading-relaxed`}>
             Conforme creas y agregas tareas podrás visualizar la cantidad de actividades que te has propuesto y el acumulado de unidades de promoción.

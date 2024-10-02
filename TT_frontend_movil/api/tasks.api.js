@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Initial set-up
 const TasksAPI = axios.create({
-    baseURL: 'http://localhost:8000/api/v1/'
+    baseURL: 'http://192.168.1.143:8000/api/v1/'
 })
 
 // create task method
@@ -33,5 +33,12 @@ export const updateTaskStatus = (taskId, updatedData) => {
         headers: {
             Authorization: `Bearer ${token}`,
         },
+    });
+};
+
+export const deleteTask = (taskId) => {
+    const token = localStorage.getItem('token');
+    return TasksAPI.delete(`tasks/${taskId}/delete/`, {
+        headers: { Authorization: `Bearer ${token}` },
     });
 };

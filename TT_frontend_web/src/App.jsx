@@ -6,11 +6,13 @@ import ConocerMas from './pages/ConocerMas';
 import Nosotros from './pages/Nosotros'; 
 import Login from "./pages/Login";
 import Registro from './pages/Registro'; 
+import RecuperarCuenta from './pages/RecuperarCuenta';
 import HomeScreen from './pages/HomeScreen';
 import Projection from './pages/Projection';
 import KanbanBoard from './pages/KanbanBoard';
 import NewProjection from "./pages/NewProjection";
 import UnidadesPromocion from './pages/UnidadesPromocion';
+import GradoAcademico from './pages/GradoAcademico';
 import VerProyeccion from './pages/VerProyeccion';
 import Links from './pages/Links';
 import Documents from './pages/Documents';
@@ -18,6 +20,7 @@ import Calendar from './pages/Calendar';
 import Account from './pages/Account';
 import Guia from './pages/Guia';
 import Convocatoria from "./pages/Convocatoria";
+import Privacidad from './pages/PrivacyScreen';
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
 import { Toaster } from "react-hot-toast";
@@ -36,29 +39,32 @@ function App() {
     >
       <Header />
       <Routes>
-        // Redirigiendo la pagina principal(/) a /welcome con Navigate
+        {/* Redirigiendo la pagina principal(/) a /welcome con Navigate */}
         <Route path='/' element={<Navigate to="/welcome" />} />
 
-        // Asignando que paginas mostrar cuando se visite cierta url
+        {/* Asignando qué páginas mostrar cuando se visite cierta URL */}
         <Route path='/welcome' element={<MainContent className="flex-grow" />} />
         <Route path='/ConocerMas' element={<ConocerMas />} />
         <Route path='/Nosotros' element={<Nosotros />} />
         <Route path="/login" element={<Login/>} />
         <Route path="/Registro" element={<Registro/>} />
-        {/* <Route path="/home" element={<HomeScreen />} /> */}
-        <Route path="/home" element={<ProtectedRoute component={HomeScreen} />} />
-        <Route path="/projection" element={<Projection />} />
-        <Route path="/links" element={<Links />} />
-        <Route path="/documents" element={<Documents />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/new-projection" element={<NewProjection />} />
-        <Route path="/unidades-promocion" element={<UnidadesPromocion />} />
-        <Route path="/observe-projection" element={<VerProyeccion />} />
-        <Route path="/Convocatoria" element={<Convocatoria/>}/>
-        <Route path="/Guia" element={<Guia/>}/>
-        <Route path="/KanbanBoard" element={<KanbanBoard/>}/>
+        <Route path="/RecuperarCuenta" element={<RecuperarCuenta/>} />
+        <Route path="/privacidad" element={<Privacidad/>} />
 
+        {/* ProtectedRoute pages, only accessible when logged in */}
+        <Route path="/home" element={<ProtectedRoute component={HomeScreen} />} />
+        <Route path="/projection" element={<ProtectedRoute component={Projection} />} />
+        <Route path="/links" element={<ProtectedRoute component={Links} />} />
+        <Route path="/documents" element={<ProtectedRoute component={Documents} />} />
+        <Route path="/calendar" element={<ProtectedRoute component={Calendar} />} />
+        <Route path="/account" element={<ProtectedRoute component={Account} />} />
+        <Route path="/new-projection" element={<ProtectedRoute component={NewProjection} />} />
+        <Route path="/unidades-promocion" element={<ProtectedRoute component={UnidadesPromocion} />} />
+        <Route path="/promocion-grado" element={<ProtectedRoute component={GradoAcademico} />} />
+        <Route path="/observe-projection" element={<ProtectedRoute component={VerProyeccion} />} />
+        <Route path="/Convocatoria" element={<ProtectedRoute component={Convocatoria} />} />
+        <Route path="/Guia" element={<ProtectedRoute component={Guia} />} />
+        <Route path="/KanbanBoard" element={<ProtectedRoute component={KanbanBoard} />} />
       </Routes>
       <Footer />
       <Toaster />
