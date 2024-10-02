@@ -27,7 +27,7 @@ export const getTasks = (account_id) => {
     });
 };
 
-export const updateTaskStatus = (taskId, updatedData) => {
+export const updateTask = (taskId, updatedData) => {
     const token = localStorage.getItem('token');
     return TasksAPI.patch(`tasks/${taskId}/edit/`, updatedData, {
         headers: {

@@ -28,6 +28,7 @@ class Task(models.Model):
         choices=Status.choices,
         default=Status.TODO
     )
+    priority = models.CharField(_('priority'), max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     start_date = models.DateField()

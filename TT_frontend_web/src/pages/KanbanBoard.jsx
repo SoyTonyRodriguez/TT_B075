@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { createTask, getTasks, updateTaskStatus, deleteTask } from "../../../api/tasks.api";
+import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks.api";
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
+
+// Componente de Spinner discreto
+const LoadingSpinner = () => (
+<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+        <div className="flex flex-col items-center justify-center">
+            <div className="animate-spin rounded-full h-36 w-36 border-t-8 border-b-8 border-blue-500"></div>
+            <p className="text-white text-3xl font-semibold mt-4 animate-pulse text-center">
+                Guardando los cambios...
+            </p>
+        </div>
+    </div>
+
+);
 
 function KanbanBoard() {
     // Get Tasks from the API
@@ -15,6 +28,8 @@ function KanbanBoard() {
 
     // Loading state (Pantalla de carga XD)
     const [loading, setLoading] = useState(true);
+    const [isTaskLoading, setIsTaskLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
+    
     
     // New task state
     const [newTask, setNewTask] = useState({
@@ -31,6 +46,9 @@ function KanbanBoard() {
 
     // Modal state, to show or hide the task creation form
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [taskToEdit, setTaskToEdit] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     // Decode JWT once at the start and get the user ID
     useEffect(() => {
@@ -81,32 +99,88 @@ function KanbanBoard() {
     // Create a new task and add it to the tasks state
     const handleCreateTask = async () => {
         try {
-            // Call the API to create the task
-            const response = await createTask(newTask);
+            setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
 
-            // Add the new task to the tasks state
+            // Verificar si todos los campos obligatorios están llenos
+            if (!newTask.title || !newTask.description || !newTask.end_date) {
+                toast.error('Todos los campos son obligatorios.');
+                return;
+            }
+    
+            // Llamar a la API para crear la tarea
+            const response = await createTask(newTask);
+    
+            // Verificar que haya datos en la respuesta (si la tarea fue creada)
+            if (!response || !response.data) {
+                throw new Error('Error creando la tarea');
+            }
+    
+            // Añadir la nueva tarea al estado local
             setTasks([...tasks, response.data]);
+    
+            // Limpiar el formulario y cerrar el modal
             setNewTask({
                 title: '',
                 description: '',
                 priority: 'Media',
                 status: 'todo',
-                start_date: '',
+                start_date: '', // Fecha actual en formato local
                 end_date: ''
             });
-
-            // Close the modal (Ocultar el formulario XD)
+    
             setIsModalOpen(false);
-            toast.success('Tarea creada con éxito');  // Mostrar toast para la tarea creada
+            toast.success('Tarea creada con éxito');  // Mostrar toast de éxito
         } catch (error) {
-            console.error('Error creating task:', error);
-            setError('Error creating task.');
+            const apiErrors = error.response.data || {};
+            if (error.response.status === 400) {
+                const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
+                toast.error(errorMessage);
+            }else {
+                console.error('Error creando tarea:', error);
+    
+                // Mostrar un toast si ocurre un error
+                toast.error('Error creando la tarea. Verifica los datos.');
+            }
+        } finally { 
+            setIsTaskLoading(false);  // Detener la pantalla de carga para tareas
         }
     };
 
     // Eliminar una tarea del estado local (no de la API)
     const handleDeleteTask = (id) => {
         setTasks(tasks.filter(task => task.id !== id));  // Filtrar las tareas eliminando la que coincide con el id
+    };
+
+    // Actualizar una tarea en el estado local y en la API
+    const handleUpdateTask = async () => {
+        try {
+            setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
+            // Verificar si todos los campos obligatorios están llenos
+            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.end_date) {
+                toast.error('Todos los campos son obligatorios.');
+                return;
+            }
+
+            const response = await updateTask(taskToEdit.id, taskToEdit);
+            if (response && response.data) {
+                setTasks(tasks.map(task => task.id === taskToEdit.id ? response.data : task));
+                toast.success('Tarea actualizada con éxito');
+                closeEditModal();
+            }
+        } catch (error) {
+            const apiErrors = error.response.data || {};
+            if (error.response.status === 400) {
+                const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
+                toast.error(errorMessage);
+            }else {
+                console.error('Error creando tarea:', error);
+    
+                // Mostrar un toast si ocurre un error
+                toast.error('Error creando la tarea. Verifica los datos.');
+            }
+        } finally {
+            setIsTaskLoading(false);  // Detener la pantalla de carga para tareas
+        }
     };
 
     // Update task status when dropped in a different column
@@ -120,7 +194,7 @@ function KanbanBoard() {
     
         // Luego hacer la llamada a la API
         try {
-            await updateTaskStatus(id, { status: newStatus });
+            await updateTask(id, { status: newStatus });
             toast.success('Tarea actualizada con éxito');  // Mostrar toast para la tarea actualizada
         } catch (error) {
             console.error('Error updating task status:', error);
@@ -130,14 +204,6 @@ function KanbanBoard() {
         }
     };
 
-    // Calculate duration between start and end date
-    const calculateDuration = (startDate, endDate) => {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const durationInMs = Math.abs(end - start);
-        const durationInDays = Math.ceil(durationInMs / (1000 * 60 * 60 * 24));
-        return durationInDays;
-    };
 
     // TaskCard component that displays the task details
     const TaskCard = ({ task, onDelete }) => {
@@ -151,7 +217,8 @@ function KanbanBoard() {
         });
     
         // Función que maneja la eliminación de la tarea
-        const handleDelete = async () => {
+        const handleDelete = async (e) => {
+            e.stopPropagation();  // Detener la propagación del clic para que no abra el modal de edición
             try {
                 onDelete(task.id);          // Eliminarla del estado local
                 await deleteTask(task.id);  // Llamar a la API para eliminar la tarea
@@ -162,14 +229,29 @@ function KanbanBoard() {
             }
         };
     
+        // Determinar el color de fondo según la prioridad
+        const getPriorityColor = () => {
+            switch (task.priority) {
+                case 'Alta':
+                    return 'bg-red-200';    // Color para alta prioridad
+                case 'Media':
+                    return 'bg-yellow-200'; // Color para prioridad media
+                case 'Baja':
+                    return 'bg-blue-200';  // Color para baja prioridad
+                default:
+                    return 'bg-gray-200';   // Color por defecto
+            }
+        };
+    
         return (
             <div
+                onClick={() => openEditModal(task)}
                 ref={drag}
-                className={`relative bg-white p-4 mb-4 rounded-lg shadow-md transition-all duration-300 transform ${
+                className={`relative p-4 mb-4 rounded-lg shadow-md transition-all duration-300 transform ${getPriorityColor()} ${
                     isDragging 
-                    ? 'opacity-50 scale-0' // Efecto de opacidad y escala al arrastrar
-                    : 'opacity-100 scale-100' // Estado normal
-                }`}
+                    ? 'opacity-50 scale-0 cursor-move' // Efecto de opacidad y escala al arrastrar
+                    : 'opacity-100 scale-100 cursor-pointer' // Estado normal
+                } `}
             >
                 {/* Botón de eliminación "X" en la esquina superior derecha */}
                 <button
@@ -180,12 +262,33 @@ function KanbanBoard() {
                 </button>
     
                 <div className="font-bold text-lg mb-2">{task.title}</div>
-                <p><strong>Duración:</strong> {calculateDuration(task.start_date, task.end_date)} días</p>
                 <p><strong>Prioridad:</strong> {task.priority}</p>
                 <p><strong>Vencimiento:</strong> {task.end_date}</p>
                 <p><strong>Descripción:</strong> {task.description}</p>
             </div>
         );
+    };
+
+    const openEditModal = (task) => {
+        // Obtener la fecha actual y restar un día
+        const today = new Date();
+        today.setDate(today.getDate());
+    
+        // Formatear la fecha en "YYYY-MM-DD"
+        const formattedDate = today.toISOString().split('T')[0];
+    
+        // Abrir el modal y establecer la fecha actual como la fecha de inicio
+        setTaskToEdit({
+            ...task,
+            start_date: formattedDate, // Setear la fecha actual restada un día
+        });
+                
+        setIsEditModalOpen(true);
+    };
+    
+    const closeEditModal = () => {
+        setTaskToEdit(null);
+        setIsEditModalOpen(false);
     };
     
 
@@ -220,8 +323,27 @@ function KanbanBoard() {
     };
 
     // Modal toggles (Abrir y cerrar el modal)
-    const openModal = () => setIsModalOpen(true);
+    const openModal = () => {
+        // Obtener la fecha actual y restar un día
+        const today = new Date();
+        today.setDate(today.getDate());
+    
+        // Formatear la fecha en "YYYY-MM-DD"
+        const formattedDate = today.toISOString().split('T')[0];
+    
+        // Abrir el modal y establecer la fecha actual como la fecha de inicio
+        setNewTask({
+            ...newTask,
+            start_date: formattedDate, // Setear la fecha actual restada un día
+        });
+        setIsModalOpen(true);
+    };
     const closeModal = () => setIsModalOpen(false);
+
+    // // Show loading screen when tasks are being created or edited
+    // if (isTaskLoading) {
+    //     return <lo />;  // Pantalla de carga específica para creación/edición de tareas
+    // }
 
     // Show loading (Mostrar pantalla de carga)
     if (loading) {
@@ -265,65 +387,145 @@ function KanbanBoard() {
                     </div>
 
                     {isModalOpen && (
-                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                                <h3 className="text-lg font-bold mb-4">Crear Nueva Tarea</h3>
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white p-8 rounded-lg shadow-xl w-96">
+                            <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">Crear Nueva Tarea</h3>
+                                    
+                            {/* Campo del título */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Título de la tarea</label>
                                 <input
                                     type="text"
                                     name="title"
                                     value={newTask.title}
                                     onChange={handleTaskChange}
-                                    placeholder="Título de la tarea"
-                                    className="w-full p-2 mb-4 border border-gray-300 rounded"
+                                    placeholder="Escribe el título"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                                 />
+                            </div>
+                                    
+                            {/* Campo de la descripción */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
                                 <textarea
                                     name="description"
                                     value={newTask.description}
                                     onChange={handleTaskChange}
-                                    placeholder="Descripción"
-                                    className="w-full p-2 mb-4 border border-gray-300 rounded"
+                                    placeholder="Escribe la descripción"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                                 />
-                                <input
-                                    type="date"
-                                    name="start_date"
-                                    value={newTask.start_date}
-                                    onChange={handleTaskChange}
-                                    className="w-full p-2 mb-4 border border-gray-300 rounded"
-                                />
+                            </div>
+                            
+                            {/* Campo de fecha de vencimiento */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha de Vencimiento</label>
                                 <input
                                     type="date"
                                     name="end_date"
                                     value={newTask.end_date}
                                     onChange={handleTaskChange}
-                                    className="w-full p-2 mb-4 border border-gray-300 rounded"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                                 />
+                            </div>
+                                    
+                            {/* Selector de prioridad */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
                                 <select
                                     name="priority"
                                     value={newTask.priority}
                                     onChange={handleTaskChange}
-                                    className="w-full p-2 mb-4 border border-gray-300 rounded"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                                 >
                                     <option value="Alta">Alta</option>
                                     <option value="Media">Media</option>
                                     <option value="Baja">Baja</option>
                                 </select>
-                                <div className="flex justify-between">
-                                    <button
-                                        onClick={closeModal}
-                                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button
-                                        onClick={handleCreateTask}
-                                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                                    >
-                                        Crear
-                                    </button>
-                                </div>
+                            </div>
+                                    
+                            {/* Botones para cancelar o crear */}
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    onClick={closeModal}
+                                    className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleCreateTask}
+                                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+                                >
+                                    Crear
+                                </button>
                             </div>
                         </div>
-                    )}
+                    </div>
+                )}
+
+                {isEditModalOpen && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white p-8 rounded-lg shadow-xl w-96">
+                            <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">Editar Tarea</h3>
+                            
+                            {/* Campo de título */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Título de la tarea</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={taskToEdit?.title || ''}
+                                    onChange={(e) => setTaskToEdit({ ...taskToEdit, title: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                />
+                            </div>
+                            
+                            {/* Campo de descripción */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+                                <textarea
+                                    name="description"
+                                    value={taskToEdit?.description || ''}
+                                    onChange={(e) => setTaskToEdit({ ...taskToEdit, description: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                />
+                            </div>
+                            
+                            {/* Campo de fecha de vencimiento */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha de Vencimiento</label>
+                                <input
+                                    type="date"
+                                    name="end_date"
+                                    value={taskToEdit?.end_date || ''}
+                                    onChange={(e) => setTaskToEdit({ ...taskToEdit, end_date: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                />
+                            </div>
+
+                            {/* Selector de prioridad */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
+                                <select
+                                    name="priority"
+                                    value={taskToEdit?.priority || ''}
+                                    onChange={(e) => setTaskToEdit({ ...taskToEdit, priority: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                >
+                                    <option value="Alta">Alta</option>
+                                    <option value="Media">Media</option>
+                                    <option value="Baja">Baja</option>
+                                </select>
+                            </div>
+                            
+                            <div className="flex justify-end space-x-4">
+                                <button onClick={closeEditModal} className="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</button>
+                                <button onClick={handleUpdateTask} className="bg-green-500 text-white px-4 py-2 rounded-lg">Actualizar</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                    {isTaskLoading && <LoadingSpinner />}  {/* Mostrar spinner discreto si hay carga */}
+
                 </DndProvider>
             </div>
         </main>
