@@ -5,6 +5,7 @@ import Documents from '../img/documentos.png';
 import Calendar from '../img/calendario.png';
 import Account from '../img/miPerfil.png';
 import MenuIcon from '../img/menu-icon.png';
+import InfoProjection from './InfoProjection';
 
 function UnidadesPromocion() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -288,8 +289,8 @@ function UnidadesPromocion() {
             </div>
             <div className="mb-8">
               <h3 className="text-lg font-bold text-gray-700">¿No sabes qué agregar?</h3>
-              <p className="text-gray-700">¡Conoce más acerca de las actividades que puedes realizar, qué implican y sus detalles!</p>
-              <button className="mt-4 bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600">¿Qué puedo agregar?</button>
+              <p className="text-gray-700 mb-8">¡Conoce más acerca de las actividades que puedes realizar, qué implican y sus detalles!</p>
+              <Link to= '/InfoProjection' className="mt-4 bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600">¿Qué puedo agregar?</Link>
             </div>
           </div>
         </div>
