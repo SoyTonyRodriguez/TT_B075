@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IoStarOutline, IoSchoolOutline } from "react-icons/io5";
 import Navigation from './Navigation/Navigation'; 
+import { createProjection, getProjection, deleteProjection, updateProjection } from '../../../api/projections.api';
 
 function UnidadesPromocion() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [prioridad, setPrioridad] = useState('');
   const [fechaProyectada, setFechaProyectada] = useState('');
   const [funcion, setFuncion] = useState('');
@@ -13,10 +13,6 @@ function UnidadesPromocion() {
   const [actividad, setActividad] = useState('');
   const [documentoRequerido, setDocumentoRequerido] = useState('');
   const [up, setUp] = useState('');
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
 
   // Definición de la función para obtener el color según la prioridad
   const getColorForPriority = (priority) => {
@@ -80,6 +76,19 @@ function UnidadesPromocion() {
     ],
   };
 
+  // Función para resetear todos los campos excepto la función
+  const handleFuncionChange = (e) => {
+    setFuncion(e.target.value);
+
+    // Resetea los demás campos
+    setActividad('');
+    setFechaProyectada('');
+    setRolParticipacion('');
+    setAlcance('');
+    setDocumentoRequerido('');
+    setUp('');
+  };
+  
   const getActividades = () => {
     if (funcion && actividadesPorFuncion[funcion]) {
       return actividadesPorFuncion[funcion].map((item, index) => (
@@ -132,7 +141,7 @@ function UnidadesPromocion() {
               <label className="block text-white text-sm font-semibold mb-2">Función</label>
               <select
                 value={funcion}
-                onChange={(e) => setFuncion(e.target.value)}
+                onChange={handleFuncionChange}
                 className="w-full p-2 rounded-lg border border-gray-400"
               >
                 <option value="" disabled>Selecciona una función</option>
