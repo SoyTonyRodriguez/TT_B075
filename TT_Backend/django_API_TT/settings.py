@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'accounts',
     'tasks',
     'calendar_dates',
+    'projections',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)

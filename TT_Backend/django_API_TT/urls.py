@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('', include('tasks.urls')),
     path('', include('calendar_dates.urls')),
+    path('', include('projections.urls')),
 ]
