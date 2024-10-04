@@ -18,7 +18,7 @@ export const createProjection = (projection) => {
 // getTasks from account method
 export const getProjection = (account_id) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.get(`tasks/${account_id}/`, {
+    return TasksAPI.get(`projections/${account_id}/`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -27,7 +27,7 @@ export const getProjection = (account_id) => {
 
 export const updateProjection = (projection_id, updatedData) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.patch(`tasks/${projection_id}/edit/`, updatedData, {
+    return TasksAPI.patch(`projections/${projection_id}/edit/`, updatedData, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -36,7 +36,7 @@ export const updateProjection = (projection_id, updatedData) => {
 
 export const deleteProjection = (projection_id) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.delete(`tasks/${projection_id}/delete/`, {
+    return TasksAPI.delete(`projections/${projection_id}/delete/`, {
         headers: { Authorization: `Bearer ${token}` },
     });
 };
