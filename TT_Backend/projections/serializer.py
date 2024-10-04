@@ -7,7 +7,7 @@ class RegisterProjectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projection
         fields = ['id', 'account_id', 'function', 'activity', 'role', 'scope', 
-                  'tasks', 'documents_required', 'start_date', 'end_date']
+                  'tasks', 'documents_required', 'start_date', 'end_date', 'units', 'priority']
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True},

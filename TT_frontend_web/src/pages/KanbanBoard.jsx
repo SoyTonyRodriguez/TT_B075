@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks.api";
+import { getProjection, updateProjection } from '../../../api/projections.api';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
@@ -20,7 +21,20 @@ const LoadingSpinner = () => (
 
 );
 
+const generateRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+};
+
 function KanbanBoard() {
+
+    // Estado para almacenar los colores generados para cada proyección
+    const [projectionColors, setProjectionColors] = useState({});
+
     // Get Tasks from the API
     const [tasks, setTasks] = useState([]);
 
@@ -30,7 +44,9 @@ function KanbanBoard() {
     // Loading state (Pantalla de carga XD)
     const [loading, setLoading] = useState(true);
     const [isTaskLoading, setIsTaskLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
-    
+
+    // Estado para guardar las proyecciones traídas de la API
+    const [projections, setProjections] = useState([]);
     
     // New task state
     const [newTask, setNewTask] = useState({
@@ -51,6 +67,19 @@ function KanbanBoard() {
     const [taskToEdit, setTaskToEdit] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+    useEffect(() => {
+        const newProjectionColors = {};
+
+        // Generar color aleatorio para cada proyección si aún no tiene uno
+        projections.forEach(projection => {
+            if (!newProjectionColors[projection.id]) {
+                newProjectionColors[projection.id] = generateRandomColor();
+            }
+        });
+
+        setProjectionColors(newProjectionColors);  // Almacenar los colores generados
+    }, [projections]);  // Se ejecuta cuando las proyecciones cambian
+
     // Decode JWT once at the start and get the user ID
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -70,22 +99,39 @@ function KanbanBoard() {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                // Call the API to get the tasks
                 const response = await getTasks(userId);
-
-                // Set the tasks state with the response data (Lista de tareas)
                 setTasks(response.data);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
                 setError('Error fetching tasks.');
-            } finally {
-                setLoading(false); // Always stop loading after fetching
             }
         };
-
-        // if userId is set, fetch the tasks
+    
+        const fetchProjections = async () => {
+            try {
+                const response = await getProjection(userId);
+                setProjections(response.data); // Guardar las proyecciones en el estado
+                console.log(response.data);
+            } catch (error) {
+                console.error('Error fetching projections:', error);
+                setError('Error fetching projections.');
+            }
+        };
+    
+        const fetchData = async () => {
+            setLoading(true); // Inicia la carga
+            try {
+                // Ejecuta ambas funciones en paralelo y espera a que ambas terminen
+                await Promise.all([fetchTasks(), fetchProjections()]);
+            } catch (error) {
+                console.error('Error in one or both requests:', error);
+            } finally {
+                setLoading(false); // Finaliza la carga cuando ambas han terminado
+            }
+        };
+    
         if (userId) {
-            fetchTasks();
+            fetchData(); // Llama a la función que maneja ambas solicitudes
         }
     }, [userId]);
 
@@ -103,7 +149,7 @@ function KanbanBoard() {
             setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
 
             // Verificar si todos los campos obligatorios están llenos
-            if (!newTask.title || !newTask.description || !newTask.end_date) {
+            if (!newTask.title || !newTask.description || !newTask.end_date || !newTask.projection, !newTask.projection_id) {
                 toast.error('Todos los campos son obligatorios.');
                 return;
             }
@@ -126,7 +172,8 @@ function KanbanBoard() {
                 priority: 'Media',
                 status: 'todo',
                 start_date: '', // Fecha actual en formato local
-                end_date: ''
+                end_date: '',
+                projection_id: '' // Limpiar el campo de proyección
             });
     
             setIsModalOpen(false);
@@ -157,7 +204,7 @@ function KanbanBoard() {
         try {
             setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
             // Verificar si todos los campos obligatorios están llenos
-            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.end_date) {
+            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.end_date || !taskToEdit.projection_id) {
                 toast.error('Todos los campos son obligatorios.');
                 return;
             }
@@ -207,7 +254,7 @@ function KanbanBoard() {
 
 
     // TaskCard component that displays the task details
-    const TaskCard = ({ task, onDelete }) => {
+    const TaskCard = ({ task, onDelete, projections }) => {
         // Hook para arrastrar y soltar
         const [{ isDragging }, drag] = useDrag({
             type: 'task',
@@ -244,32 +291,50 @@ function KanbanBoard() {
             }
         };
     
+        // Buscar el nombre de la proyección en base al projection_id
+        const projection = projections.find(proj => proj.id === task.projection_id);
+        const projectionName = projection ? projection.function : 'Sin proyección';
+        const projectionActivity = projection ? projection.activity : 'Sin actividad';
+
+        const projectionColor = projectionColors[task.projection_id] || '#f0f0f0'; // Color por defecto si no hay proyección
+
+    
         return (
             <div
                 onClick={() => openEditModal(task)}
                 ref={drag}
-                className={`relative p-4 mb-4 rounded-lg shadow-md transition-all duration-300 transform ${getPriorityColor()} ${
+                className={`relative p-4 mb-4 rounded-lg shadow-lg transition-all duration-300 transform ${getPriorityColor()} ${
                     isDragging 
                     ? 'opacity-50 scale-0 cursor-move' // Efecto de opacidad y escala al arrastrar
                     : 'opacity-100 scale-100 cursor-pointer' // Estado normal
                 } `}
+                style={{ paddingBottom: '4rem' }}  // Asegura que haya espacio para el "badge"
             >
                 {/* Botón de eliminación "X" en la esquina superior derecha */}
                 <button
                     onClick={handleDelete}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-3xl"
-                    >
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-2xl"
+                >
                     &times;
                 </button>
     
-                <div className="font-bold text-lg mb-2">{task.title}</div>
-                <p><strong>Prioridad:</strong> {task.priority}</p>
-                <p><strong>Vencimiento:</strong> {task.end_date}</p>
-                <p><strong>Descripción:</strong> {task.description}</p>
+                {/* Mostrar el nombre de la tarea */}
+                <div className="font-bold text-xl mb-2 text-gray-800">{task.title}</div>
+                <p className="text-sm"><strong>Prioridad:</strong> {task.priority}</p>
+                <p className="text-sm"><strong>Vencimiento:</strong> {task.end_date}</p>
+                <p className="text-sm mb-4"><strong>Descripción:</strong> {task.description}</p>
+    
+                {/* Mostrar el nombre de la actividad y la proyección en la esquina inferior derecha */}
+                <div className="absolute bottom-2 right-2 bg-gray-100 text-gray-700 text-xs font-medium px-4 py-1 rounded-md shadow border border-gray-300 text-right max-w-xs break-words"
+                    style={{ backgroundColor: projectionColor }} // Aplicar el color aquí
+                >
+                    <div>{projectionActivity}</div> {/* Nombre de la actividad */}
+                    <div className="text-gray-600 italic">{projectionName}</div> {/* Nombre de la proyección */}
+                </div>
             </div>
         );
     };
-
+    
     const openEditModal = (task) => {
         // Obtener la fecha actual y restar un día
         const today = new Date();
@@ -368,17 +433,17 @@ function KanbanBoard() {
                     <div className="flex justify-between gap-x-6 p-6 bg-gray-800 rounded-lg shadow-md">
                         <Column status="todo">
                             {tasks.filter(task => task.status === 'todo').map(task => (
-                                <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} />
+                                <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                             ))}
                         </Column>
                         <Column status="in-progress">
                             {tasks.filter(task => task.status === 'in-progress').map(task => (
-                                <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} />
+                                <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                             ))}
                         </Column>
                         <Column status="done">
                             {tasks.filter(task => task.status === 'done').map(task => (
-                                <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} />
+                                <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                             ))}
                         </Column>
                     </div>
@@ -448,6 +513,25 @@ function KanbanBoard() {
                                     <option value="Baja">Baja</option>
                                 </select>
                             </div>
+
+                            {/* Selector de proyección */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Proyección</label>
+                                <select
+                                    name="projection_id"
+                                    value={newTask.projection_id}
+                                    onChange={(e) => setNewTask({ ...newTask, projection_id: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                >
+                                    <option value="">Selecciona una proyección</option>
+                                    {projections.map(projection => (
+                                        <option key={projection.id} value={projection.id}>
+                                            {projection.function}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            
                                     
                             {/* Botones para cancelar o crear */}
                             <div className="flex justify-end space-x-4">
@@ -520,6 +604,24 @@ function KanbanBoard() {
                                     <option value="Alta">Alta</option>
                                     <option value="Media">Media</option>
                                     <option value="Baja">Baja</option>
+                                </select>
+                            </div>
+
+                            {/* Selector de proyección */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Proyección</label>
+                                <select
+                                    name="projection_id"
+                                    value={taskToEdit?.projection_id || ''}
+                                    onChange={(e) => setTaskToEdit({ ...taskToEdit, projection_id: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                >
+                                    <option value="">Selecciona una proyección</option>
+                                    {projections.map(projection => (
+                                        <option key={projection.id} value={projection.id}>
+                                            {projection.function}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             
