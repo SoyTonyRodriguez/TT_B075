@@ -33,6 +33,7 @@ class Task(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     start_date = models.DateField()
     end_date = models.DateField()
+    projection_id = models.CharField(max_length=255)
 
     def __str__(self):
         return self.title

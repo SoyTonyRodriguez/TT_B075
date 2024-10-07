@@ -6,7 +6,7 @@ from datetime import datetime
 class RegisterTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['id', 'account_id','title', 'description', 'status', 'priority', 'start_date', 'end_date']
+        fields = ['id', 'account_id','title', 'description', 'status', 'priority', 'start_date', 'end_date', 'projection_id']
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True}
