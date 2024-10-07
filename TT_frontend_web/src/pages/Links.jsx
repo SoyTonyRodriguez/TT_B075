@@ -1,59 +1,120 @@
-import React from 'react';
+import React, { useState } from 'react'; 
 import { Link } from 'react-router-dom';
+import { IoLinkOutline } from "react-icons/io5";
+import { motion } from 'framer-motion';
 import Navigation from './Navigation/Navigation'; 
 
-// InfoCard component to display information with an image
-function InfoCard({ title, subtitle, linkText, linkHref, image }) {
-    return (
-        <div className="info-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            {image && <img src={image} alt={title} className="w-full h-40 object-cover rounded-lg mb-4" />}
-            <h3 className="text-lg font-bold text-blue-500 mb-2">{title}</h3>
-            {subtitle && <p className="text-gray-700 mb-4">{subtitle}</p>}
-            <a href={linkHref} className="text-blue-500 font-semibold hover:underline">{linkText}</a>
-        </div>
-    );
-}
-
-// Links component that contains both the navigation and information cards
 function Links() {
-    // Sample data for each card with images
-    const infoData = [
-        { title: "Noticia", subtitle: "Mario Barbosa", linkText: "Leer", linkHref: "#", image: "https://via.placeholder.com/300x150" },
-        { title: "¿Conoces las condiciones para que acepten tu promoción?", subtitle: "", linkText: "Leer", linkHref: "#", image: "https://via.placeholder.com/300x150" },
-        { title: "Noticia", subtitle: "Condiciones Generales para Proceso de promoción docente", linkText: "Leer", linkHref: "#", image: "https://via.placeholder.com/300x150" },
-        { title: "¿Sabes las condiciones sobre tutorados para ser válidas?", subtitle: "", linkText: "Leer", linkHref: "#", image: "https://via.placeholder.com/300x150" },
-        { title: "Artículo", subtitle: "Liferay", linkText: "Leer", linkHref: "#", image: "https://via.placeholder.com/300x150" },
-        { title: "Docentes aceptados durante los procesos de años anteriores", subtitle: "", linkText: "Leer", linkHref: "#", image: "https://via.placeholder.com/300x150" },
-        { title: "Historia sobre la promoción docente en el IPN",  linkText: "Leer", linkHref: "#", image: "https://via.placeholder.com/300x150" },
-        { title: "Reglamento de promoción docente", subtitle: "", linkText: "Leer", linkHref: "#", image: "https://via.placeholder.com/300x150" },
-    ];
+  const [hoveredButton, setHoveredButton] = useState(null); 
 
-    return (
-        <div className="min-h-screen bg-cover bg-center">
-        {/* navegación fija */}
-            <Navigation />
-    
-            <hr className="border-t-2 border-black my-4" />
+  const handleMouseEnter = (button) => {
+    setHoveredButton(button); 
+  };
 
-            {/* Información Cards Section */}
-            <div className="mt-10 px-16 mb-8">
-                <h2 className="text-center text-3xl font-bold mb-8">Más información</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {infoData.map((item, index) => (
-                        <InfoCard 
-                            key={index} 
-                            title={item.title} 
-                            subtitle={item.subtitle} 
-                            linkText={item.linkText} 
-                            linkHref={item.linkHref} 
-                            image={item.image} // Pass image to each card
-                        />
-                    ))}
-                </div>
-            </div>
+  const handleMouseLeave = () => {
+    setHoveredButton(null);
+  };
 
+  const renderDescription = () => {
+    switch (hoveredButton) {
+      case 'convocatoria':
+        return "La convocatoria para la promoción docente del Instituto Politécnico Nacional (IPN) 2024 está dirigida a todo el personal académico que cumpla con los requisitos de acumulación de 100 Unidades de Promoción (U.P.) o la obtención de grado académico. Esta convocatoria detalla los plazos, formatos, y criterios que deben cumplir los docentes para optar por su promoción en distintas categorías académicas.";
+      case 'reglamento':
+        return "El Reglamento de Promoción Docente del IPN establece los procedimientos y requisitos para que el personal académico pueda acceder a una promoción por acumulación de U.P. o por obtención de grado académico. Define las funciones en las áreas de docencia, investigación, superación académica y actividades complementarias. Además, describe el proceso a seguir para solicitar reconsideraciones en caso de no ser promovido.";
+      case 'cronograma':
+        return "El cronograma de la promoción docente 2024 establece las fechas clave para la recepción de solicitudes, revisión de documentos, publicación de resultados y plazos para solicitar reconsideraciones. La Dirección de Capital Humano se encarga de coordinar el cumplimiento de estos plazos a lo largo del proceso anual.";
+      case 'valoracionactividades':
+        return "El proceso de Promoción por acumulación de 100 Unidades de Promoción (U.P.) en el Instituto Politécnico Nacional (IPN) está diseñado para valorar una amplia variedad de actividades que el personal docente realiza en su labor académica. Estas actividades se dividen en varias áreas clave, cada una con una puntuación específica que contribuye a la acumulación de las 100 U.P. necesarias para la promoción.";
+      default:
+        return "";
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-cover bg-center relative">
+      {/* Navegación fija */}
+      <Navigation />
+
+      <hr className="border-t-2 border-black my-4" />
+
+      {/* Contenido Principal */}
+      <div className="container mx-auto mt-8">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+          <motion.div
+            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }} 
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <Link
+              to="/new-projection"
+              onMouseEnter={() => handleMouseEnter('convocatoria')}
+              onMouseLeave={handleMouseLeave}
+              className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
+            >
+              <IoLinkOutline className="mb-4 w-20 h-20" />
+              <p className="text-center text-lg font-semibold">Convocatoria 2024</p>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }} 
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <Link
+              to="#"
+              onMouseEnter={() => handleMouseEnter('reglamento')}
+              onMouseLeave={handleMouseLeave}
+              className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
+            >
+              <IoLinkOutline className="mb-4 w-20 h-20" />
+              <p className="text-center text-lg font-semibold">Reglamento promoción</p>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <Link
+              to="#"
+              onMouseEnter={() => handleMouseEnter('cronograma')}
+              onMouseLeave={handleMouseLeave}
+              className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
+            >
+              <IoLinkOutline className="mb-4 w-20 h-20" />
+              <p className="text-center text-lg font-semibold">Cronograma 2024</p>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }} 
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <Link
+              to="#"
+              onMouseEnter={() => handleMouseEnter('valoracionactividades')}
+              onMouseLeave={handleMouseLeave}
+              className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
+            >
+              <IoLinkOutline className="mb-4 w-20 h-20" />
+              <p className="text-center text-lg font-semibold">Valoración de actividades 100 U.P.</p>
+            </Link>
+          </motion.div>
         </div>
-    );
+
+        {hoveredButton && (
+          <motion.div
+            className="mt-4 text-center text-white bg-black bg-opacity-70 p-4 rounded-lg"
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }}   
+            exit={{ opacity: 0, y: 20 }}     
+            transition={{ duration: 0.4 }} 
+          >
+            <p className="text-lg">{renderDescription()}</p>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default Links;
