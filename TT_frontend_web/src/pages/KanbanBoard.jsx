@@ -120,61 +120,81 @@ function KanbanBoard() {
     // Create a new task and add it to the tasks state
     const handleCreateTask = async () => {
         try {
-            setIsTaskLoading(true);
-            
-            if (!newTask.title || !newTask.description || !newTask.end_date || !newTask.projection_id) {
+            setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
+
+            // Verificar si todos los campos obligatorios están llenos
+            if (!newTask.title || !newTask.description || !newTask.end_date || !newTask.projection, !newTask.projection_id) {
                 toast.error('Todos los campos son obligatorios.');
                 return;
             }
     
-            // Actualizamos el estado local primero para mejorar la respuesta de la UI
-            const tempTask = { ...newTask, id: Date.now() };  // Crear un ID temporal
-            setTasks([...tasks, tempTask]);
-    
-            // Llamada a la API para crear la tarea
+            // Llamar a la API para crear la tarea
             const response = await createTask(newTask);
-            const createdTask = response.data;
     
-            // Actualizamos la tarea con la ID real desde la API
-            setTasks(prevTasks => prevTasks.map(task => task.id === tempTask.id ? createdTask : task));
-    
-            // Si la tarea pertenece a una proyección, recalculamos el progreso
-            if (createdTask.projection_id) {
-                updateProjectionProgress(createdTask.projection_id, [...tasks, createdTask]);
+            // Verificar que haya datos en la respuesta (si la tarea fue creada)
+            if (!response || !response.data) {
+                throw new Error('Error creando la tarea');
             }
     
-            setNewTask({ title: '', description: '', priority: 'Media', status: 'todo', end_date: '', projection_id: '' });
+            // Añadir la nueva tarea al estado local
+            setTasks([...tasks, response.data]);
+            
+            const createdTask = response.data;
+            // Si la tarea creada tiene un `projection_id`, actualizar el progreso de la proyección
+            if (createdTask.projection_id) {
+                await updateProjectionProgress(createdTask.projection_id, [...tasks, createdTask]);
+            }
+    
+            // Limpiar el formulario y cerrar el modal
+            setNewTask({
+                title: '',
+                description: '',
+                priority: 'Media',
+                status: 'todo',
+                start_date: '', // Fecha actual en formato local
+                end_date: '',
+                projection_id: '' // Limpiar el campo de proyección
+            });
+    
             setIsModalOpen(false);
-            toast.success('Tarea creada con éxito');
+            toast.success('Tarea creada con éxito');  // Mostrar toast de éxito
         } catch (error) {
-            setTasks(tasks);  // Revertir si la API falla
-            console.error('Error creando tarea:', error);
-            toast.error('Error creando la tarea.');
-        } finally {
-            setIsTaskLoading(false);
+            const apiErrors = error.response.data || {};
+            if (error.response.status === 400) {
+                const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
+                toast.error(errorMessage);
+            }else {
+                console.error('Error creando tarea:', error);
+    
+                // Mostrar un toast si ocurre un error
+                toast.error('Error creando la tarea. Verifica los datos.');
+            }
+        } finally { 
+            setIsTaskLoading(false);  // Detener la pantalla de carga para tareas
         }
     };
 
     // Eliminar una tarea del estado local (no de la API)
     const handleDeleteTask = async (id) => {
         const taskToDelete = tasks.find(task => task.id === id);
-        
-        // Actualizamos el estado local inmediatamente
-        const updatedTasks = tasks.filter(task => task.id !== id);
-        setTasks(updatedTasks);
     
         try {
+            // Eliminar la tarea del estado local
+            const updatedTasks = tasks.filter(task => task.id !== id);
+            setTasks(updatedTasks);
+    
+            // Llamar a la API para eliminar la tarea
             await deleteTask(id);
             toast.success('Tarea eliminada con éxito');
     
-            // Si la tarea pertenece a una proyección, recalculamos el progreso
+            // Si la tarea pertenece a una proyección, recalcular el progreso
             if (taskToDelete.projection_id) {
-                updateProjectionProgress(taskToDelete.projection_id, updatedTasks);
+                await updateProjectionProgress(taskToDelete.projection_id, updatedTasks);
             }
+    
         } catch (error) {
-            setTasks(tasks);  // Revertir si la API falla
             console.error('Error eliminando tarea:', error);
-            toast.error('Error eliminando la tarea.');
+            toast.error('Error eliminando la tarea');
         }
     };
 
@@ -235,20 +255,23 @@ function KanbanBoard() {
     // Actualizar el progreso de la proyección cuando cambie el estado de una tarea
     const updateProjectionProgress = async (projectionId, tasks) => {
         const progress = calculateProgress(tasks, projectionId);
-    
-        // Actualizamos el estado local inmediatamente
-        setProjections(prevProjections =>
-            prevProjections.map(projection =>
-                projection.id === projectionId ? { ...projection, progress } : projection
-            )
-        );
-    
+        
         try {
+            // Actualizar la proyección con el nuevo progreso
             await updateProjection(projectionId, { progress });
-            toast.success('Progreso actualizado');
+            
+            // Verificar el progreso actualizado
+            const response = await getProjection(userId); // Obtén las proyecciones desde la API de nuevo
+            const updatedProjections = response.data;
+    
+            console.log(`Progreso actualizado para la proyección ${projectionId}:`, progress);
+    
+            // Actualizar el estado local de las proyecciones
+            setProjections(updatedProjections);
+    
         } catch (error) {
-            console.error('Error actualizando progreso de proyección:', error);
-            toast.error('Error actualizando el progreso de la proyección.');
+            console.error('Error updating projection progress:', error);
+            toast.error('Error actualizando el progreso de la proyección');
         }
     };
 
@@ -300,27 +323,40 @@ function KanbanBoard() {
         const updatedTasks = tasks.map(task =>
             task.id === id ? { ...task, status: newStatus } : task
         );
-
-        // Actualizar el estado local inmediatamente para una respuesta rápida en la UI
+    
+        // Actualizar el estado local de tareas inmediatamente
         setTasks(updatedTasks);
-
-        // Obtener la tarea que se actualizó
+    
+        // Obtener la tarea actualizada
         const updatedTask = updatedTasks.find(task => task.id === id);
-
-        // Luego hacer la llamada a la API
+    
+        // Calcular el progreso localmente para la proyección
+        if (updatedTask.projection_id) {
+            const localProgress = calculateProgress(updatedTasks, updatedTask.projection_id);
+            
+            // Actualizar la proyección localmente antes de hacer la llamada a la API
+            setProjections(prevProjections => prevProjections.map(projection =>
+                projection.id === updatedTask.projection_id
+                    ? { ...projection, progress: localProgress }
+                    : projection
+            ));
+        }
+    
+        // Luego, hacer la llamada a la API
         try {
             await updateTask(id, { status: newStatus });
             toast.success('Tarea actualizada con éxito');
-
-            // Si la tarea pertenece a una proyección, actualizar el progreso
+    
+            // Si la tarea pertenece a una proyección, actualizar el progreso en la API
             if (updatedTask.projection_id) {
                 await updateProjectionProgress(updatedTask.projection_id, updatedTasks);
             }
         } catch (error) {
             console.error('Error updating task status:', error);
-            setError('Error updating task status.');
+            setError('Error actualizando el estado de la tarea.');
             
-            setTasks(tasks); // Revertir a las tareas originales si falla la API
+            // Revertir al estado original si falla la API
+            setTasks(tasks);
         }
     };
 
