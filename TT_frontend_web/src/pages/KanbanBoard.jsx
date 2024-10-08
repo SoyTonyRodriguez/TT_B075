@@ -175,8 +175,27 @@ function KanbanBoard() {
     };
 
     // Eliminar una tarea del estado local (no de la API)
-    const handleDeleteTask = (id) => {
-        setTasks(tasks.filter(task => task.id !== id));  // Filtrar las tareas eliminando la que coincide con el id
+    const handleDeleteTask = async (id) => {
+        const taskToDelete = tasks.find(task => task.id === id);
+    
+        try {
+            // Eliminar la tarea del estado local
+            const updatedTasks = tasks.filter(task => task.id !== id);
+            setTasks(updatedTasks);
+    
+            // Llamar a la API para eliminar la tarea
+            await deleteTask(id);
+            toast.success('Tarea eliminada con éxito');
+    
+            // Si la tarea pertenece a una proyección, recalcular el progreso
+            if (taskToDelete.projection_id) {
+                await updateProjectionProgress(taskToDelete.projection_id, updatedTasks);
+            }
+    
+        } catch (error) {
+            console.error('Error eliminando tarea:', error);
+            toast.error('Error eliminando la tarea');
+        }
     };
 
     // Actualizar una tarea en el estado local y en la API
@@ -189,9 +208,15 @@ function KanbanBoard() {
                 return;
             }
 
-            const response = await updateTask(taskToEdit.id, taskToEdit);
             if (response && response.data) {
-                setTasks(tasks.map(task => task.id === taskToEdit.id ? response.data : task));
+                const updatedTask = response.data;
+                setTasks(tasks.map(task => task.id === taskToEdit.id ? updatedTask : task));
+            
+                // Si la tarea pertenece a una proyección, recalcular el progreso
+                if (updatedTask.projection_id) {
+                    await updateProjectionProgress(updatedTask.projection_id, tasks);
+                }
+            
                 toast.success('Tarea actualizada con éxito');
                 closeEditModal();
             }
@@ -213,13 +238,16 @@ function KanbanBoard() {
 
     // Función para calcular el progreso basado en las tareas completadas
     const calculateProgress = (tasks, projectionId) => {
+        // Obtener todas las tareas asociadas a la proyección
         const projectionTasks = tasks.filter(task => task.projection_id === projectionId);
+
+        // Filtrar solo las tareas que están en estado "done"
         const doneTasks = projectionTasks.filter(task => task.status === 'done');
         
-        // Si no hay tareas, el progreso es 0
+        // Si no hay tareas asociadas a la proyección, el progreso es 0
         if (projectionTasks.length === 0) return 0;
 
-        // Calcular el porcentaje
+        // Calcular el porcentaje de tareas completadas
         const progress = (doneTasks.length / projectionTasks.length) * 100;
         return Math.round(progress); // Redondear al número entero más cercano
     };
@@ -233,7 +261,14 @@ function KanbanBoard() {
             await updateProjection(projectionId, { progress });
             
             // Verificar el progreso actualizado
-            await verifyUpdatedProgress(projectionId, progress);
+            const response = await getProjection(userId); // Obtén las proyecciones desde la API de nuevo
+            const updatedProjections = response.data;
+    
+            console.log(`Progreso actualizado para la proyección ${projectionId}:`, progress);
+    
+            // Actualizar el estado local de las proyecciones
+            setProjections(updatedProjections);
+    
         } catch (error) {
             console.error('Error updating projection progress:', error);
             toast.error('Error actualizando el progreso de la proyección');
