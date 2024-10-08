@@ -60,6 +60,10 @@ function Navigation() {
         setTitle('Por obtención de grado académico');
         setIcon(<IoSchoolOutline size={60} />); 
         break;
+      case '/InfoProjection':  
+        setTitle('¿Qué puedes proyectar?');
+        setIcon(<IoSchoolOutline size={60} />); 
+        break;
       default:
         setTitle('');
         setIcon(null); 
