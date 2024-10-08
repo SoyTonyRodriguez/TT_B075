@@ -7,7 +7,7 @@ import {
   IoPersonOutline, 
   IoEyeOutline, 
   IoStarOutline, 
-  IoSchoolOutline, IoCreateOutline, IoGlassesOutline, IoHelpCircleOutline
+  IoSchoolOutline, IoCreateOutline, IoGlassesOutline, IoHelpCircleOutline, IoMenuOutline, IoCloseOutline
 } from 'react-icons/io5';
 import { motion } from 'framer-motion';
 
@@ -50,7 +50,7 @@ function Navigation() {
         break;
       case '/Guia':
         setTitle('Guía');
-        setIcon(<IoHelpCircleOutline  size={60} />); 
+        setIcon(<IoHelpCircleOutline size={60} />); 
         break;
       case '/unidades-promocion':  
         setTitle('Por unidades de promoción');
@@ -58,6 +58,10 @@ function Navigation() {
         break;
       case '/promocion-grado':  
         setTitle('Por obtención de grado académico');
+        setIcon(<IoSchoolOutline size={60} />); 
+        break;
+      case '/InfoProjection':  
+        setTitle('¿Qué puedes proyectar?');
         setIcon(<IoSchoolOutline size={60} />); 
         break;
       default:
@@ -121,8 +125,8 @@ function Navigation() {
         </motion.div>
       )}
 
-      <div className="hidden md:flex space-x-4">
-
+      {/* Botones grandes para pantallas grandes */}
+      <div className="hidden lg:flex space-x-4">
         {/* Proyección y seguimiento */}
         <motion.div 
           variants={buttonVariants} 
@@ -192,13 +196,92 @@ function Navigation() {
             <p className="text-sm font-semibold">Mi cuenta</p>
           </Link>
         </motion.div>
-
       </div>
+
+      {/* Menú hamburguesa para pantallas pequeñas */}
+      <div className="lg:hidden flex items-center">
+        <button onClick={toggleMenu}>
+          {menuOpen ? (
+            <IoCloseOutline size={30} className="text-blue-500" />
+          ) : (
+            <IoMenuOutline size={30} className="text-blue-500" />
+          )}
+        </button>
+      </div>
+
+      {/* Menú desplegable flotante hacia la derecha cuando el menú hamburguesa está abierto */}
+      {menuOpen && (
+        <div className="absolute top-0 right-0 mt-12 mr-4 bg-transparent flex flex-col items-end space-y-2 z-50 lg:hidden">
+          {/* Proyección y seguimiento */}
+          <motion.div 
+            variants={buttonVariants} 
+            whileHover="hover" 
+            whileTap="tap"
+          >
+            <Link to="/projection" className={`${getButtonClass('/projection')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+              <motion.div variants={iconVariants} whileHover="hover">
+                <IoEyeOutline size={30} />
+              </motion.div>
+            </Link>
+          </motion.div>
+
+          {/* Mis documentos */}
+          <motion.div 
+            variants={buttonVariants} 
+            whileHover="hover" 
+            whileTap="tap"
+          >
+            <Link to="/documents" className={`${getButtonClass('/documents')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+              <motion.div variants={iconVariants} whileHover="hover">
+                <IoDocumentTextOutline size={30} />
+              </motion.div>
+            </Link>
+          </motion.div>
+
+          {/* Calendario */}
+          <motion.div 
+            variants={buttonVariants} 
+            whileHover="hover" 
+            whileTap="tap"
+          >
+            <Link to="/calendar" className={`${getButtonClass('/calendar')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+              <motion.div variants={iconVariants} whileHover="hover">
+                <IoCalendarOutline size={30} />
+              </motion.div>
+            </Link>
+          </motion.div>
+
+          {/* Enlaces y bases */}
+          <motion.div 
+            variants={buttonVariants} 
+            whileHover="hover" 
+            whileTap="tap"
+          >
+            <Link to="/links" className={`${getButtonClass('/links')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+              <motion.div variants={iconVariants} whileHover="hover">
+                <IoLinkOutline size={30} />
+              </motion.div>
+            </Link>
+          </motion.div>
+
+          {/* Mi cuenta */}
+          <motion.div 
+            variants={buttonVariants} 
+            whileHover="hover" 
+            whileTap="tap"
+          >
+            <Link to="/account" className={`${getButtonClass('/account')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+              <motion.div variants={iconVariants} whileHover="hover">
+                <IoPersonOutline size={30} />
+              </motion.div>
+            </Link>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default Navigation;
-
 
 
