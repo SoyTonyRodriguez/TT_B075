@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IoStarOutline, IoSchoolOutline } from "react-icons/io5";
 import Navigation from './Navigation/Navigation'; 
+import InfoProjection from './InfoProjection';
 
 function UnidadesPromocion() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -233,8 +234,8 @@ function UnidadesPromocion() {
             </div>
             <div className="mb-8">
               <h3 className="text-lg font-bold text-gray-700">¿No sabes qué agregar?</h3>
-              <p className="text-gray-700">¡Conoce más acerca de las actividades que puedes realizar, qué implican y sus detalles!</p>
-              <button className="mt-4 bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600">¿Qué puedo agregar?</button>
+              <p className="text-gray-700 mb-8">¡Conoce más acerca de las actividades que puedes realizar, qué implican y sus detalles!</p>
+              <Link to= '/InfoProjection' className="mt-4 bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600">¿Qué puedo agregar?</Link>
             </div>
           </div>
         </div>
