@@ -497,10 +497,9 @@ function KanbanBoard() {
             <div
                 ref={drop}
                 className={`w-1/3 p-4 rounded-lg shadow-md transition-all duration-300 transform ${
-                    isOver
-                        ? 'bg-blue-300 scale-105'  // Efecto cuando una tarea está sobre la columna
-                        : 'bg-gray-100 scale-100'  // Estado normal
+                    isOver ? 'bg-blue-300 scale-105' : 'bg-gray-100 scale-100'
                 }`}
+                style={{ height: '650px', overflowY: 'auto' }} // Establece un tamaño fijo y scroll
             >
                 <h2 className="text-2xl font-bold text-center mb-4">{status.toUpperCase()}</h2>
                 <div>{children}</div>
@@ -552,7 +551,7 @@ function KanbanBoard() {
             <div className="container mx-auto p-8">
                 <DndProvider backend={HTML5Backend}>
                 {/* Contenedor flex que envuelve las columnas y el panel lateral */}
-                <div className="flex justify-between gap-x-6 p-6 bg-gray-800 rounded-lg shadow-md">
+                <div className="flex justify-between gap-x-6 p-6 bg-gray-800 rounded-lg shadow-md" style={{ height: '700px', overflow: 'hidden' }}>
                     
                     {/* Columna de Tareas */}
                     <div className="flex-1 flex gap-x-6">
@@ -574,17 +573,17 @@ function KanbanBoard() {
                     </div>
                     
                     {/* Panel lateral derecho con proyecciones y su progreso */}
-                    <div className="w-1/4 p-6 bg-gray-100 shadow-lg">
-                    <h2 className="text-2xl font-bold mb-6">Progresos de Proyecciones</h2>
-                    <div className="space-y-4">
-                        {projections.map(projection => (
-                        <div key={projection.id} className="bg-white shadow-md p-4 rounded-lg">
-                            <h3 className="text-lg font-semibold">{projection.activity}</h3>
-                            <ProgressBar progress={projection.progress || 0} />
-                            <p className="mt-2 text-sm text-gray-600">Progreso: {projection.progress}%</p>
+                    <div className="w-1/4 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px', overflowY: 'auto' }}>
+                        <h2 className="text-2xl font-bold mb-6">Progresos de Proyecciones</h2>
+                        <div className="space-y-4">
+                            {projections.map(projection => (
+                            <div key={projection.id} className="bg-white shadow-md p-4 rounded-lg">
+                                <h3 className="text-lg font-semibold">{projection.activity}</h3>
+                                <ProgressBar progress={projection.progress || 0} />
+                                <p className="mt-2 text-sm text-gray-600">Progreso: {projection.progress}%</p>
+                            </div>
+                            ))}
                         </div>
-                        ))}
-                    </div>
                     </div>
 
                 </div>
