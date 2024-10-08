@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'accounts',
     'tasks',
     'calendar_dates',
+    'projections',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -196,8 +197,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
   "http://localhost:5173",
   "http://localhost:8081",
-  'http://192.168.1.143:8000',
-  'http://192.168.1.143:8081',
+  'http://192.168.100.97:8000',
+  'http://192.168.100.97:8081',
   'http://0.0.0.0:8000',
 ]
 
