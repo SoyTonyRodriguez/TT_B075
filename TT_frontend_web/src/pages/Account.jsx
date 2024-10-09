@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import perfilImage from '../img/perfi.png'; 
 import Navigation from './Navigation/Navigation'; 
+import { getAccount } from '../../../api/accounts.api'; // Importa el método para obtener el usuario
 
 function Account() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileImage, setProfileImage] = useState(perfilImage); // Initialize with default image
+  const [profileImage, setProfileImage] = useState(perfilImage); 
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -13,23 +14,44 @@ function Account() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('');
+  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
 
-  // Load account data from localStorage on component mount
+  // Estado para habilitar/deshabilitar la edición
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    // Obtener el id del usuario desde localStorage
+    const userId = localStorage.getItem('userId');
+    
+    // Si existe el id, obtenemos la información del usuario
+    if (userId) {
+      getAccount(userId)
+        .then((response) => {
+          const { userName, fullName, email, category, phone } = response.data;
+          setFullName(fullName);
+          setEmail(email);
+          setCategory(category);
+          setPassword(password);
+        })
+        .catch((error) => {
+          console.error("Error al obtener los datos del usuario", error);
+        });
+    }
+  }, []); // Se ejecuta solo una vez al montar el componente
+
+
   useEffect(() => {
     try {
       const storedAccountData = localStorage.getItem('accountDetails');
       if (storedAccountData) {
         const { userName, fullName, email, category, phone } = JSON.parse(storedAccountData);
-        setUserName(userName);
-        setFullName(fullName);
+          setFullName(fullName);
         setEmail(email);
         setCategory(category);
-        setPhone(phone);
       }
     } catch (error) {
       console.error("Error accessing or parsing account details from localStorage:", error);
-      // You can clear invalid data if necessary
       localStorage.removeItem('accountDetails');
     }
   }, []);
@@ -43,7 +65,7 @@ function Account() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result); // Preview selected image
+        setImagePreview(reader.result); 
       };
       reader.readAsDataURL(file);
     }
@@ -51,13 +73,53 @@ function Account() {
 
   const handleImageSave = () => {
     if (imagePreview) {
-      setProfileImage(imagePreview); // Save selected image as profile picture
+      setProfileImage(imagePreview); 
     }
   };
 
   const triggerFileInput = () => {
-    fileInputRef.current.click(); // Simulate click on hidden file input
+    fileInputRef.current.click(); 
   };
+
+  // Habilitar edición
+  const handleEdit = () => {
+    setIsEditing(true); // Habilita la edición de los campos
+  };
+
+  // Guardar cambios
+  const handleSave = async (e) => {
+    e.preventDefault();  // Evitar la recarga de la página
+  
+    const updatedData = {
+      fullName,
+      email,
+      category,
+      // Añade otros datos si son necesarios, como current_password o new_password
+    };
+  
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        throw new Error('No se ha encontrado el ID del usuario.');
+      }
+  
+      const response = await updateAccount(userId, updatedData);
+  
+      if (response.status !== 200) {
+        throw new Error('Error al guardar los cambios');
+      }
+  
+      // Actualiza localStorage con la nueva información (opcional)
+      localStorage.setItem('accountDetails', JSON.stringify(updatedData));
+  
+      // Deshabilita el modo de edición
+      setIsEditing(false);
+      alert('Cambios guardados correctamente');
+    } catch (error) {
+      console.error('Error al actualizar la información', error);  // <-- Muestra el error completo en la consola
+      alert('Hubo un error al guardar la información.');
+    }
+};
 
   return (
     <div className="min-h-screen bg-cover bg-center">
@@ -90,41 +152,57 @@ function Account() {
             <input type="checkbox" className="mr-2" checked />
             <label className="text-sm">Recibir notificaciones</label>
           </div>
-          {/* <div className="mt-4">
-            <label className="block text-sm mb-2">Celular</label>
-            <input type="text" 
-              className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-              value={phone} />
-          </div> */}
         </div>
         {/* Formulario de información */}
         <div className="w-2/3 ml-8">
-          <form>
+          <form onSubmit={handleSave}>
             <div className="mb-4">
               <label className="block text-sm mb-2">Nombre Completo</label>
-              <input type="text" 
+              <input 
+                type="text" 
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                value={fullName} disabled />
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                disabled={!isEditing} // Deshabilitar si no está en modo de edición
+              />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-2">E-mail</label>
               <input type="email" 
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={email} disabled />
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={!isEditing} // Deshabilitar si no está en modo de edición
+              />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-2">Categoría</label>
               <input type="text" 
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                value={category} disabled />
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                disabled={!isEditing} // Deshabilitar si no está en modo de edición
+              />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-2">Contraseña</label>
-              <input type="password" className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" value="" />
+              <input type="password" className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" value={password} disabled={!isEditing} />
             </div>
             <div className="flex justify-end mt-8">
-              <button type="button" className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2">Editar información</button>
-              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Guardar</button>
+              {!isEditing ? (
+                <button type="button" onClick={handleEdit} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2">
+                  Editar información
+                </button>
+              ) : (
+                <>
+                  <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2">
+                    Cancelar
+                  </button>
+                  <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Guardar
+                  </button>
+                </>
+              )}
             </div>
           </form>
         </div>

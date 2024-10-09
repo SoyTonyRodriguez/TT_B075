@@ -20,3 +20,21 @@ export const getAccount = (id) => {
         },
     });
 };
+
+export const updateAccount = async (id, accountData) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await accountsAPI.patch(`account/${id}/`, accountData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;  // Retorna los datos si todo sale bien
+    } catch (error) {
+      console.error('Error al actualizar la cuenta:', error.response || error.message);  // Registro del error
+      throw error;  // Lanza el error para manejarlo en el componente
+    }
+  };
+
+  
+  
