@@ -1,19 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import perfilImage from '../img/perfi.png';
 import { Link } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-// new path:
 import { createAccount } from '../../../api/accounts.api';
+import LoadingAnimation from "../components/LoadingAnimation";  // Importa tu componente de animación
+
 
 const Registro = () => {
 
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);  // Estado para la pantalla de carga
+
 
   const onSubmit = handleSubmit(async (data) => {
+    setLoading(true);  // Mostrar la pantalla de carga
     const password = data.password;
     const confirmPassword = data.confirmar_password;
 
@@ -29,26 +33,33 @@ const Registro = () => {
     // Remove confirmar_password before sending to the API
     const { confirmar_password, ...accountData } = data;
 
-      try {
-          await createAccount(accountData);
-          toast.success('Cuenta creada exitosamente');
-          reset();            // Reset form fields after successful submission
-          navigate('/login'); // Redirect to login or another page
-      } catch (error) {
-        console.error('Error creating account:', error);
+    try {
+      const response = await createAccount(accountData);
+      console.log('Account created:', response.data);
+      toast.success('Cuenta creada exitosamente');
+      reset();            // Reset form fields after successful submission
+      navigate('/login'); // Redirect to login or another page
+    } catch (error) {
+      console.error('Error creating account:', error);
 
-        // API returns an error response with a 400 status code
-        if (error.response && error.response.status === 400) {
-          const apiErrors = error.response.data;
-          
-          if (apiErrors.email) {
-            toast.error(apiErrors.email)
-          }
-        } else {
-          toast.error("Error al crear cuenta: " + error.message);
+      // API returns an error response with a 400 status code
+      if (error.response && error.response.status === 400) {
+        const apiErrors = error.response.data;
+        
+        if (apiErrors.email) {
+          toast.error(apiErrors.email);
         }
+      } else {
+        toast.error("Error al crear cuenta: " + error.message);
       }
+    } finally {
+        setLoading(false);  // Ocultar la pantalla de carga tras completar la operación
+    }
   });
+
+  if (loading) {
+    return <LoadingAnimation />;  // Mostrar la pantalla de carga mientras se procesa el registro
+  }
 
   // Watch the password field to compare with confirm password
   const password = watch('password');  
@@ -160,12 +171,12 @@ const Registro = () => {
                 >
                     Cancelar
                 </Link>
-                <Link
-                        to="/home"
-                        className="bg-blue-700 text-white px-6 py-3 rounded-2xl hover:bg-blue-800 w-full sm:w-auto min-w-[200px] text-lg flex items-center justify-center"
+                <button
+                    type="submit"
+                    className="bg-blue-700 text-white px-6 py-3 rounded-2xl hover:bg-blue-800 w-full sm:w-auto min-w-[200px] text-lg flex items-center justify-center"
                     >
                         Ingresar
-                </Link>
+                </button>
                 </div>
             </form>
         </div>
