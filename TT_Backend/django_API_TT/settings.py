@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'tasks',
     'calendar_dates',
     'projections',
+    'products',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
