@@ -41,7 +41,6 @@ class EditProjectionView(RetrieveUpdateAPIView):
         return Projection.objects.filter(account_id=self.request.user.id)
     
     def perform_update(self, serializer):
-        # Ensure that the projection belongs to the authenticated user's account before updating
         projection = self.get_object()
         if projection.account_id != self.request.user.id:
             raise PermissionDenied("You do not have permission to edit this projection.")

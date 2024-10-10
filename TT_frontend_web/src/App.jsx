@@ -20,10 +20,12 @@ import Calendar from './pages/Calendar';
 import Account from './pages/Account';
 import Guia from './pages/Guia';
 import Convocatoria from "./pages/Convocatoria";
+import InfoProjection from './pages/InfoProjection';
 import Privacidad from './pages/PrivacyScreen';
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
 import { Toaster } from "react-hot-toast";
+
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -65,6 +67,7 @@ function App() {
         <Route path="/Convocatoria" element={<ProtectedRoute component={Convocatoria} />} />
         <Route path="/Guia" element={<ProtectedRoute component={Guia} />} />
         <Route path="/KanbanBoard" element={<ProtectedRoute component={KanbanBoard} />} />
+        <Route path="/InfoProjection" element={<ProtectedRoute component={InfoProjection} />} />
       </Routes>
       <Footer />
       <Toaster />
