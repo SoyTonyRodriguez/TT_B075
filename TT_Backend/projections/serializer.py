@@ -7,7 +7,7 @@ class RegisterProjectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projection
         fields = ['id', 'account_id', 'function', 'activity', 'role', 'scope', 
-                  'tasks', 'documents_required', 'start_date', 'end_date', 'units', 'priority']
+                  'tasks', 'documents_required', 'start_date', 'end_date', 'units', 'priority', 'color', 'progress']
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True},
@@ -33,6 +33,11 @@ class RegisterProjectionSerializer(serializers.ModelSerializer):
         instance.documents_required = validated_data.get('documents_required', instance.documents_required)
         instance.start_date = validated_data.get('start_date', instance.start_date)
         instance.end_date = validated_data.get('end_date', instance.end_date)
+        instance.progress = validated_data.get('progress', instance.progress)  # Ensure progress is updated
+        instance.units = validated_data.get('units', instance.units)
+        instance.priority = validated_data.get('priority', instance.priority)
+        instance.color = validated_data.get('color', instance.color)
+
 
         # Manejar la actualización de la lista de tareas
         new_tasks = validated_data.get('tasks', [])
