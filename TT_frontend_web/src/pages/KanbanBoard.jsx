@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks.api";
-import { getProjection, updateProjection } from '../../../api/projections.api';
+import { getProduct, updateProduct } from '../../../api/products.api';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
@@ -83,7 +83,7 @@ function KanbanBoard() {
     
         const fetchProjections = async () => {
             try {
-                const response = await getProjection(userId);
+                const response = await getProduct(userId);
                 console.log("Respuesta de la API con proyecciones:", response.data);  // Verifica si `progress` está presente
                 setProjections(response.data);
             } catch (error) {
@@ -258,10 +258,10 @@ function KanbanBoard() {
         
         try {
             // Actualizar la proyección con el nuevo progreso
-            await updateProjection(projectionId, { progress });
+            await updateProduct(projectionId, { progress });
             
             // Verificar el progreso actualizado
-            const response = await getProjection(userId); // Obtén las proyecciones desde la API de nuevo
+            const response = await getProduct(userId); // Obtén las proyecciones desde la API de nuevo
             const updatedProjections = response.data;
     
             console.log(`Progreso actualizado para la proyección ${projectionId}:`, progress);
@@ -278,7 +278,7 @@ function KanbanBoard() {
     // Función para verificar que el progreso ha sido actualizado correctamente
     const verifyUpdatedProgress = async (projectionId, expectedProgress) => {
         try {
-            const response = await getProjection(userId);  // Obtén la proyección desde la API
+            const response = await getProduct(userId);  // Obtén la proyección desde la API
             const updatedProjections = response.data;  // Aquí se asume que es un array
     
             // Verificar que hay proyecciones y que el campo progress existe

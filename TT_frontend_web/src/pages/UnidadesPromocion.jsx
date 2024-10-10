@@ -5,15 +5,13 @@ import { toast } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import LoadingAnimation from "../components/LoadingAnimation";
 
-import { createProjection, getProjection, deleteProjection, updateProjection } from '../../../api/projections.api';
+import { createProduct } from '../../../api/products.api';
 
 function UnidadesPromocion() {
   const navigate = useNavigate();
 
   // Estados para los campos del formulario
   const [priority, setPriority] = useState('');
-  const [start_date, setStartDate] = useState(''); 
-  const [end_date, setEndDate] = useState('');
   const [functionField, setFunctionField] = useState('');
   const [role, setRole] = useState('');
   const [scope, setScope] = useState('');
@@ -27,27 +25,26 @@ function UnidadesPromocion() {
   // Estados de validación para los errores
   const [functionError, setFunctionError] = useState(false);
   const [activityError, setActivityError] = useState(false);
-  const [dateError, setDateError] = useState(false);
   const [roleError, setRoleError] = useState(false);
   const [scopeError, setScopeError] = useState(false);
   const [priorityError, setPriorityError] = useState(false);
 
-  const getCurrenDate = () => {
-    // Obtener la fecha actual y restar un día
-    const today = new Date();
-    today.setDate(today.getDate());
+  // const getCurrenDate = () => {
+  //   // Obtener la fecha actual y restar un día
+  //   const today = new Date();
+  //   today.setDate(today.getDate());
 
-    // Formatear la fecha en "YYYY-MM-DD"
-    const formattedDate = today.toISOString().split('T')[0];
-    setStartDate(formattedDate);
-  };
+  //   // Formatear la fecha en "YYYY-MM-DD"
+  //   const formattedDate = today.toISOString().split('T')[0];
+  //   setStartDate(formattedDate);
+  // };
 
-  // Usa useEffect para establecer la fecha actual cuando el componente se monta
-  useEffect(() => {
-    getCurrenDate();
-    console.log(getCurrenDate());
-    setTasks([]);
-  }, []);
+  // // Usa useEffect para establecer la fecha actual cuando el componente se monta
+  // useEffect(() => {
+  //   getCurrenDate();
+  //   console.log(getCurrenDate());
+  //   setTasks([]);
+  // }, []);
 
   // Definición de la función para obtener el color según la prioridad
   const getColorForPriority = (priority) => {
@@ -125,7 +122,6 @@ function UnidadesPromocion() {
     setFunctionField(e.target.value);
     setFunctionError(false); // Elimina el error al seleccionar algo
     setActivity('');
-    setEndDate('');
     setRole('');
     setScope('');
     setDocumentsRequired('');
@@ -177,11 +173,6 @@ function UnidadesPromocion() {
       isValid = false;
     }
 
-    if (!end_date) {
-      setDateError(true);
-      isValid = false;
-    }
-
     if (!role) {
       setRoleError(true);
       isValid = false;
@@ -211,8 +202,6 @@ function UnidadesPromocion() {
     const projectionData = {
       function: functionField,
       activity,
-      start_date,
-      end_date,
       role,
       scope,
       documents_required,
@@ -226,7 +215,7 @@ function UnidadesPromocion() {
       setError(null);
 
       // Llama al método createProjection con los datos del formulario
-      const response = await createProjection(projectionData);
+      const response = await createProduct(projectionData);
       console.log('Proyección creada:', response.data);
       toast.success('Proyección creada con éxito');  // Mostrar toast de éxito
       navigate('/KanbanBoard'); // Redirect to login or another page
@@ -297,19 +286,6 @@ function UnidadesPromocion() {
               </select>
               {activityError && <span className="text-red-500">Por favor, selecciona una actividad.</span>}
 
-            </div>
-            <div className="mb-4">
-              <label className="block text-white text-sm font-semibold mb-2">Establece una fecha proyectada de inicio</label>
-              <input
-                type="date"
-                value={end_date}
-                onChange={(e) => {
-                  setEndDate(e.target.value)
-                  setDateError(false); // Elimina el error al seleccionar una fecha
-                }}
-                className="w-full p-2 rounded-lg border border-gray-400"
-              />
-              {dateError && <span className="text-red-500">Por favor, selecciona una fecha de inicio.</span>}
             </div>
 
             <div className="mb-4">
