@@ -6,16 +6,24 @@ from datetime import datetime
 class RegisterProjectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projection
-        fields = ['id', 'products', 'start_date', 'end_date']
+        fields = ['id', 'account_id', 'products', 'start_date', 'end_date']
         extra_kwargs = {
             'id': {'read_only': True},
+            'account_id': {'read_only': True},
             'products': {'required': False}
         }
     
     def create(self, validated_data):
+        request = self.context.get('request')
+        account_id = request.auth.get('user_id') if request.auth else request.user.id
+        validated_data['account_id'] = account_id
         return super().create(validated_data)
     
     def update(self, instance, validated_data):
+        # Validar que el usuario que intenta actualizar sea el dueño del producto
+        validated_data['account_id'] = instance.account_id
+        self.validate(validated_data)
+        
         # Actualizar otros campos normalmente
         instance.start_date = validated_data.get('start_date', instance.start_date)
         instance.end_date = validated_data.get('end_date', instance.end_date)
