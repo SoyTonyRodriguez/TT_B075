@@ -46,12 +46,12 @@ class RegisterProductSerializer(serializers.ModelSerializer):
 
         return instance
     
-    def validate(self, data):
-        start_date = data.get('start_date')
-        end_date = data.get('end_date')
-        if end_date and start_date and end_date < start_date:
-            raise serializers.ValidationError("La fecha de término no puede ser menor a la fecha de inicio.")
-        return data
+    # def validate(self, data):
+    #     start_date = data.get('start_date')
+    #     end_date = data.get('end_date')
+    #     if end_date and start_date and end_date < start_date:
+    #         raise serializers.ValidationError("La fecha de término no puede ser menor a la fecha de inicio.")
+    #     return data
     
 # serializer to get all task from an user
 class ProductSerializer(serializers.ModelSerializer):

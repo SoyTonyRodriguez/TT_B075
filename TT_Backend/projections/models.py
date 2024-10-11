@@ -15,6 +15,7 @@ class Projection(models.Model):
         default=generate_projection_id,
         editable=False
     )
+    account_id = models.CharField(max_length=255)
     products = models.JSONField(
         models.CharField(max_length=255),  # IDs de productos
         blank=True, 

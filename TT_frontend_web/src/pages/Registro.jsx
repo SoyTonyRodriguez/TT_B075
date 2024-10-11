@@ -123,17 +123,6 @@ const Registro = () => {
                         </div>
 
                         <div className="mb-4">
-                            <label className="block font-raleway text-white mb-1">Número de empleado</label>
-                            <input 
-                                type="text" 
-                                placeholder="Ingresa tu número de empleado" 
-                                {...register('employee_number', { required: true })}
-                                className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
-                            />
-                            {errors.employee_number && <span className="text-red-500">Este campo es obligatorio</span>}
-                        </div>
-
-                        <div className="mb-4">
                             <label className="block font-raleway text-white mb-1">Contraseña</label>
                             <input 
                                 type="password" 

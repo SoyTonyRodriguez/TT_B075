@@ -11,10 +11,11 @@ from django.contrib.auth import authenticate
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accounts
-        fields = ['id', 'name', 'email', 'password', 'date_joined', 'category', 'employee_number', 'is_staff']
+        fields = ['id', 'name', 'email', 'password', 'date_joined', 'category', 'is_staff', 'projection_id', 'units_projection']
         extra_kwargs = {
             'password': {'write_only': True},
             'id': {'read_only': True},
+            'projection_id': {'required': False}
         }
 
     # # Use validate_<field_name> methods to add custom validation logic.
