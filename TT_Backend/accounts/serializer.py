@@ -49,7 +49,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accounts
-        fields = "__all__"
+        fields = ['id', 'name', 'email', 'category', 'employee_number']  # Incluye todos los campos que desees actualizar
+        extra_kwargs = {
+            'id': {'read_only': True},
+        }
+    def update(self, instance, validated_data):
+        # Si deseas aplicar alguna lógica antes de la actualización, hazlo aquí
+        return super().update(instance, validated_data)
 
 # Custom serializer to get a token
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
