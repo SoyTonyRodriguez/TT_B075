@@ -14,6 +14,8 @@ import MoreInfoScreen from './screens/MoreInfoScreen';
 import ProjectionCreationScreen from './screens/ProjectionCreationScreen';
 import ProjectScreen from './screens/ProjectScreen';
 import UnidadesPromocion from './screens/UnidadesPromocion';
+import KanbanBoard from './screens/KanbanBoard';
+import FilesScreen from './screens/FilesScreen';
 
 const Stack = createStackNavigator();
 
@@ -32,11 +34,12 @@ export default function App() {
           <Stack.Screen name="HomeScreen" component={MainTabNavigator} />
           
           {/* Pantallas adicionales de la navegacion Home (solo es prueba) */}
-          
+          <Stack.Screen name="FilesScreen" component={FilesScreen} />
 
           {/* Pantallas adicionales de la navegacion Proyección */}
           <Stack.Screen name="ProjectionCreationScreen" component={ProjectionCreationScreen} />
           <Stack.Screen name="UnidadesPromocion" component={UnidadesPromocion} />
+          
           
 
           {/* Pantallas adicionales de la navegacion Perfil */}
