@@ -71,7 +71,7 @@ const News1Screen = ({ navigation }) => {
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Contenido de la noticia */}
           <Image 
-            source={require('../assets/images/sistema.jpg')} 
+            source={require('../assets/images/ipn-main.webp')} 
             style={tw`w-full h-50 rounded-lg`} 
           />
           <Text style={tw`text-justify text-base text-[#d0e1ff] my-5`}>

@@ -141,12 +141,12 @@ const CalendarScreen = () => {
     >
       {/* Encabezado */}
       <View style={tw`flex-row justify-between items-center px-5 mt-10`}>
-        <Text style={tw`text-3xl font-bold text-black`}>Calendario</Text>
+        <Text style={tw`text-2xl font-bold text-black`}>Calendario</Text>
         <Ionicons name="calendar-outline" size={40} color="#000" style={tw`ml-2`} />
       </View>
 
       {/* Botones de Inicio y Final */}
-      <View style={tw`flex-row justify-around mt-5 px-5`}>
+      <View style={tw`flex-row justify-around mt-2 px-5`}>
         <TouchableOpacity
           style={tw`flex-row items-center bg-blue-600 py-2 px-5 rounded-full`}
           onPress={() => changeDate(inicioConvocatoria)}
@@ -165,8 +165,8 @@ const CalendarScreen = () => {
       </View>
 
       {/* Calendario */}
-      <View style={tw`flex-1 justify-center items-center mt-10`}>
-        <View style={tw`shadow-lg rounded-lg bg-white p-3`}>
+      <View style={tw`flex-1 justify-center items-center mt-4`}>
+        <View style={tw`shadow-lg rounded-lg bg-white p-2`}>
           <Calendar
             key={calendarKey}
             current={currentDate}
@@ -174,7 +174,7 @@ const CalendarScreen = () => {
             maxDate={maxDate}
             onDayPress={(day) => setSelectedDate(day.dateString)}
             markedDates={enrichedMarkedDates}
-            markingType={'custom'} // Añadir estilo personalizado
+            markingType={'custom'}
             theme={{
               backgroundColor: 'transparent',
               calendarBackground: '#f1f5f9',
@@ -187,10 +187,11 @@ const CalendarScreen = () => {
             }}
             onPressArrowRight={handlePressArrowRight}
             onPressArrowLeft={handlePressArrowLeft}
-            style={[tw`border rounded-lg`, { width: 330, height: 380 }]}
+            style={[tw`border rounded-lg`, { width: 320, height: 360 }]}
           />
         </View>
       </View>
+
 
       {/* Detalles de actividad */}
       {selectedDate && (

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Initial set-up
 const TasksAPI = axios.create({
-    baseURL: 'http://192.168.77.44:8000/api/v1/'
+    baseURL: 'http://192.168.1.11:8000/api/v1/'
 })
 
 // create task method
