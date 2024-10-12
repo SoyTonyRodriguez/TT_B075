@@ -3,6 +3,7 @@ import { IoStarOutline, IoSchoolOutline } from "react-icons/io5";
 import Navigation from './Navigation/Navigation';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import LoadingAnimation from "../components/LoadingAnimation";
 
 import { createProduct } from '../../../api/products.api';
@@ -29,22 +30,14 @@ function UnidadesPromocion() {
   const [scopeError, setScopeError] = useState(false);
   const [priorityError, setPriorityError] = useState(false);
 
-  // const getCurrenDate = () => {
-  //   // Obtener la fecha actual y restar un día
-  //   const today = new Date();
-  //   today.setDate(today.getDate());
+  const [accepted, setAccepted] = useState(false); // Estado para controlar si el usuario acepta o no
+  const handleAccept = () => {
+    setAccepted(true); // El usuario acepta la proyección
+  };
 
-  //   // Formatear la fecha en "YYYY-MM-DD"
-  //   const formattedDate = today.toISOString().split('T')[0];
-  //   setStartDate(formattedDate);
-  // };
-
-  // // Usa useEffect para establecer la fecha actual cuando el componente se monta
-  // useEffect(() => {
-  //   getCurrenDate();
-  //   console.log(getCurrenDate());
-  //   setTasks([]);
-  // }, []);
+  const handleReject = () => {
+    setAccepted(false); // El usuario rechaza la proyección
+  };
 
   // Definición de la función para obtener el color según la prioridad
   const getColorForPriority = (priority) => {
@@ -69,7 +62,6 @@ function UnidadesPromocion() {
     'Actividades de extensión, integración y difusión de la ciencia y de la cultura': 'extension',
   };
 
-  
   // Opciones de actividades por función con documentos requeridos y U.P
   const actividadesPorFuncion = {
     docencia: [
@@ -244,8 +236,8 @@ function UnidadesPromocion() {
     {/* Incluye la navegación */}
     <Navigation />
 
-    {/* Línea de separación */}
-    <hr className="border-t-2 border-black my-4" />
+      {/* Línea de separación */}
+      <hr className="border-t-2 border-black my-4" />
 
       {/* Contenido Principal */}
       <div className="container mx-auto mt-8 mb-8">
@@ -262,6 +254,7 @@ function UnidadesPromocion() {
                 value={functionField}
                 onChange={handleFunctionChange}
                 className="w-full p-2 rounded-lg border border-gray-400"
+                disabled={!accepted} // Se habilita solo si se ha aceptado
               >
                 <option value="" disabled>Selecciona una función</option>
                 <option value="Docencia (carga académica y otras actividades)">Docencia (carga académica y otras actividades)</option>
@@ -297,6 +290,7 @@ function UnidadesPromocion() {
                   setRoleError(false); // Elimina el error al seleccionar un rol
                 }}
                 className="w-full p-2 rounded-lg border border-gray-400"
+                disabled={!accepted} // Se habilita solo si se ha aceptado
               >
                 <option value="" disabled>Selecciona un rol de participación</option>
                 <option value="expositor">Expositor</option>
@@ -315,6 +309,7 @@ function UnidadesPromocion() {
                   setScopeError(false); // Elimina el error al seleccionar un alcance
                 }}
                 className="w-full p-2 rounded-lg border border-gray-400"
+                disabled={!accepted} // Se habilita solo si se ha aceptado
               >
                 <option value="" disabled>Selecciona un alcance</option>
                 <option value="nacional">Nacional</option>
@@ -345,6 +340,7 @@ function UnidadesPromocion() {
                     setPriority(e.target.value);
                     setPriorityError(false); // Elimina el error al seleccionar una prioridad
                   }}
+                  disabled={!accepted} // Se habilita solo si se ha aceptado
                 >
                   <option value="" disabled>Selecciona una prioridad</option>
                   <option value="Baja">Baja</option>
@@ -355,7 +351,11 @@ function UnidadesPromocion() {
               </div>
 
               <div className="w-1/2 ml-2">
-                <button type="submit" className="bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full mt-6">
+                <button 
+                  type="submit" 
+                  className="bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full mt-6"
+                  disabled={!accepted} // Se habilita solo si se ha aceptado
+                  >
                   Agregar
                 </button>
               </div>
@@ -365,19 +365,53 @@ function UnidadesPromocion() {
 
           {/* Información Adicional */}
           <div className="w-full md:w-1/2 lg:w-2/5">
+            {/* Recuadro llamativo con la proyección */}
             <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-700">Proyección del usuario:</h3>
+              <div className="bg-yellow-300 border-l-4 border-yellow-600 text-yellow-800 p-4 rounded-lg shadow-lg">
+                <p className="font-semibold"> 
+                  Tu proyección cubrirá el período del 2024 al 2026. Por favor, acepta para habilitar el formulario.
+                </p>
+              </div>
+            </div>
+
+            {/* Botones de aceptación */}
+            <div className="flex space-x-4">
+              {!accepted ? (
+                <>
+                  <button
+                    onClick={handleAccept}
+                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-500 w-full"
+                  >
+                    Aceptar
+                  </button>
+                  <button
+                    onClick={handleReject}
+                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-500 w-full"
+                  >
+                    Rechazar
+                  </button>
+                </>
+              ) : (
+                <p className="text-green-600 font-bold">Formulario habilitado. Puedes editar ahora.</p>
+              )}
+            </div>
+            
+            {/* Campos de texto para agregar actividades proyectadas y U.P acumuladas */}
+            {/* <div className="mb-8">
               <h3 className="text-lg font-bold text-gray-700">Actividades proyectadas:</h3>
               <input type="text" className="w-full p-2 mt-2 rounded-lg border border-gray-400" />
             </div>
             <div className="mb-8">
               <h3 className="text-lg font-bold text-gray-700">U.P acumuladas:</h3>
               <input type="text" className="w-full p-2 mt-2 rounded-lg border border-gray-400" />
-            </div>
+            </div> */}
             <div className="mb-8">
               <h3 className="text-lg font-bold text-gray-700">¿No sabes qué agregar?</h3>
-              <p className="text-gray-700">¡Conoce más acerca de las actividades que puedes realizar, qué implican y sus detalles!</p>
-              <button className="mt-4 bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600">¿Qué puedo agregar?</button>
+              <p className="text-gray-700 mb-8">¡Conoce más acerca de las actividades que puedes realizar, qué implican y sus detalles!</p>
+              <Link to= '/InfoProjection' className="mt-4 bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600">¿Qué puedo agregar?</Link>
             </div>
+
           </div>
         </div>
       </div>
