@@ -34,6 +34,19 @@ class AccountView(APIView):
             return Response(serializer.data)
         except Accounts.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        # Método para actualizar la información del usuario
+    def patch(self, request, id, format=None):
+        try:
+            user = Accounts.objects.get(id=id)  # Obtener el usuario por su ID
+        except Accounts.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Serializar y validar los datos
+        serializer = AccountSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()  # Guardar los cambios en la base de datos
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
