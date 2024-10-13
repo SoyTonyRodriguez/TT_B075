@@ -16,4 +16,5 @@ urlpatterns = [
     path('api/v1/register/', RegisterAccountsView.as_view()),
     path('api/v1/account/<str:id>/', AccountView.as_view(), name='user_detail'),
 
+
 ]

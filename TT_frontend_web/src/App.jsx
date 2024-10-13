@@ -24,6 +24,7 @@ import InfoProjection from './pages/InfoProjection';
 import Privacidad from './pages/PrivacyScreen';
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
+import ProjectionFirstTime from './pages/Projection_FirstTime';
 import { Toaster } from "react-hot-toast";
 
 
@@ -37,6 +38,7 @@ function App() {
         backgroundImage: `url(${fondo})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundAttachment: 'fixed', 
       }}
     >
       <Header />
@@ -68,6 +70,7 @@ function App() {
         <Route path="/Guia" element={<ProtectedRoute component={Guia} />} />
         <Route path="/KanbanBoard" element={<ProtectedRoute component={KanbanBoard} />} />
         <Route path="/InfoProjection" element={<ProtectedRoute component={InfoProjection} />} />
+        <Route path="/Projection-first" element={<ProtectedRoute component={ProjectionFirstTime} />} />
       </Routes>
       <Footer />
       <Toaster />

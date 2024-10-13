@@ -20,9 +20,11 @@ function Login() {
         try {
             const response = await login(data);
             toast.success('Inicio de sesión exitoso');
+            console.log('Respuesta de login:', response.data);
 
             // Save the token or user data as needed
             localStorage.setItem('token', response.data.access);
+            localStorage.setItem('refreshToken', response.data.refresh);
             
             navigate('/home'); // Redirect to the home
         } catch (error) {

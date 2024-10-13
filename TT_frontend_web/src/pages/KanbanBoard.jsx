@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks.api";
-import { getProjection, updateProjection } from '../../../api/projections.api';
+import { getProduct, updateProduct } from '../../../api/products.api';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
@@ -41,8 +41,6 @@ function KanbanBoard() {
         description: '',
         priority: 'Media',
         status: 'todo',
-        start_date: '',
-        end_date: ''
     });
 
     // Error state
@@ -83,7 +81,7 @@ function KanbanBoard() {
     
         const fetchProjections = async () => {
             try {
-                const response = await getProjection(userId);
+                const response = await getProduct(userId);
                 console.log("Respuesta de la API con proyecciones:", response.data);  // Verifica si `progress` está presente
                 setProjections(response.data);
             } catch (error) {
@@ -123,7 +121,7 @@ function KanbanBoard() {
             setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
 
             // Verificar si todos los campos obligatorios están llenos
-            if (!newTask.title || !newTask.description || !newTask.end_date || !newTask.projection, !newTask.projection_id) {
+            if (!newTask.title || !newTask.description || !newTask.projection, !newTask.projection_id) {
                 toast.error('Todos los campos son obligatorios.');
                 return;
             }
@@ -151,8 +149,6 @@ function KanbanBoard() {
                 description: '',
                 priority: 'Media',
                 status: 'todo',
-                start_date: '', // Fecha actual en formato local
-                end_date: '',
                 projection_id: '' // Limpiar el campo de proyección
             });
     
@@ -203,7 +199,7 @@ function KanbanBoard() {
         try {
             setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
             // Verificar si todos los campos obligatorios están llenos
-            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.end_date || !taskToEdit.projection_id) {
+            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.projection_id) {
                 toast.error('Todos los campos son obligatorios.');
                 return;
             }
@@ -258,10 +254,10 @@ function KanbanBoard() {
         
         try {
             // Actualizar la proyección con el nuevo progreso
-            await updateProjection(projectionId, { progress });
+            await updateProduct(projectionId, { progress });
             
             // Verificar el progreso actualizado
-            const response = await getProjection(userId); // Obtén las proyecciones desde la API de nuevo
+            const response = await getProduct(userId); // Obtén las proyecciones desde la API de nuevo
             const updatedProjections = response.data;
     
             console.log(`Progreso actualizado para la proyección ${projectionId}:`, progress);
@@ -278,7 +274,7 @@ function KanbanBoard() {
     // Función para verificar que el progreso ha sido actualizado correctamente
     const verifyUpdatedProgress = async (projectionId, expectedProgress) => {
         try {
-            const response = await getProjection(userId);  // Obtén la proyección desde la API
+            const response = await getProduct(userId);  // Obtén la proyección desde la API
             const updatedProjections = response.data;  // Aquí se asume que es un array
     
             // Verificar que hay proyecciones y que el campo progress existe
@@ -455,20 +451,7 @@ function KanbanBoard() {
         );
     };
     
-    const openEditModal = (task) => {
-        // Obtener la fecha actual y restar un día
-        const today = new Date();
-        today.setDate(today.getDate());
-    
-        // Formatear la fecha en "YYYY-MM-DD"
-        const formattedDate = today.toISOString().split('T')[0];
-    
-        // Abrir el modal y establecer la fecha actual como la fecha de inicio
-        setTaskToEdit({
-            ...task,
-            start_date: formattedDate, // Setear la fecha actual restada un día
-        });
-                
+    const openEditModal = (task) => {       
         setIsEditModalOpen(true);
     };
     
@@ -509,18 +492,6 @@ function KanbanBoard() {
 
     // Modal toggles (Abrir y cerrar el modal)
     const openModal = () => {
-        // Obtener la fecha actual y restar un día
-        const today = new Date();
-        today.setDate(today.getDate());
-    
-        // Formatear la fecha en "YYYY-MM-DD"
-        const formattedDate = today.toISOString().split('T')[0];
-    
-        // Abrir el modal y establecer la fecha actual como la fecha de inicio
-        setNewTask({
-            ...newTask,
-            start_date: formattedDate, // Setear la fecha actual restada un día
-        });
         setIsModalOpen(true);
     };
     const closeModal = () => setIsModalOpen(false);
@@ -628,18 +599,6 @@ function KanbanBoard() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                         />
                     </div>
-                    
-                    {/* Campo de fecha de vencimiento */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha de Vencimiento</label>
-                        <input
-                        type="date"
-                        name="end_date"
-                        value={newTask.end_date}
-                        onChange={handleTaskChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
                             
                     {/* Selector de prioridad */}
                     <div className="mb-6">
@@ -717,18 +676,6 @@ function KanbanBoard() {
                         name="description"
                         value={taskToEdit?.description || ''}
                         onChange={(e) => setTaskToEdit({ ...taskToEdit, description: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                        />
-                    </div>
-                    
-                    {/* Campo de fecha de vencimiento */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha de Vencimiento</label>
-                        <input
-                        type="date"
-                        name="end_date"
-                        value={taskToEdit?.end_date || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, end_date: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
