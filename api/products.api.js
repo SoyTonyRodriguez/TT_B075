@@ -6,40 +6,38 @@ const TasksAPI = axios.create({
     baseURL: 'http://192.168.1.143:8000/api/v1/'
 })
 
-// create task method
-// export const createTask = (task) => accountsAPI.post('task/register/', task)
-export const createTask = (task) => {
+// create projection method
+export const createProduct = (product) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.post('task/register/', task, {
+    return TasksAPI.post('product/register/', product, {
         headers: {
             Authorization: `Bearer ${token}`,
         }
     });
 }
 
-
 // getTasks from account method
-export const getTasks = (account_id) => {
+export const getProduct = (account_id) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.get(`tasks/${account_id}/`, {
+    return TasksAPI.get(`products/${account_id}/`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
 };
 
-export const updateTaskStatus = (taskId, updatedData) => {
+export const updateProduct = (product_id, updatedData) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.patch(`tasks/${taskId}/edit/`, updatedData, {
+    return TasksAPI.patch(`products/${product_id}/edit/`, updatedData, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
 };
 
-export const deleteTask = (taskId) => {
+export const deleteProduct = (product_id) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.delete(`tasks/${taskId}/delete/`, {
+    return TasksAPI.delete(`products/${product_id}/delete/`, {
         headers: { Authorization: `Bearer ${token}` },
     });
 };

@@ -6,12 +6,11 @@ from datetime import datetime
 class RegisterProjectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projection
-        fields = ['id', 'account_id', 'function', 'activity', 'role', 'scope', 
-                  'tasks', 'documents_required', 'start_date', 'end_date', 'units', 'priority', 'color', 'progress']
+        fields = ['id', 'account_id', 'products', 'start_date', 'end_date']
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True},
-            'tasks': {'required': False}
+            'products': {'required': False}
         }
     
     def create(self, validated_data):
@@ -21,29 +20,19 @@ class RegisterProjectionSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
     
     def update(self, instance, validated_data):
-        # Validar que el usuario que intenta actualizar sea el dueño de la proyección
+        # Validar que el usuario que intenta actualizar sea el dueño del producto
         validated_data['account_id'] = instance.account_id
         self.validate(validated_data)
-
+        
         # Actualizar otros campos normalmente
-        instance.function = validated_data.get('function', instance.function)
-        instance.activity = validated_data.get('activity', instance.activity)
-        instance.role = validated_data.get('role', instance.role)
-        instance.scope = validated_data.get('scope', instance.scope)
-        instance.documents_required = validated_data.get('documents_required', instance.documents_required)
         instance.start_date = validated_data.get('start_date', instance.start_date)
         instance.end_date = validated_data.get('end_date', instance.end_date)
-        instance.progress = validated_data.get('progress', instance.progress)  # Ensure progress is updated
-        instance.units = validated_data.get('units', instance.units)
-        instance.priority = validated_data.get('priority', instance.priority)
-        instance.color = validated_data.get('color', instance.color)
-
 
         # Manejar la actualización de la lista de tareas
-        new_tasks = validated_data.get('tasks', [])
-        if new_tasks:
+        new_products = validated_data.get('products', [])
+        if new_products:
             # Evitar sobrescribir las tareas, en lugar de eso, agregar nuevas
-            instance.tasks = list(set(instance.tasks + new_tasks))  # Evitar duplicados
+            instance.products = list(set(instance.products + new_products))  # Evitar duplicados
         instance.save()
 
         return instance

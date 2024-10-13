@@ -42,7 +42,9 @@ class Accounts(AbstractBaseUser):
   date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
   name = models.CharField(_('full name'), max_length=100, blank=False)
   category = models.CharField(max_length=100, blank=False)
-  employee_number = models.CharField(max_length=255, blank=False)
+
+  projection_id = models.CharField(max_length=100, blank=False, default="")
+  units_projection = models.IntegerField(default=0)
 
   objects = AccountManager()
 
