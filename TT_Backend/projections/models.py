@@ -1,18 +1,11 @@
 from django.db import models
 from djongo import models
-import uuid
 from django.utils.translation import gettext_lazy as _
-import random
+import uuid
+from django.utils import timezone
 
 def generate_projection_id():
     return 'projection_' + str(uuid.uuid4())
-
-def generate_pastel_color():
-    # Genera valores aleatorios entre 127 y 255 para obtener colores claros (pastel)
-    red = random.randint(127, 255)
-    green = random.randint(127, 255)
-    blue = random.randint(127, 255)
-    return f'#{red:02X}{green:02X}{blue:02X}'
 
 # Create your models here.
 class Projection(models.Model):
@@ -23,27 +16,33 @@ class Projection(models.Model):
         editable=False
     )
     account_id = models.CharField(max_length=255)
-    function = models.CharField(max_length=255)
-    activity = models.CharField(max_length=255)
-    role = models.CharField(max_length=255)
-    scope = models.CharField(max_length=255)
-    tasks = models.JSONField(
-        models.CharField(max_length=255),  # IDs de tareas
+    products = models.JSONField(
+        models.CharField(max_length=255),  # IDs de productos
         blank=True, 
         null=True
     )
-    documents_required = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    units = models.FloatField(null=True, blank=True, default=0) # Unidades de la proyección
-    priority = models.CharField(max_length=255)
-    color = models.CharField(max_length=7, default=generate_pastel_color, blank=True)
-    progress = models.FloatField(default=0)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Se importa aquí para evitar ciclos de importación
+        from default_Projection_Dates.models import DefaultProjectionDates
+
+        # Obtener las fechas por defecto
+        default_dates = DefaultProjectionDates.objects.first()
+
+        # Se coloca la fecha por defecto que haya colocado el administrador
+        if not self.start_date and default_dates:
+            self.start_date = default_dates.start_date
+        if not self.end_date and default_dates:
+            self.end_date = default_dates.end_date
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.function
+        return self.id
 
     class Meta:
         verbose_name = _('projection')

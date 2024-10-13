@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('tasks.urls')),
     path('', include('calendar_dates.urls')),
     path('', include('projections.urls')),
+    path('', include('products.urls')),
 ]

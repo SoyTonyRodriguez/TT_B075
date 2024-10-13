@@ -11,10 +11,11 @@ from django.contrib.auth import authenticate
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accounts
-        fields = ['id', 'name', 'email', 'password', 'date_joined', 'category', 'employee_number', 'is_staff']
+        fields = ['id', 'name', 'email', 'password', 'date_joined', 'category', 'is_staff', 'projection_id', 'units_projection']
         extra_kwargs = {
             'password': {'write_only': True},
             'id': {'read_only': True},
+            'projection_id': {'required': False}
         }
 
     # # Use validate_<field_name> methods to add custom validation logic.
@@ -49,7 +50,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accounts
-        fields = "__all__"
+        fields = ['id', 'name', 'email', 'category', 'employee_number']  # Incluye todos los campos que desees actualizar
+        extra_kwargs = {
+            'id': {'read_only': True},
+        }
+    def update(self, instance, validated_data):
+        # Si deseas aplicar alguna lógica antes de la actualización, hazlo aquí
+        return super().update(instance, validated_data)
 
 # Custom serializer to get a token
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
