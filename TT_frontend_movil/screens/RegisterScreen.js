@@ -37,7 +37,6 @@ const RegisterScreen = (route) => {
       name: '',
       email: '',
       category: '',
-      employee_number: '',
       password: '',
       confirmar_password: ''
     }
@@ -130,8 +129,6 @@ const RegisterScreen = (route) => {
         return "Por favor, ingresa un correo electrónico válido.";
       case 'category':
         return "Selecciona una categoría.";
-      case 'employee_number':
-        return "El número de empleado es obligatorio.";
       case 'password':
         return "La contraseña es obligatoria.";
       case 'confirmar_password':
@@ -222,25 +219,6 @@ const RegisterScreen = (route) => {
             />
           </TouchableOpacity>
           {errors.category && renderErrorMessage(getErrorMessage('category'))}
-
-          {/* Employee number input */}
-          <Controller
-            control={control}
-            name="employee_number"
-            rules={{ required: 'El número de empleado es obligatorio.' }}
-            render={({ field: { onChange, value } }) => (
-              <>
-                <TextInput
-                  placeholder="Ingresa tu número de empleado"
-                  style={inputStyle(errors.employee_number)}
-                  keyboardType="numeric"
-                  value={value}
-                  onChangeText={onChange}
-                />
-                {errors.employee_number && renderErrorMessage(getErrorMessage('employee_number'))}
-              </>
-            )}
-          />
 
           {/* Password and Confirm Password Inputs */}
           <Controller

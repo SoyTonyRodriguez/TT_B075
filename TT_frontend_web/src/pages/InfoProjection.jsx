@@ -86,7 +86,7 @@ const actividadesPorFuncion = {
     },
     { 
       actividad: "Producción de Unidades de Aprendizaje en Línea", 
-      documento: "Constancia emitida por DEMS, DES o SIP​.", 
+      documento: "Constancia emitida por UPEV, avalada por DEMS, DES o SIP​.", 
       up: ['8.00 U.P. como profesor-autor o diseñador didáctico.','5.00 U.P. como comunicólogo educativo o programador web.','3.00 U.P. como supervisor editorial o corrector de estilo.'], 
       condiciones: [
         'Las unidades de aprendizaje deben ser validadas por las autoridades académicas y utilizadas en programas de enseñanza a distancia.'
@@ -103,7 +103,7 @@ const actividadesPorFuncion = {
   {
     actividad: "Proyectos de Aula", 
     documento: "Constancia emitida por DEMS que indique la participación como coordinador del Proyecto Aula​.​.", 
-    up: ['5.00 U.P. por semestre.'], 
+    up: ['5.00 U.P. por semestre como coordinador.'], 
     condiciones: [
     'Los docentes deben coordinar el proyecto y cumplir con las responsabilidades académicas en el aula, con un enfoque en el aprendizaje práctico y colaborativo.'
   ] 
@@ -134,7 +134,17 @@ const actividadesPorFuncion = {
       '50.00 U.P. por la aprobación del examen de forma.','60.00 U.P. por la obtención de patentes nacionales con registro en el IMPI.','80.00 U.P. por la obtención de patentes internacionales'
     ], 
     condiciones: [
+      'Las U.P. dependen de las distintas etapas del desarrollo y registro de la patente.',
       'El desarrollo de patentes debe estar relacionado con actividades de innovación académica o de investigación.'
+    ]
+  },
+  {
+    actividad: "Estancias de Investigación", 
+    documento: "Carta de terminación emitida por la institución donde se realizó la estancia​.", 
+    up: ['15.00 U.P. por año de estancia de investigación.'
+    ], 
+    condiciones: [
+      'La estancia debe ser realizada en una institución reconocida, nacional o internacional, y debe estar alineada con los objetivos de investigación del IPN.',
     ]
   }
   ],
@@ -153,7 +163,7 @@ const actividadesPorFuncion = {
       documento: "Certificado emitido por la entidad certificadora, con constancia de participación emitida por el titular del centro de trabajo​.", 
       up: ['20.00 U.P. por la certificación de laboratorios.','5.00 U.P. por la validación de pruebas de laboratorio.'], 
       condiciones: [
-        'Los laboratorios deben ser certificados oficialmente por una entidad reconocida.'
+        'La certificación debe ser realizada por una entidad reconocida, y las pruebas de laboratorio deben ser validadas por una autoridad competente.'
       ] 
     },
     {
@@ -163,6 +173,16 @@ const actividadesPorFuncion = {
       condiciones: [
          'Máximo: 20.00 U.P. por periodo de promoción.',
         'Aplica para la dirección o asesoría de tesis de licenciatura, maestría o doctorado.'
+      ] 
+    },
+    {
+      actividad: "Dirección o Asesoría de Trabajos Escritos para Titulación", 
+      documento: "Oficio o constancia de designación emitida por la unidad académica​..", 
+      up: ['5.00 U.P. por cada trabajo asesorado.'], 
+      condiciones: [
+         'Máximo: 20.00 U.P. por periodo de promoción.',
+        'El docente debe estar designado oficialmente como asesor o director del trabajo de titulación.',
+        'Los trabajos deben concluirse exitosamente con la titulación del estudiante.'
       ] 
     }
   ],
@@ -203,6 +223,8 @@ const actividadesPorFuncion = {
       documento: "Constancia emitida por DEMS, DES, SIP o CGFIE, según corresponda​.​.", 
       up: ['3.00 U.P. por cada 15 horas de curso con evaluación.', '1.00 U.P. por cada 15 horas de curso sin evaluación.','8.00 U.P. por cada 20 horas de cursos de identidad institucional con evaluación.'], 
       condiciones: [
+        'Máximo de 7 cursos acumulables por periodo de promoción.',
+        'El docente debe cumplir con todas las horas del curso y, si aplica, presentar una evaluación.',
         'Los cursos deben estar alineados con la función docente o de investigación, y ser impartidos o validados por el IPN.'
       ]
     }
@@ -244,7 +266,7 @@ function InfoProjection({ userName }) {
   };
 
   const springStyle = (index) => useSpring({
-    height: openSection === index ? sectionRefs.current[index]?.scrollHeight : 0,
+    maxHeight: openSection === index ? sectionRefs.current[index]?.scrollHeight : 0,
     opacity: openSection === index ? 1 : 0,
     overflow: 'hidden',
   });
@@ -254,11 +276,10 @@ function InfoProjection({ userName }) {
   });
 
   return (
-    <main className="min-h-screen bg-cover bg-center">
-      <Navigation />
-      
+<main className="min-h-screen relative overflow-hidden">
+<Navigation />
       <hr className="border-t-2 border-black my-4" />
-    <div className="container mx-auto mt-8 mb-8">
+      <div className="container mx-auto mt-8 overflow-hidden">
 
       <div className="flex items-center justify-between bg-black bg-opacity-40 p-6 rounded-lg shadow-lg">
       <p className="text-xl text-white leading-relaxed text-justified justify-center">

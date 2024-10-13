@@ -3,17 +3,17 @@ import { IoStarOutline, IoSchoolOutline } from "react-icons/io5";
 import Navigation from './Navigation/Navigation';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import LoadingAnimation from "../components/LoadingAnimation";
+import { jwtDecode } from "jwt-decode";
 
-import { createProjection, getProjection, deleteProjection, updateProjection } from '../../../api/projections.api';
+import { createProduct } from '../../../api/products.api';
 
 function UnidadesPromocion() {
   const navigate = useNavigate();
 
   // Estados para los campos del formulario
   const [priority, setPriority] = useState('');
-  const [start_date, setStartDate] = useState(''); 
-  const [end_date, setEndDate] = useState('');
   const [functionField, setFunctionField] = useState('');
   const [role, setRole] = useState('');
   const [scope, setScope] = useState('');
@@ -22,32 +22,15 @@ function UnidadesPromocion() {
   const [units, setUnits] = useState('');
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [projection_id, setProjectionId] = useState('');
   const [error, setError] = useState(null);
 
   // Estados de validación para los errores
   const [functionError, setFunctionError] = useState(false);
   const [activityError, setActivityError] = useState(false);
-  const [dateError, setDateError] = useState(false);
   const [roleError, setRoleError] = useState(false);
   const [scopeError, setScopeError] = useState(false);
   const [priorityError, setPriorityError] = useState(false);
-
-  const getCurrenDate = () => {
-    // Obtener la fecha actual y restar un día
-    const today = new Date();
-    today.setDate(today.getDate());
-
-    // Formatear la fecha en "YYYY-MM-DD"
-    const formattedDate = today.toISOString().split('T')[0];
-    setStartDate(formattedDate);
-  };
-
-  // Usa useEffect para establecer la fecha actual cuando el componente se monta
-  useEffect(() => {
-    getCurrenDate();
-    console.log(getCurrenDate());
-    setTasks([]);
-  }, []);
 
   // Definición de la función para obtener el color según la prioridad
   const getColorForPriority = (priority) => {
@@ -72,7 +55,6 @@ function UnidadesPromocion() {
     'Actividades de extensión, integración y difusión de la ciencia y de la cultura': 'extension',
   };
 
-  
   // Opciones de actividades por función con documentos requeridos y U.P
   const actividadesPorFuncion = {
     docencia: [
@@ -121,11 +103,32 @@ function UnidadesPromocion() {
     ],
   };
 
+  useEffect(() => {
+    // Verify if the userName is stored in the localStorage
+    const storedAccountData = localStorage.getItem('accountDetails');
+
+    // If the account is stored, set data and skip loading animation
+    if (storedAccountData) {
+      const { projection_id } = JSON.parse(storedAccountData);
+      setProjectionId(projection_id);
+      console.log('Account details loaded from localStorage' + storedAccountData);
+    } else {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                setUserId(decodedToken.user_id);
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
+        }
+    }
+  }, []);
+
   const handleFunctionChange = (e) => {
     setFunctionField(e.target.value);
     setFunctionError(false); // Elimina el error al seleccionar algo
     setActivity('');
-    setEndDate('');
     setRole('');
     setScope('');
     setDocumentsRequired('');
@@ -177,11 +180,6 @@ function UnidadesPromocion() {
       isValid = false;
     }
 
-    if (!end_date) {
-      setDateError(true);
-      isValid = false;
-    }
-
     if (!role) {
       setRoleError(true);
       isValid = false;
@@ -211,14 +209,13 @@ function UnidadesPromocion() {
     const projectionData = {
       function: functionField,
       activity,
-      start_date,
-      end_date,
       role,
       scope,
       documents_required,
       priority,
       units,
       tasks,
+      projection_id,
     };
 
     try {
@@ -226,7 +223,7 @@ function UnidadesPromocion() {
       setError(null);
 
       // Llama al método createProjection con los datos del formulario
-      const response = await createProjection(projectionData);
+      const response = await createProduct(projectionData);
       console.log('Proyección creada:', response.data);
       toast.success('Proyección creada con éxito');  // Mostrar toast de éxito
       navigate('/KanbanBoard'); // Redirect to login or another page
@@ -255,8 +252,8 @@ function UnidadesPromocion() {
     {/* Incluye la navegación */}
     <Navigation />
 
-    {/* Línea de separación */}
-    <hr className="border-t-2 border-black my-4" />
+      {/* Línea de separación */}
+      <hr className="border-t-2 border-black my-4" />
 
       {/* Contenido Principal */}
       <div className="container mx-auto mt-8 mb-8">
@@ -290,26 +287,12 @@ function UnidadesPromocion() {
                 value={activity}
                 onChange={handleActivityChange}
                 className="w-full p-2 rounded-lg border border-gray-400"
-                disabled={!functionField}
               >
                 <option value="" disabled>Selecciona una actividad</option>
                 {getActividades()}
               </select>
               {activityError && <span className="text-red-500">Por favor, selecciona una actividad.</span>}
 
-            </div>
-            <div className="mb-4">
-              <label className="block text-white text-sm font-semibold mb-2">Establece una fecha proyectada de inicio</label>
-              <input
-                type="date"
-                value={end_date}
-                onChange={(e) => {
-                  setEndDate(e.target.value)
-                  setDateError(false); // Elimina el error al seleccionar una fecha
-                }}
-                className="w-full p-2 rounded-lg border border-gray-400"
-              />
-              {dateError && <span className="text-red-500">Por favor, selecciona una fecha de inicio.</span>}
             </div>
 
             <div className="mb-4">
@@ -379,7 +362,10 @@ function UnidadesPromocion() {
               </div>
 
               <div className="w-1/2 ml-2">
-                <button type="submit" className="bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full mt-6">
+                <button 
+                  type="submit" 
+                  className="bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full mt-6"
+                  >
                   Agregar
                 </button>
               </div>
@@ -389,19 +375,35 @@ function UnidadesPromocion() {
 
           {/* Información Adicional */}
           <div className="w-full md:w-1/2 lg:w-2/5">
+            {/* Recuadro llamativo con la proyección */}
             <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-700">Tú proyección actual:</h3>
+              <div className="bg-yellow-300 border-l-4 border-yellow-600 text-yellow-800 p-4 rounded-lg shadow-lg">
+                <p className="font-semibold">
+                  Tu proyección cubrirá el período del <strong>2024 al 2026</strong>. 
+                  Aquí puedes comenzar a registrar actividades que realices dentro de este período, donde acumularás U.P. 
+                </p>
+                <p className='font-semibold mt-4'>
+                Cada actividad que completes contribuirá a tus unidades de promoción (U.P), que te beneficiarán en tu proceso de promoción docente.
+                </p>
+              </div>
+            </div>
+            
+            {/* Campos de texto para agregar actividades proyectadas y U.P acumuladas */}
+            {/* <div className="mb-8">
               <h3 className="text-lg font-bold text-gray-700">Actividades proyectadas:</h3>
               <input type="text" className="w-full p-2 mt-2 rounded-lg border border-gray-400" />
             </div>
             <div className="mb-8">
               <h3 className="text-lg font-bold text-gray-700">U.P acumuladas:</h3>
               <input type="text" className="w-full p-2 mt-2 rounded-lg border border-gray-400" />
-            </div>
+            </div> */}
             <div className="mb-8">
               <h3 className="text-lg font-bold text-gray-700">¿No sabes qué agregar?</h3>
-              <p className="text-gray-700">¡Conoce más acerca de las actividades que puedes realizar, qué implican y sus detalles!</p>
-              <button className="mt-4 bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600">¿Qué puedo agregar?</button>
+              <p className="text-gray-700 mb-8">¡Conoce más acerca de las actividades que puedes realizar, qué implican y sus detalles!</p>
+              <Link to= '/InfoProjection' className="mt-4 bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600">¿Qué puedo agregar?</Link>
             </div>
+
           </div>
         </div>
       </div>

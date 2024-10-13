@@ -19,6 +19,8 @@ function MainContent() {
     const [email, setEmail] = useState('');
     const [category, setCategory] = useState('');
     const [phone, setPhone] = useState('');
+    const [units_projection, setUnitsProjection] = useState('');
+    const [projection_id, setProjectionId] = useState('');
 
     // Loading state
     const [loading, setLoading] = useState(true); 
@@ -29,13 +31,16 @@ function MainContent() {
 
       // If the account is stored, set data and skip loading animation
       if (storedAccountData) {
-        const { userName, fullName, email, category, phone } = JSON.parse(storedAccountData);
+        const { userName, fullName, email, category, phone, units_projection, projection_id } = JSON.parse(storedAccountData);
         setUserName(userName);
         setFullName(fullName);
         setEmail(email);
         setCategory(category);
         setPhone(phone);
+        setUnitsProjection(units_projection);
+        setProjectionId(projection_id);
         setLoading(false);
+        console.log('Account details loaded from localStorage' + storedAccountData);
       } else {
           const token = localStorage.getItem('token');
           if (token) {
@@ -59,6 +64,8 @@ function MainContent() {
                   const email = response.data.email;
                   const category = response.data.category;
                   const phone = response.data.phone;
+                  const units_projection = response.data.units_projection;
+                  const projection_id = response.data.projection_id;
 
                   // Store the account details in the state
                   setUserName(firstName);
@@ -66,6 +73,8 @@ function MainContent() {
                   setEmail(email);
                   setCategory(category);
                   setPhone(phone);
+                  setUnitsProjection(units_projection);
+                  setProjectionId(projection_id);
 
                   // Create an object with the account details
                   const accountDetails = {
@@ -73,7 +82,9 @@ function MainContent() {
                       fullName,
                       email,
                       category,
-                      phone
+                      phone,
+                      units_projection,
+                      projection_id,
                   };
 
                   // Save the account details in the localStorage

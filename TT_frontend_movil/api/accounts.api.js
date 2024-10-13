@@ -3,7 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa
 
 // Initial set-up
 const accountsAPI = axios.create({
-    baseURL: 'http://192.168.1.11:8000/api/v1/'
+    //baseURL: 'http://192.168.77.44:8000/api/v1/'
+    baseURL: 'http://192.168.1.143:8000/api/v1/'
 })
 
 // register method

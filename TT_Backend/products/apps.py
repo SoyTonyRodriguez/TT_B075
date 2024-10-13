@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 
 
-class ProjectionsConfig(AppConfig):
+class ProductsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'projections'
+    name = 'products'
 
     def ready(self):
-        import projections.signals
+        import products.signals
