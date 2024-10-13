@@ -31,8 +31,24 @@ class Task(models.Model):
     priority = models.CharField(_('priority'), max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Se importa aquí para evitar ciclos de importación
+        from default_Projection_Dates.models import DefaultProjectionDates
+
+        # Obtener las fechas por defecto
+        default_dates = DefaultProjectionDates.objects.first()
+
+        # Se coloca la fecha por defecto que haya colocado el administrador
+        if not self.start_date and default_dates:
+            self.start_date = default_dates.start_date
+        if not self.end_date and default_dates:
+            self.end_date = default_dates.end_date
+        
+        super().save(*args, **kwargs)
+
     projection_id = models.CharField(max_length=255)
 
     def __str__(self):

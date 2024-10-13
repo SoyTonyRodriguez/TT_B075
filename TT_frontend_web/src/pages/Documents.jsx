@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { FaSearch, FaFilePdf, FaFileImage, FaFileAlt, FaCalendarAlt, FaSyncAlt } from 'react-icons/fa';
+import JSZip from 'jszip'; // Importar JSZip
+import { saveAs } from 'file-saver'; // Importar FileSaver para descargar el archivo ZIP
 import Navigation from './Navigation/Navigation';
 
 function Documents() {
@@ -8,8 +10,8 @@ function Documents() {
   const [errorMessage, setErrorMessage] = useState("");
   const [fileTypeFilter, setFileTypeFilter] = useState(''); 
   const [dateFilter, setDateFilter] = useState(''); 
-  const [showFileTypeDropdown, setShowFileTypeDropdown] = useState(false); // Mostrar dropdown de tipo
-  const [showDateDropdown, setShowDateDropdown] = useState(false); // Mostrar dropdown de fechas
+  const [showFileTypeDropdown, setShowFileTypeDropdown] = useState(false); 
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
 
   // Función que cierra todos los dropdowns
   const closeDropdowns = () => {
@@ -68,31 +70,31 @@ function Documents() {
 
       // Función para subir documentos con sus restricciones
       if (fileType === "application/pdf") {
-        // Restringimos a máximo 2 mb un pdf
         if (fileSizeInKB <= 2048) {
           validFiles.push({
             name: file.name,
             size: `${(file.size / 1024 / 1024).toFixed(2)} Mb`,
             date: new Date().toLocaleDateString(),
-            type: 'pdf', // Guardamos el tipo de archivo
+            type: 'pdf',
+            file: file, // Añadir archivo original
           });
         } else {
           setErrorMessage("El archivo PDF debe ser de un tamaño máximo de 2MB.");
         }
       } else if (fileType === "image/jpeg" || fileType === "image/jpg") {
-        // Restringimos la imagen de 50kb a 700 kb como lo marca la convocatoria
         if (fileSizeInKB >= 50 && fileSizeInKB <= 700) {
           validFiles.push({
             name: file.name,
             size: `${(file.size / 1024).toFixed(2)} Kb`,
             date: new Date().toLocaleDateString(),
-            type: 'image', // Guardamos el tipo de archivo
+            type: 'image',
+            file: file, // Añadir archivo original
           });
         } else {
           setErrorMessage("Las imágenes deben tener un tamaño entre 50KB y 700KB.");
         }
       } else {
-        setErrorMessage("Solo se permiten archivos PDF y JPG/JPEG."); // Mensaje para recordarle al docente que no sea wey
+        setErrorMessage("Solo se permiten archivos PDF y JPG/JPEG.");
       }
     });
 
@@ -102,13 +104,29 @@ function Documents() {
     }
   };
 
+  // Función para exportar documentos en ZIP
+  const handleExportZip = async () => {
+    if (fileData.length === 0) {
+      setErrorMessage("No hay archivos para exportar.");
+      return;
+    }
+
+    const zip = new JSZip();
+
+    fileData.forEach((file) => {
+      // Agregamos los archivos al zip con su nombre original
+      zip.file(file.name, file.file);
+    });
+
+    const content = await zip.generateAsync({ type: "blob" });
+    saveAs(content, "documentos.zip");
+  };
+
   return (
     <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/path-to-your-background-image.png')" }}>
-      {/* navegación fija */}
       <Navigation />
       <hr className="border-t-2 border-black my-4" />
 
-      {/* Document Section */}
       <div className="p-6 max-w-5xl mx-auto">
         <div className="mb-6 flex items-center">
           <div className="relative w-full">
@@ -123,10 +141,7 @@ function Documents() {
           </div>
         </div>
 
-
-
         <div className="flex justify-center space-x-4 mb-6">
-          {/* Filtro por Tipo con ícono */}
           <div className="relative">
             <button
               className="px-4 py-2 rounded-full border bg-gray-200 hover:bg-blue-500 text-gray-600 hover:text-white shadow-md hover:shadow-lg transition duration-300 flex items-center space-x-2"
@@ -150,7 +165,6 @@ function Documents() {
             )}
           </div>
 
-          {/* Filtro por Fecha de modificación con ícono */}
           <div className="relative">
             <button
               className="px-4 py-2 rounded-full border bg-gray-200 hover:bg-blue-500 text-gray-600 hover:text-white shadow-md hover:shadow-lg transition duration-300 flex items-center space-x-2"
@@ -180,7 +194,6 @@ function Documents() {
             )}
           </div>
 
-          {/* Botón Predeterminado con ícono */}
           <button
             className="px-4 py-2 rounded-full border bg-gray-200 hover:bg-blue-500 text-gray-600 hover:text-white shadow-md hover:shadow-lg transition duration-300 flex items-center space-x-2"
             onClick={resetFilters}
@@ -190,9 +203,7 @@ function Documents() {
           </button>
         </div>
 
-
         <div className="bg-white shadow-lg rounded-lg p-6">
-          {/* Boton para añadir un pdf o imagen nuevo */}
           <div className="mb-6 flex items-center justify-start">
             <label
               htmlFor="file-upload"
@@ -219,7 +230,6 @@ function Documents() {
             <div>Subido</div>
           </div>
 
-          {/* A partir de aqui se muestran los documentos */}
           {filteredFileData.length === 0 ? (
             <div className="text-center p-4 text-gray-500">No tienes documentos cargados</div>
           ) : (
@@ -239,9 +249,11 @@ function Documents() {
             ))
           )}
 
-          {/* Boton para exportar los documentos en un ZIP, aun no funciona jajaja */}
           <div className="flex justify-end mt-6">
-            <button className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition duration-300">
+            <button
+              onClick={handleExportZip} // Añadimos el evento click para exportar ZIP
+              className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
+            >
               Exportar ZIP
             </button>
           </div>
