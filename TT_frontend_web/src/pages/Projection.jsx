@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { IoCreateOutline, IoGlassesOutline, IoHelpCircleOutline } from "react-icons/io5";
 import { motion } from 'framer-motion';
@@ -6,6 +6,36 @@ import Navigation from './Navigation/Navigation';
 
 function ProyeccionSeguimiento() {
   const [hoveredButton, setHoveredButton] = useState(null); 
+
+
+    // Store data account
+  const [projection_id, setProjectionId] = useState('');
+
+  // Loading state
+  const [loading, setLoading] = useState(true); 
+
+  useEffect(() => {
+    // Verify if the userName is stored in the localStorage
+    const storedAccountData = localStorage.getItem('accountDetails');
+
+    // If the account is stored, set data and skip loading animation
+    if (storedAccountData) {
+      const { projection_id } = JSON.parse(storedAccountData);
+      setProjectionId(projection_id);
+      setLoading(false);
+      console.log('Account details loaded from localStorage' + storedAccountData);
+    } else {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                setUserId(decodedToken.user_id);
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
+        }
+    }
+  }, []);
 
   const handleMouseEnter = (button) => {
     setHoveredButton(button); 
@@ -28,6 +58,16 @@ function ProyeccionSeguimiento() {
     }
   };
 
+  const handleRedirectCreate = () => {
+    // Redirect to the create projection
+    if (projection_id === '') {
+      return '/Projection-first';
+    } else {
+      return '/new-projection';
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-cover bg-center relative">
       {/* Navegación fija */}
@@ -43,7 +83,7 @@ function ProyeccionSeguimiento() {
             transition={{ type: 'spring', stiffness: 300 }}
           >
             <Link
-              to="/new-projection"
+              to={handleRedirectCreate()}
               onMouseEnter={() => handleMouseEnter('crear')}
               onMouseLeave={handleMouseLeave}
               className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"

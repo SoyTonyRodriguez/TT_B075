@@ -7,9 +7,9 @@ const TasksAPI = axios.create({
 })
 
 // create projection method
-export const createProduct = (projection) => {
+export const createProduct = (product) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.post('product/register/', projection, {
+    return TasksAPI.post('product/register/', product, {
         headers: {
             Authorization: `Bearer ${token}`,
         }
@@ -26,18 +26,18 @@ export const getProduct = (account_id) => {
     });
 };
 
-export const updateProduct = (projection_id, updatedData) => {
+export const updateProduct = (product_id, updatedData) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.patch(`products/${projection_id}/edit/`, updatedData, {
+    return TasksAPI.patch(`products/${product_id}/edit/`, updatedData, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
 };
 
-export const deleteProduct = (projection_id) => {
+export const deleteProduct = (product_id) => {
     const token = localStorage.getItem('token');
-    return TasksAPI.delete(`products/${projection_id}/delete/`, {
+    return TasksAPI.delete(`products/${product_id}/delete/`, {
         headers: { Authorization: `Bearer ${token}` },
     });
 };
