@@ -38,6 +38,7 @@ function App() {
         backgroundImage: `url(${fondo})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundAttachment: 'fixed', 
       }}
     >
       <Header />
