@@ -41,8 +41,6 @@ function KanbanBoard() {
         description: '',
         priority: 'Media',
         status: 'todo',
-        start_date: '',
-        end_date: ''
     });
 
     // Error state
@@ -123,7 +121,7 @@ function KanbanBoard() {
             setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
 
             // Verificar si todos los campos obligatorios están llenos
-            if (!newTask.title || !newTask.description || !newTask.end_date || !newTask.projection, !newTask.projection_id) {
+            if (!newTask.title || !newTask.description || !newTask.projection, !newTask.projection_id) {
                 toast.error('Todos los campos son obligatorios.');
                 return;
             }
@@ -151,8 +149,6 @@ function KanbanBoard() {
                 description: '',
                 priority: 'Media',
                 status: 'todo',
-                start_date: '', // Fecha actual en formato local
-                end_date: '',
                 projection_id: '' // Limpiar el campo de proyección
             });
     
@@ -203,7 +199,7 @@ function KanbanBoard() {
         try {
             setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
             // Verificar si todos los campos obligatorios están llenos
-            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.end_date || !taskToEdit.projection_id) {
+            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.projection_id) {
                 toast.error('Todos los campos son obligatorios.');
                 return;
             }
@@ -455,20 +451,7 @@ function KanbanBoard() {
         );
     };
     
-    const openEditModal = (task) => {
-        // Obtener la fecha actual y restar un día
-        const today = new Date();
-        today.setDate(today.getDate());
-    
-        // Formatear la fecha en "YYYY-MM-DD"
-        const formattedDate = today.toISOString().split('T')[0];
-    
-        // Abrir el modal y establecer la fecha actual como la fecha de inicio
-        setTaskToEdit({
-            ...task,
-            start_date: formattedDate, // Setear la fecha actual restada un día
-        });
-                
+    const openEditModal = (task) => {       
         setIsEditModalOpen(true);
     };
     
@@ -509,18 +492,6 @@ function KanbanBoard() {
 
     // Modal toggles (Abrir y cerrar el modal)
     const openModal = () => {
-        // Obtener la fecha actual y restar un día
-        const today = new Date();
-        today.setDate(today.getDate());
-    
-        // Formatear la fecha en "YYYY-MM-DD"
-        const formattedDate = today.toISOString().split('T')[0];
-    
-        // Abrir el modal y establecer la fecha actual como la fecha de inicio
-        setNewTask({
-            ...newTask,
-            start_date: formattedDate, // Setear la fecha actual restada un día
-        });
         setIsModalOpen(true);
     };
     const closeModal = () => setIsModalOpen(false);
@@ -628,18 +599,6 @@ function KanbanBoard() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                         />
                     </div>
-                    
-                    {/* Campo de fecha de vencimiento */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha de Vencimiento</label>
-                        <input
-                        type="date"
-                        name="end_date"
-                        value={newTask.end_date}
-                        onChange={handleTaskChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
                             
                     {/* Selector de prioridad */}
                     <div className="mb-6">
@@ -717,18 +676,6 @@ function KanbanBoard() {
                         name="description"
                         value={taskToEdit?.description || ''}
                         onChange={(e) => setTaskToEdit({ ...taskToEdit, description: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                        />
-                    </div>
-                    
-                    {/* Campo de fecha de vencimiento */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha de Vencimiento</label>
-                        <input
-                        type="date"
-                        name="end_date"
-                        value={taskToEdit?.end_date || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, end_date: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
