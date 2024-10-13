@@ -8,6 +8,10 @@ import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
 import Navigation from './Navigation/Navigation'; 
 import LoadingSpinner from '../components/LoadingSpinner';
+import { IoTime } from "react-icons/io5";
+import { TbXboxXFilled } from "react-icons/tb";
+
+
 
 function KanbanBoard() {
     // Get Tasks from the API
@@ -400,33 +404,35 @@ function KanbanBoard() {
             <div
                 onClick={() => openEditModal(task)}
                 ref={drag}
-                className={`relative p-4 mb-4 rounded-lg shadow-lg transition-all duration-300 transform ${getPriorityColor()} ${
-                    isDragging 
-                    ? 'opacity-50 scale-0 cursor-move' // Efecto de opacidad y escala al arrastrar
-                    : 'opacity-100 scale-100 cursor-pointer' // Estado normal
-                } `}
-                style={{ paddingBottom: '4rem' }}  // Asegura que haya espacio para el "badge"
+                className={`relative p-3 mb-2 rounded-lg shadow-md transition-all duration-300 transform ${getPriorityColor()} ${
+                    isDragging ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
+                } hover:shadow-lg cursor-pointer`}
+                style={{ minHeight: '100px', paddingBottom: '3rem' }} // Altura mínima y espacio para el badge
             >
-                {/* Botón de eliminación "X" en la esquina superior derecha */}
-                <button
-                    onClick={handleDelete}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-2xl"
+                {/* Botón de eliminación más pequeño */}
+                <div 
+                    className="absolute top-1 -right-1 text-red-500 hover:text-red-700 text-sm"
+                    onClick={handleDelete} // Agrega el manejador de eventos aquí
                 >
-                    &times;
-                </button>
+                    <TbXboxXFilled className="mr-2" />
+                </div>
     
-                {/* Mostrar el nombre de la tarea */}
-                <div className="font-bold text-xl mb-2 text-gray-800">{task.title}</div>
-                <p className="text-sm"><strong>Prioridad:</strong> {task.priority}</p>
-                <p className="text-sm"><strong>Vencimiento:</strong> {task.end_date}</p>
-                <p className="text-sm mb-4"><strong>Descripción:</strong> {task.description}</p>
-    
-                {/* Mostrar el nombre de la actividad y la proyección en la esquina inferior derecha */}
-                <div className="absolute bottom-2 right-2 bg-gray-100 text-gray-700 text-xs font-medium px-4 py-1 rounded-md shadow border border-gray-300 text-right max-w-xs break-words"
-                    style={{ backgroundColor: projectionColor }} // Aplicar el color aquí
+                {/* Mostrar el título de la tarea */}
+                <div className="font-bold text-md mb-1 text-gray-800 truncate z-10">{task.title}</div>
+
+                {/* Fecha de vencimiento */}
+                <div className="absolute top-8 right-2 flex items-center text-gray-600 text-xs font-medium">
+                    <IoTime className="mr-2" /> {/* Ícono de reloj */}
+                    {task.end_date}
+                </div>
+
+                {/* Recuadro de proyección */}
+                <div
+                    className="absolute bottom-2 left-2 right-2 bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-md shadow-sm border border-gray-300 text-right break-words overflow-hidden"
+                    style={{ backgroundColor: projectionColor }}
                 >
-                    <div>{projectionActivity}</div> {/* Nombre de la actividad */}
-                    <div className="text-gray-600 italic">{projectionName}</div> {/* Nombre de la proyección */}
+                    <div className="truncate">{projectionActivity}</div> {/* Nombre de la actividad */}
+                    <div className="text-gray-600 italic truncate">{projectionName}</div> {/* Nombre de la proyección */}
                 </div>
             </div>
         );
