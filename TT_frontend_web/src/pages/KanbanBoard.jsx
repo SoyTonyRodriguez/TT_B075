@@ -7,19 +7,7 @@ import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
 import Navigation from './Navigation/Navigation'; 
-
-// Componente de Spinner discreto
-const LoadingSpinner = () => (
-<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-        <div className="flex flex-col items-center justify-center">
-            <div className="animate-spin rounded-full h-36 w-36 border-t-8 border-b-8 border-blue-500"></div>
-            <p className="text-white text-3xl font-semibold mt-4 animate-pulse text-center">
-                Guardando los cambios...
-            </p>
-        </div>
-    </div>
-
-);
+import LoadingSpinner from '../components/LoadingSpinner';
 
 function KanbanBoard() {
     // Get Tasks from the API
@@ -197,38 +185,31 @@ function KanbanBoard() {
     // Actualizar una tarea en el estado local y en la API
     const handleUpdateTask = async () => {
         try {
-            setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
-            // Verificar si todos los campos obligatorios están llenos
-            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.projection_id) {
-                toast.error('Todos los campos son obligatorios.');
-                return;
-            }
-
+            setIsTaskLoading(true);
+    
+            // Llamada a la API para actualizar la tarea
+            const response = await updateTask(taskToEdit.id, taskToEdit);
+            
             if (response && response.data) {
                 const updatedTask = response.data;
+                
+                // Actualizar la tarea en el estado local
                 setTasks(tasks.map(task => task.id === taskToEdit.id ? updatedTask : task));
-            
-                // Si la tarea pertenece a una proyección, recalcular el progreso
+                
+                // Actualizar el progreso de la proyección si es necesario
                 if (updatedTask.projection_id) {
                     await updateProjectionProgress(updatedTask.projection_id, tasks);
                 }
-            
+    
                 toast.success('Tarea actualizada con éxito');
                 closeEditModal();
             }
         } catch (error) {
-            const apiErrors = error.response.data || {};
-            if (error.response.status === 400) {
-                const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
-                toast.error(errorMessage);
-            }else {
-                console.error('Error creando tarea:', error);
-    
-                // Mostrar un toast si ocurre un error
-                toast.error('Error creando la tarea. Verifica los datos.');
-            }
+            // Manejo de errores
+            console.error('Error actualizando la tarea:', error);
+            toast.error('Error actualizando la tarea.');
         } finally {
-            setIsTaskLoading(false);  // Detener la pantalla de carga para tareas
+            setIsTaskLoading(false);
         }
     };
 
@@ -451,7 +432,8 @@ function KanbanBoard() {
         );
     };
     
-    const openEditModal = (task) => {       
+    const openEditModal = (task) => {     
+        setTaskToEdit(task);  // Asigna la tarea seleccionada al estado  
         setIsEditModalOpen(true);
     };
     
