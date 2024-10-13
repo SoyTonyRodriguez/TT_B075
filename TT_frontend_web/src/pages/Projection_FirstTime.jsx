@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { IoSchoolOutline, IoStarOutline } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import Navigation from './Navigation/Navigation';
+import LoadingAnimation from "../components/LoadingAnimation";  
+
 import { createProjection } from '../../../api/projections.api'; // Asegúrate de que esta función esté correctamente implementada para hacer el POST
 
 function ProjectionFirstTime() {
@@ -25,20 +27,21 @@ function ProjectionFirstTime() {
         accountDetails.projection_id = projectionId;
         localStorage.setItem('accountDetails', JSON.stringify(accountDetails));
 
-        // Si la proyección fue creada correctamente, redirige o haz lo que necesites
-        alert('Proyección creada exitosamente');
         navigate('/new-projection'); // Redirigir después de crear la proyección
       } else {
         alert('Error al crear la proyección');
       }
     } catch (error) {
       console.error('Error creando la proyección:', error);
-      alert('Hubo un problema al crear la proyección.');
     } finally {
       setLoading(false); // Desactivar estado de carga
     }
   };
 
+  if (loading) {
+    return <LoadingAnimation />;
+  }
+  
   return (
     <div className="min-h-screen bg-cover bg-center">
       {/* Incluye la navegación */}
@@ -134,10 +137,9 @@ function ProjectionFirstTime() {
         <div className="mt-6 flex justify-center">
           <button
             onClick={handleCreateProjection} // Manejador de clic
-            className={`bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={loading} // Desactivar el botón cuando está cargando
+            className={`bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-600`}
           >
-            {loading ? 'Creando proyección...' : 'Acepta y crea tu proyección'}
+            Acepta y crea tu proyección
           </button>
         </div>
       </div>

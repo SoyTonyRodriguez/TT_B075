@@ -1,4 +1,5 @@
 from django.db import models
+from djongo import models
 from django.utils.translation import gettext_lazy as _
 import uuid
 from django.utils import timezone

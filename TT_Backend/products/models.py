@@ -23,7 +23,7 @@ class Products(models.Model):
         editable=False
     )
     account_id = models.CharField(max_length=255)
-    projection_id = models.CharField(max_length=255, default="test")
+    projection_id = models.CharField(max_length=255, default="test")  # Aqui es product_id, pero da hueva cambiarlo
     function = models.CharField(max_length=255)
     activity = models.CharField(max_length=255)
     role = models.CharField(max_length=255)
