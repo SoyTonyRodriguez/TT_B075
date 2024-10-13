@@ -11,8 +11,6 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { IoTime } from "react-icons/io5";
 import { TbXboxXFilled } from "react-icons/tb";
 
-
-
 function KanbanBoard() {
     // Get Tasks from the API
     const [tasks, setTasks] = useState([]);
@@ -256,48 +254,16 @@ function KanbanBoard() {
         }
     };
 
-    // Función para verificar que el progreso ha sido actualizado correctamente
-    const verifyUpdatedProgress = async (projectionId, expectedProgress) => {
-        try {
-            const response = await getProduct(userId);  // Obtén la proyección desde la API
-            const updatedProjections = response.data;  // Aquí se asume que es un array
-    
-            // Verificar que hay proyecciones y que el campo progress existe
-            if (updatedProjections && updatedProjections.length > 0) {
-                const updatedProjection = updatedProjections[0];  // Accede al primer elemento del array
-                
-                if (typeof updatedProjection.progress !== 'undefined') {
-                    const updatedProgress = updatedProjection.progress;
-    
-                    // Comparar el progreso esperado y el obtenido
-                    if (updatedProgress === expectedProgress) {
-                        toast.success(`Progreso verificado: ${updatedProgress}%`);
-                        setProjections(updatedProjections);  // Actualizar el estado local
-                    } else {
-                        toast.error(`El progreso no coincide. Esperado: ${expectedProgress}%, Actual: ${updatedProgress}%`);
-                    }
-                } else {
-                    toast.error('El campo "progress" no está presente en la proyección actualizada.');
-                }
-            } else {
-                toast.error('No se encontraron proyecciones actualizadas.');
-            }
-        } catch (error) {
-            console.error('Error verificando el progreso de la proyección:', error);
-            toast.error('Error verificando el progreso de la proyección');
-        }
-    };
-
     // Barra de progreso para cada proyección
     const ProgressBar = ({ progress }) => (
-        <div className="w-full bg-gray-200 rounded-full h-4">
-            <div
-                className="bg-green-500 h-4 rounded-full"
-                style={{ width: `${progress}%` }}
-            ></div>
+        <div className="w-full bg-gray-200 rounded-full h-2 relative mt-1">
+          <div
+            className="bg-blue-500 h-2 rounded-full"
+            style={{ width: `${progress}%` }}
+          >
+          </div>
         </div>
-    );
-    
+      );
 
     // Update task status when dropped in a different column
     const handleDrop = async (id, newStatus) => {
@@ -532,16 +498,29 @@ function KanbanBoard() {
                     </div>
                     
                     {/* Panel lateral derecho con proyecciones y su progreso */}
-                    <div className="w-1/4 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px', overflowY: 'auto' }}>
-                        <h2 className="text-2xl font-bold mb-6">Progresos de Proyecciones</h2>
+                    <div className="w-1/3 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px', overflowY: 'auto' }}>
+                        <h2 className="text-2xl font-bold mb-2">Progresos de Actividades</h2>
                         <div className="space-y-4">
-                            {projections.map(projection => (
-                            <div key={projection.id} className="bg-white shadow-md p-4 rounded-lg">
-                                <h3 className="text-lg font-semibold">{projection.activity}</h3>
-                                <ProgressBar progress={projection.progress || 0} />
-                                <p className="mt-2 text-sm text-gray-600">Progreso: {projection.progress}%</p>
-                            </div>
-                            ))}
+                            {projections.map(projection => {
+                                // Filtrar las tareas asociadas a la proyección actual
+                                const projectionTasks = tasks.filter(task => task.projection_id === projection.id);
+                                const doneTasks = projectionTasks.filter(task => task.status === 'done').length;
+                                const totalTasks = projectionTasks.length;
+
+                                return (
+                                    <div key={projection.id} className="bg-white shadow-lg p-6 rounded-xl hover:shadow-2xl transition-all duration-300">
+                                        <h3 className="font-bold text-md mb-1 text-gray-800 truncate z-10">{projection.activity}</h3>
+                                        <ProgressBar progress={projection.progress || 0} />
+                                        <p className="mt-2 text-sm text-gray-600">
+                                            <strong>Tareas Completadas: </strong> {doneTasks}/{totalTasks}
+                                        </p>
+                                        <hr className="my-2 border-t-2 border-gray-300" />
+                                        <p className="text-sm text-gray-500">
+                                            <strong>Documentos Requeridos:</strong> {projection.documents_required}
+                                        </p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
