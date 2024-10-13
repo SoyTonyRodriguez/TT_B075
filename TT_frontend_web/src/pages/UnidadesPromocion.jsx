@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import LoadingAnimation from "../components/LoadingAnimation";
+import { jwtDecode } from "jwt-decode";
 
 import { createProduct } from '../../../api/products.api';
 
@@ -21,6 +22,7 @@ function UnidadesPromocion() {
   const [units, setUnits] = useState('');
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [projection_id, setProjectionId] = useState('');
   const [error, setError] = useState(null);
 
   // Estados de validación para los errores
@@ -29,15 +31,6 @@ function UnidadesPromocion() {
   const [roleError, setRoleError] = useState(false);
   const [scopeError, setScopeError] = useState(false);
   const [priorityError, setPriorityError] = useState(false);
-
-  const [accepted, setAccepted] = useState(false); // Estado para controlar si el usuario acepta o no
-  const handleAccept = () => {
-    setAccepted(true); // El usuario acepta la proyección
-  };
-
-  const handleReject = () => {
-    setAccepted(false); // El usuario rechaza la proyección
-  };
 
   // Definición de la función para obtener el color según la prioridad
   const getColorForPriority = (priority) => {
@@ -109,6 +102,28 @@ function UnidadesPromocion() {
       { actividad: "Impartición de disciplinas deportivas y/o talleres culturales", documento: "Constancia de participación emitida por la autoridad competente.", up: 0.50 }
     ],
   };
+
+  useEffect(() => {
+    // Verify if the userName is stored in the localStorage
+    const storedAccountData = localStorage.getItem('accountDetails');
+
+    // If the account is stored, set data and skip loading animation
+    if (storedAccountData) {
+      const { projection_id } = JSON.parse(storedAccountData);
+      setProjectionId(projection_id);
+      console.log('Account details loaded from localStorage' + storedAccountData);
+    } else {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                setUserId(decodedToken.user_id);
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
+        }
+    }
+  }, []);
 
   const handleFunctionChange = (e) => {
     setFunctionField(e.target.value);
@@ -200,6 +215,7 @@ function UnidadesPromocion() {
       priority,
       units,
       tasks,
+      projection_id,
     };
 
     try {
@@ -254,7 +270,6 @@ function UnidadesPromocion() {
                 value={functionField}
                 onChange={handleFunctionChange}
                 className="w-full p-2 rounded-lg border border-gray-400"
-                disabled={!accepted} // Se habilita solo si se ha aceptado
               >
                 <option value="" disabled>Selecciona una función</option>
                 <option value="Docencia (carga académica y otras actividades)">Docencia (carga académica y otras actividades)</option>
@@ -272,7 +287,6 @@ function UnidadesPromocion() {
                 value={activity}
                 onChange={handleActivityChange}
                 className="w-full p-2 rounded-lg border border-gray-400"
-                disabled={!functionField}
               >
                 <option value="" disabled>Selecciona una actividad</option>
                 {getActividades()}
@@ -290,7 +304,6 @@ function UnidadesPromocion() {
                   setRoleError(false); // Elimina el error al seleccionar un rol
                 }}
                 className="w-full p-2 rounded-lg border border-gray-400"
-                disabled={!accepted} // Se habilita solo si se ha aceptado
               >
                 <option value="" disabled>Selecciona un rol de participación</option>
                 <option value="expositor">Expositor</option>
@@ -309,7 +322,6 @@ function UnidadesPromocion() {
                   setScopeError(false); // Elimina el error al seleccionar un alcance
                 }}
                 className="w-full p-2 rounded-lg border border-gray-400"
-                disabled={!accepted} // Se habilita solo si se ha aceptado
               >
                 <option value="" disabled>Selecciona un alcance</option>
                 <option value="nacional">Nacional</option>
@@ -340,7 +352,6 @@ function UnidadesPromocion() {
                     setPriority(e.target.value);
                     setPriorityError(false); // Elimina el error al seleccionar una prioridad
                   }}
-                  disabled={!accepted} // Se habilita solo si se ha aceptado
                 >
                   <option value="" disabled>Selecciona una prioridad</option>
                   <option value="Baja">Baja</option>
@@ -354,7 +365,6 @@ function UnidadesPromocion() {
                 <button 
                   type="submit" 
                   className="bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full mt-6"
-                  disabled={!accepted} // Se habilita solo si se ha aceptado
                   >
                   Agregar
                 </button>
@@ -367,34 +377,16 @@ function UnidadesPromocion() {
           <div className="w-full md:w-1/2 lg:w-2/5">
             {/* Recuadro llamativo con la proyección */}
             <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-700">Proyección del usuario:</h3>
+              <h3 className="text-lg font-bold text-gray-700">Tú proyección actual:</h3>
               <div className="bg-yellow-300 border-l-4 border-yellow-600 text-yellow-800 p-4 rounded-lg shadow-lg">
-                <p className="font-semibold"> 
-                  Tu proyección cubrirá el período del 2024 al 2026. Por favor, acepta para habilitar el formulario.
+                <p className="font-semibold">
+                  Tu proyección cubrirá el período del <strong>2024 al 2026</strong>. 
+                  Aquí puedes comenzar a registrar actividades que realices dentro de este período, donde acumularás U.P. 
+                </p>
+                <p className='font-semibold mt-4'>
+                Cada actividad que completes contribuirá a tus unidades de promoción (U.P), que te beneficiarán en tu proceso de promoción docente.
                 </p>
               </div>
-            </div>
-
-            {/* Botones de aceptación */}
-            <div className="flex space-x-4">
-              {!accepted ? (
-                <>
-                  <button
-                    onClick={handleAccept}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-500 w-full"
-                  >
-                    Aceptar
-                  </button>
-                  <button
-                    onClick={handleReject}
-                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-500 w-full"
-                  >
-                    Rechazar
-                  </button>
-                </>
-              ) : (
-                <p className="text-green-600 font-bold">Formulario habilitado. Puedes editar ahora.</p>
-              )}
             </div>
             
             {/* Campos de texto para agregar actividades proyectadas y U.P acumuladas */}

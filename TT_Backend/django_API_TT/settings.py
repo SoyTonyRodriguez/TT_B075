@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'calendar_dates',
     'projections',
     'products',
+    'default_Projection_Dates',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
