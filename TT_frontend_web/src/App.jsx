@@ -13,7 +13,6 @@ import KanbanBoard from './pages/KanbanBoard';
 import NewProjection from "./pages/NewProjection";
 import UnidadesPromocion from './pages/UnidadesPromocion';
 import GradoAcademico from './pages/GradoAcademico';
-import VerProyeccion from './pages/VerProyeccion';
 import Links from './pages/Links';
 import Documents from './pages/Documents';
 import Calendar from './pages/Calendar';
@@ -65,7 +64,6 @@ function App() {
         <Route path="/new-projection" element={<ProtectedRoute component={NewProjection} />} />
         <Route path="/unidades-promocion" element={<ProtectedRoute component={UnidadesPromocion} />} />
         <Route path="/promocion-grado" element={<ProtectedRoute component={GradoAcademico} />} />
-        <Route path="/observe-projection" element={<ProtectedRoute component={VerProyeccion} />} />
         <Route path="/Convocatoria" element={<ProtectedRoute component={Convocatoria} />} />
         <Route path="/Guia" element={<ProtectedRoute component={Guia} />} />
         <Route path="/KanbanBoard" element={<ProtectedRoute component={KanbanBoard} />} />

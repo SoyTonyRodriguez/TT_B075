@@ -34,6 +34,11 @@ class Products(models.Model):
         null=True
     )
     documents_required = models.TextField(blank=True, null=True)
+    documents_uploaded = models.JSONField(
+        models.CharField(max_length=255),  # IDs de tareas
+        blank=True, 
+        null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     units = models.FloatField(null=True, blank=True, default=0) # Unidades de la proyección
