@@ -7,11 +7,12 @@ class RegisterProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products
         fields = ['id', 'account_id', 'function', 'activity', 'role', 'scope', 
-                  'tasks', 'documents_required', 'units', 'priority', 'color', 'progress', 'projection_id']
+                  'tasks', 'documents_required', 'documents_uploaded', 'units', 'priority', 'color', 'progress', 'projection_id']
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True},
-            'tasks': {'required': False}
+            'tasks': {'required': False},
+            'documents_uploaded': {'required': False}
         }
     
     def create(self, validated_data):
@@ -36,12 +37,18 @@ class RegisterProductSerializer(serializers.ModelSerializer):
         instance.priority = validated_data.get('priority', instance.priority)
         instance.color = validated_data.get('color', instance.color)
         instance.projection_id = validated_data.get('projection_id', instance.projection_id)
+        instance.documents_uploaded = validated_data.get('documents_uploaded', instance.documents_uploaded)
         
         # Manejar la actualización de la lista de tareas
         new_tasks = validated_data.get('tasks', [])
         if new_tasks:
             # Evitar sobrescribir las tareas, en lugar de eso, agregar nuevas
             instance.tasks = list(set(instance.tasks + new_tasks))  # Evitar duplicados
+        instance.save()
+
+        new_documents = validated_data.get('documents_uploaded', [])
+        if new_documents:
+            instance.documents_uploaded = list(set(instance.documents_uploaded + new_documents))
         instance.save()
 
         return instance

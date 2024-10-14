@@ -23,6 +23,7 @@ function UnidadesPromocion() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [projection_id, setProjectionId] = useState('');
+  const [documents_uploaded, setDocumentUploaded] = useState('');
   const [error, setError] = useState(null);
 
   // Estados de validación para los errores
@@ -111,6 +112,7 @@ function UnidadesPromocion() {
     if (storedAccountData) {
       const { projection_id } = JSON.parse(storedAccountData);
       setProjectionId(projection_id);
+      setDocumentUploaded(documents_uploaded);
       console.log('Account details loaded from localStorage' + storedAccountData);
     } else {
         const token = localStorage.getItem('token');
@@ -134,6 +136,7 @@ function UnidadesPromocion() {
     setDocumentsRequired('');
     setUnits('');
     setTasks([]);
+    setDocumentUploaded([]);
   };
 
   const getActividades = () => {
@@ -216,6 +219,7 @@ function UnidadesPromocion() {
       units,
       tasks,
       projection_id,
+      documents_uploaded
     };
 
     try {

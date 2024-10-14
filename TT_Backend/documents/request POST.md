@@ -4,5 +4,5 @@ curl -X POST http://192.168.1.143:8000/api/v1/document/upload/ \
 -F "file_type=jpg" \
 -F "size=123123" \
 -F "account_id=acc_de24ab89-14cc-4876-a368-c6bebdd7fda8" \
--F "projection_id=123123" \
+-F "projection_id=product_7cd5c17c-4cc0-46fc-9403-b5dd523f5b10" \
 -F "file=@/home/antonio/prueba.jsx"
