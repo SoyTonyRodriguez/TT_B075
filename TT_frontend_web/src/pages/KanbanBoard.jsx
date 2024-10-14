@@ -10,6 +10,8 @@ import Navigation from './Navigation/Navigation';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { IoTime } from "react-icons/io5";
 import { TbXboxXFilled } from "react-icons/tb";
+import { AiOutlinePaperClip } from 'react-icons/ai'; // Importar el icono de clip
+import { Link } from 'react-router-dom';
 
 function KanbanBoard() {
     // Get Tasks from the API
@@ -450,11 +452,6 @@ function KanbanBoard() {
     };
     const closeModal = () => setIsModalOpen(false);
 
-    // // Show loading screen when tasks are being created or edited
-    // if (isTaskLoading) {
-    //     return <lo />;  // Pantalla de carga específica para creación/edición de tareas
-    // }
-
     // Show loading (Mostrar pantalla de carga)
     if (loading) {
         return <LoadingAnimation />;
@@ -518,6 +515,12 @@ function KanbanBoard() {
                                         <p className="text-sm text-gray-500">
                                             <strong>Documentos Requeridos:</strong> {projection.documents_required}
                                         </p>
+                                        <Link to="/documents" className="text-sm text-gray-500 flex items-center">
+                                            <AiOutlinePaperClip className="mr-2 text-blue-500" size={18} />
+                                            <span className="text-blue-500 hover:underline cursor-pointer">
+                                                Clic aquí para subir documento
+                                            </span>
+                                        </Link>
                                     </div>
                                 );
                             })}
