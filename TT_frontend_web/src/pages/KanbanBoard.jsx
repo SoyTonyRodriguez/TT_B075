@@ -7,19 +7,11 @@ import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
 import Navigation from './Navigation/Navigation'; 
-
-// Componente de Spinner discreto
-const LoadingSpinner = () => (
-<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-        <div className="flex flex-col items-center justify-center">
-            <div className="animate-spin rounded-full h-36 w-36 border-t-8 border-b-8 border-blue-500"></div>
-            <p className="text-white text-3xl font-semibold mt-4 animate-pulse text-center">
-                Guardando los cambios...
-            </p>
-        </div>
-    </div>
-
-);
+import LoadingSpinner from '../components/LoadingSpinner';
+import { IoTime } from "react-icons/io5";
+import { TbXboxXFilled } from "react-icons/tb";
+import { AiOutlinePaperClip } from 'react-icons/ai'; // Importar el icono de clip
+import { Link } from 'react-router-dom';
 
 function KanbanBoard() {
     // Get Tasks from the API
@@ -197,38 +189,31 @@ function KanbanBoard() {
     // Actualizar una tarea en el estado local y en la API
     const handleUpdateTask = async () => {
         try {
-            setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
-            // Verificar si todos los campos obligatorios están llenos
-            if (!taskToEdit.title || !taskToEdit.description || !taskToEdit.projection_id) {
-                toast.error('Todos los campos son obligatorios.');
-                return;
-            }
-
+            setIsTaskLoading(true);
+    
+            // Llamada a la API para actualizar la tarea
+            const response = await updateTask(taskToEdit.id, taskToEdit);
+            
             if (response && response.data) {
                 const updatedTask = response.data;
+                
+                // Actualizar la tarea en el estado local
                 setTasks(tasks.map(task => task.id === taskToEdit.id ? updatedTask : task));
-            
-                // Si la tarea pertenece a una proyección, recalcular el progreso
+                
+                // Actualizar el progreso de la proyección si es necesario
                 if (updatedTask.projection_id) {
                     await updateProjectionProgress(updatedTask.projection_id, tasks);
                 }
-            
+    
                 toast.success('Tarea actualizada con éxito');
                 closeEditModal();
             }
         } catch (error) {
-            const apiErrors = error.response.data || {};
-            if (error.response.status === 400) {
-                const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
-                toast.error(errorMessage);
-            }else {
-                console.error('Error creando tarea:', error);
-    
-                // Mostrar un toast si ocurre un error
-                toast.error('Error creando la tarea. Verifica los datos.');
-            }
+            // Manejo de errores
+            console.error('Error actualizando la tarea:', error);
+            toast.error('Error actualizando la tarea.');
         } finally {
-            setIsTaskLoading(false);  // Detener la pantalla de carga para tareas
+            setIsTaskLoading(false);
         }
     };
 
@@ -271,48 +256,16 @@ function KanbanBoard() {
         }
     };
 
-    // Función para verificar que el progreso ha sido actualizado correctamente
-    const verifyUpdatedProgress = async (projectionId, expectedProgress) => {
-        try {
-            const response = await getProduct(userId);  // Obtén la proyección desde la API
-            const updatedProjections = response.data;  // Aquí se asume que es un array
-    
-            // Verificar que hay proyecciones y que el campo progress existe
-            if (updatedProjections && updatedProjections.length > 0) {
-                const updatedProjection = updatedProjections[0];  // Accede al primer elemento del array
-                
-                if (typeof updatedProjection.progress !== 'undefined') {
-                    const updatedProgress = updatedProjection.progress;
-    
-                    // Comparar el progreso esperado y el obtenido
-                    if (updatedProgress === expectedProgress) {
-                        toast.success(`Progreso verificado: ${updatedProgress}%`);
-                        setProjections(updatedProjections);  // Actualizar el estado local
-                    } else {
-                        toast.error(`El progreso no coincide. Esperado: ${expectedProgress}%, Actual: ${updatedProgress}%`);
-                    }
-                } else {
-                    toast.error('El campo "progress" no está presente en la proyección actualizada.');
-                }
-            } else {
-                toast.error('No se encontraron proyecciones actualizadas.');
-            }
-        } catch (error) {
-            console.error('Error verificando el progreso de la proyección:', error);
-            toast.error('Error verificando el progreso de la proyección');
-        }
-    };
-
     // Barra de progreso para cada proyección
     const ProgressBar = ({ progress }) => (
-        <div className="w-full bg-gray-200 rounded-full h-4">
-            <div
-                className="bg-green-500 h-4 rounded-full"
-                style={{ width: `${progress}%` }}
-            ></div>
+        <div className="w-full bg-gray-200 rounded-full h-2 relative mt-1">
+          <div
+            className="bg-blue-500 h-2 rounded-full"
+            style={{ width: `${progress}%` }}
+          >
+          </div>
         </div>
-    );
-    
+      );
 
     // Update task status when dropped in a different column
     const handleDrop = async (id, newStatus) => {
@@ -419,39 +372,42 @@ function KanbanBoard() {
             <div
                 onClick={() => openEditModal(task)}
                 ref={drag}
-                className={`relative p-4 mb-4 rounded-lg shadow-lg transition-all duration-300 transform ${getPriorityColor()} ${
-                    isDragging 
-                    ? 'opacity-50 scale-0 cursor-move' // Efecto de opacidad y escala al arrastrar
-                    : 'opacity-100 scale-100 cursor-pointer' // Estado normal
-                } `}
-                style={{ paddingBottom: '4rem' }}  // Asegura que haya espacio para el "badge"
+                className={`relative p-3 mb-2 rounded-lg shadow-md transition-all duration-300 transform ${getPriorityColor()} ${
+                    isDragging ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
+                } hover:shadow-lg cursor-pointer`}
+                style={{ minHeight: '100px', paddingBottom: '3rem' }} // Altura mínima y espacio para el badge
             >
-                {/* Botón de eliminación "X" en la esquina superior derecha */}
-                <button
-                    onClick={handleDelete}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-2xl"
+                {/* Botón de eliminación más pequeño */}
+                <div 
+                    className="absolute top-1 -right-1 text-red-500 hover:text-red-700 text-sm"
+                    onClick={handleDelete} // Agrega el manejador de eventos aquí
                 >
-                    &times;
-                </button>
+                    <TbXboxXFilled className="mr-2" />
+                </div>
     
-                {/* Mostrar el nombre de la tarea */}
-                <div className="font-bold text-xl mb-2 text-gray-800">{task.title}</div>
-                <p className="text-sm"><strong>Prioridad:</strong> {task.priority}</p>
-                <p className="text-sm"><strong>Vencimiento:</strong> {task.end_date}</p>
-                <p className="text-sm mb-4"><strong>Descripción:</strong> {task.description}</p>
-    
-                {/* Mostrar el nombre de la actividad y la proyección en la esquina inferior derecha */}
-                <div className="absolute bottom-2 right-2 bg-gray-100 text-gray-700 text-xs font-medium px-4 py-1 rounded-md shadow border border-gray-300 text-right max-w-xs break-words"
-                    style={{ backgroundColor: projectionColor }} // Aplicar el color aquí
+                {/* Mostrar el título de la tarea */}
+                <div className="font-bold text-md mb-1 text-gray-800 truncate z-10">{task.title}</div>
+
+                {/* Fecha de vencimiento */}
+                <div className="absolute top-8 right-2 flex items-center text-gray-600 text-xs font-medium">
+                    <IoTime className="mr-2" /> {/* Ícono de reloj */}
+                    {task.end_date}
+                </div>
+
+                {/* Recuadro de proyección */}
+                <div
+                    className="absolute bottom-2 left-2 right-2 bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-md shadow-sm border border-gray-300 text-right break-words overflow-hidden"
+                    style={{ backgroundColor: projectionColor }}
                 >
-                    <div>{projectionActivity}</div> {/* Nombre de la actividad */}
-                    <div className="text-gray-600 italic">{projectionName}</div> {/* Nombre de la proyección */}
+                    <div className="truncate">{projectionActivity}</div> {/* Nombre de la actividad */}
+                    <div className="text-gray-600 italic truncate">{projectionName}</div> {/* Nombre de la proyección */}
                 </div>
             </div>
         );
     };
     
-    const openEditModal = (task) => {       
+    const openEditModal = (task) => {     
+        setTaskToEdit(task);  // Asigna la tarea seleccionada al estado  
         setIsEditModalOpen(true);
     };
     
@@ -496,11 +452,6 @@ function KanbanBoard() {
     };
     const closeModal = () => setIsModalOpen(false);
 
-    // // Show loading screen when tasks are being created or edited
-    // if (isTaskLoading) {
-    //     return <lo />;  // Pantalla de carga específica para creación/edición de tareas
-    // }
-
     // Show loading (Mostrar pantalla de carga)
     if (loading) {
         return <LoadingAnimation />;
@@ -544,16 +495,35 @@ function KanbanBoard() {
                     </div>
                     
                     {/* Panel lateral derecho con proyecciones y su progreso */}
-                    <div className="w-1/4 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px', overflowY: 'auto' }}>
-                        <h2 className="text-2xl font-bold mb-6">Progresos de Proyecciones</h2>
+                    <div className="w-1/3 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px', overflowY: 'auto' }}>
+                        <h2 className="text-2xl font-bold mb-2">Progresos de Actividades</h2>
                         <div className="space-y-4">
-                            {projections.map(projection => (
-                            <div key={projection.id} className="bg-white shadow-md p-4 rounded-lg">
-                                <h3 className="text-lg font-semibold">{projection.activity}</h3>
-                                <ProgressBar progress={projection.progress || 0} />
-                                <p className="mt-2 text-sm text-gray-600">Progreso: {projection.progress}%</p>
-                            </div>
-                            ))}
+                            {projections.map(projection => {
+                                // Filtrar las tareas asociadas a la proyección actual
+                                const projectionTasks = tasks.filter(task => task.projection_id === projection.id);
+                                const doneTasks = projectionTasks.filter(task => task.status === 'done').length;
+                                const totalTasks = projectionTasks.length;
+
+                                return (
+                                    <div key={projection.id} className="bg-white shadow-lg p-6 rounded-xl hover:shadow-2xl transition-all duration-300">
+                                        <h3 className="font-bold text-md mb-1 text-gray-800 truncate z-10">{projection.activity}</h3>
+                                        <ProgressBar progress={projection.progress || 0} />
+                                        <p className="mt-2 text-sm text-gray-600">
+                                            <strong>Tareas Completadas: </strong> {doneTasks}/{totalTasks}
+                                        </p>
+                                        <hr className="my-2 border-t-2 border-gray-300" />
+                                        <p className="text-sm text-gray-500">
+                                            <strong>Documentos Requeridos:</strong> {projection.documents_required}
+                                        </p>
+                                        <Link to="/documents" className="text-sm text-gray-500 flex items-center">
+                                            <AiOutlinePaperClip className="mr-2 text-blue-500" size={18} />
+                                            <span className="text-blue-500 hover:underline cursor-pointer">
+                                                Clic aquí para subir documento
+                                            </span>
+                                        </Link>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
