@@ -22,7 +22,7 @@ def store_old_product(sender, instance, **kwargs):
 @receiver(post_delete, sender=Document)
 def remove_document_from_products(sender, instance, **kwargs):
     # Buscar todos los productos que contengan el documento eliminado
-    products = Products.objects.filter(documents__contains=instance.id)
+    products = Products.objects.filter(documents_uploaded__contains=instance.id)
     for product in products:
         # Eliminar el ID del documento de la lista de productos
         product.documents_uploaded.remove(instance.id)
