@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaSearch, FaFilePdf, FaFileImage, FaFileAlt, FaCalendarAlt, FaSyncAlt } from 'react-icons/fa';
 import JSZip from 'jszip'; // Importar JSZip
 import { saveAs } from 'file-saver'; // Importar FileSaver para descargar el archivo ZIP
 import Navigation from './Navigation/Navigation';
+import LoadingAnimation from "../components/LoadingAnimation";
+import { TbXboxXFilled, TbReplace } from "react-icons/tb";
+import LoadingSpinner from '../components/LoadingSpinner';
+
+import { uploadDocument, getDocuments, deleteDocument, replaceDocument } from '../../../api/documents.api';
+import { jwtDecode } from 'jwt-decode';
 
 function Documents() {
   const [fileData, setFileData] = useState([]);
@@ -12,6 +18,107 @@ function Documents() {
   const [dateFilter, setDateFilter] = useState(''); 
   const [showFileTypeDropdown, setShowFileTypeDropdown] = useState(false); 
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [accountId, setAccountId] = useState('');
+  const [projectionId, setProjectionId] = useState(''); // Producto
+
+  // Loading state (Pantalla de carga XD)
+  const [loading, setLoading] = useState(true);
+  const [isDocumentLoading, setIsDocumentLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
+
+    // Decode JWT once at the start and get the user ID
+    useEffect(() => {
+      const token = localStorage.getItem('token');
+      if (token) {
+          try {
+              const decodedToken = jwtDecode(token);
+              setAccountId(decodedToken.user_id);
+          } catch (error) {
+              console.error('Invalid token:', error);
+          }
+      } else {
+          setLoading(false); // Stop loading if no token is found
+      }
+      setProjectionId('product_6797221c-8597-44b3-9a47-5be922873a52')
+    }, []);
+
+  // Llamada al endpoint para obtener los documentos
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      if (accountId) {
+        setLoading(true); // Mostrar pantalla de carga
+        try {
+          const response = await getDocuments(accountId);
+          const documents = response.data.map(doc => ({
+            id: doc.id,
+            name: doc.file_name,
+            size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
+            date: new Date(doc.upload_date).toLocaleDateString(),
+            type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
+          }));
+          console.log('Documentos obtenidos:', documents);
+          setFileData(documents); // Actualizar el estado con los documentos obtenidos
+        } catch (error) {
+          console.error('Error al obtener los documentos:', error);
+          setErrorMessage('Error al cargar los documentos.');
+        } finally {
+          setLoading(false); // Ocultar pantalla de carga
+        }
+      }
+    };
+
+    fetchDocuments();
+  }, [accountId]);
+
+  // Función para eliminar un documento
+  const handleDeleteDocument = async (documentId) => {
+    try {
+      setIsDocumentLoading(true); // Mostrar loading al eliminar
+      await deleteDocument(documentId); // Llamada a la API para eliminar el documento
+      setFileData(prevData => prevData.filter(file => file.id !== documentId)); // Actualizar el estado para eliminar el archivo
+      setIsDocumentLoading(false);
+    } catch (error) {
+      console.error('Error al eliminar el documento:', error);
+      setErrorMessage('Error al eliminar el documento.');
+      setIsDocumentLoading(false);
+    }
+  };
+
+  // Función para reemplazar un documento
+  const handleReplaceDocument = async (documentId, event) => {
+    console.log('documentId:', documentId); // Depurar el documentId para asegurarse de que no sea undefined
+    const newFile = event.target.files[0];
+    if (newFile) {
+      const formData = new FormData();
+      formData.append('file_name', newFile.name);
+      formData.append('size', newFile.size);
+      formData.append('file', newFile);
+
+      try {
+        setIsDocumentLoading(true);
+        await replaceDocument(documentId, formData); // Llamada al endpoint de reemplazo
+        // Actualizar la lista de archivos con el archivo reemplazado
+        setFileData(prevData =>
+          prevData.map(file =>
+            file.id === documentId
+              ? { ...file, name: newFile.name, size: `${(newFile.size / 1024 / 1024).toFixed(2)} MB`, date: new Date().toLocaleDateString() }
+              : file
+          )
+        );
+        setErrorMessage('');
+      } catch (error) {
+        console.error('Error al reemplazar el documento:', error);
+        setErrorMessage('Error al reemplazar el documento.');
+        setIsDocumentLoading(false);
+      } finally {
+        setIsDocumentLoading(false);
+      }
+    }
+  };
+
+  // Show loading (Mostrar pantalla de carga)
+  if (loading) {
+    return <LoadingAnimation />;
+  }
 
   // Función que cierra todos los dropdowns
   const closeDropdowns = () => {
@@ -59,48 +166,72 @@ function Documents() {
     }
     return true;
   });
-
-  const handleFileUpload = (event) => {
+  
+  // Función para manejar la subida de archivos
+  const handleFileUpload = async (event) => {
     const files = Array.from(event.target.files);
     const validFiles = [];
 
-    files.forEach((file) => {
+    for (const file of files) {
       const fileType = file.type;
-      const fileSizeInKB = file.size / 1024; // Tamaño de nuestro archivo en kb
+      const fileSizeInKB = file.size / 1024;
 
-      // Función para subir documentos con sus restricciones
       if (fileType === "application/pdf") {
         if (fileSizeInKB <= 2048) {
           validFiles.push({
             name: file.name,
-            size: `${(file.size / 1024 / 1024).toFixed(2)} Mb`,
-            date: new Date().toLocaleDateString(),
-            type: 'pdf',
-            file: file, // Añadir archivo original
+            size: file.size,
+            type: 'application/pdf',
+            file: file,
           });
         } else {
           setErrorMessage("El archivo PDF debe ser de un tamaño máximo de 2MB.");
+          continue;
         }
       } else if (fileType === "image/jpeg" || fileType === "image/jpg") {
         if (fileSizeInKB >= 50 && fileSizeInKB <= 700) {
           validFiles.push({
             name: file.name,
-            size: `${(file.size / 1024).toFixed(2)} Kb`,
-            date: new Date().toLocaleDateString(),
-            type: 'image',
-            file: file, // Añadir archivo original
+            size: file.size,
+            type: 'image/jpeg',
+            file: file,
           });
         } else {
           setErrorMessage("Las imágenes deben tener un tamaño entre 50KB y 700KB.");
+          continue;
         }
       } else {
         setErrorMessage("Solo se permiten archivos PDF y JPG/JPEG.");
+        continue;
       }
-    });
 
-    if (validFiles.length > 0) {
-      setFileData([...fileData, ...validFiles]);
-      setErrorMessage("");
+      // Subir archivo al backend
+      const formData = new FormData();
+      formData.append('account_id', accountId);
+      formData.append('file_name', file.name);
+      formData.append('file_type', fileType);
+      formData.append('size', file.size);
+      formData.append('projection_id', projectionId);
+      formData.append('file', file);
+
+      try {
+        setIsDocumentLoading(true);
+        const response = await uploadDocument(formData);
+        console.log('Archivo subido con éxito', response.data);
+        setFileData([...fileData, {
+          id: response.data.id,
+          name: file.name,
+          size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          date: new Date().toLocaleDateString(),
+          type: fileType === 'application/pdf' ? 'pdf' : 'image',
+        }]);
+        setErrorMessage("");
+      } catch (error) {
+        console.error('Error al subir el archivo:', error);
+        setErrorMessage("Error al subir el archivo.");
+      } finally {
+        setIsDocumentLoading(false);
+      }
     }
   };
 
@@ -224,30 +355,59 @@ function Documents() {
 
           {errorMessage && <div className="mb-4 text-red-500 font-medium">{errorMessage}</div>}
 
-          <div className="grid grid-cols-3 text-left font-bold p-2 border-b-2 border-gray-200 text-gray-600">
+          {/* Encabezados de la tabla */}
+          <div className="grid grid-cols-4 text-left font-bold p-2 border-b-2 border-gray-200 text-gray-600">
             <div>Nombre</div>
-            <div>Tamaño</div>
-            <div>Subido</div>
+            <div className="text-center">Tamaño</div>
+            <div className="text-center">Subido</div>
+            <div className="text-center">Acciones</div> {/* Alineación de la columna de acciones */}
           </div>
 
-          {filteredFileData.length === 0 ? (
+          {fileData.length === 0 ? (
             <div className="text-center p-4 text-gray-500">No tienes documentos cargados</div>
           ) : (
-            filteredFileData.map((file, index) => (
+            fileData.map((file, index) => (
               <div
                 key={index}
-                onClick={() => setSelectedFileIndex(index)}
-                className={`grid grid-cols-3 text-left p-3 cursor-pointer rounded-lg shadow-sm transform transition-all duration-300 ${selectedFileIndex === index ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 hover:bg-blue-100 hover:shadow-md'} hover:shadow-md border-b border-gray-200`}
+                className={`grid grid-cols-4 items-center p-3 rounded-lg shadow-sm transform transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md`}
               >
                 <div className="flex items-center space-x-2">
                   {file.type === 'pdf' ? <FaFilePdf className="text-red-500 w-6 h-6" /> : <FaFileImage className="text-blue-500 w-6 h-6" />}
                   <span>{file.name}</span>
                 </div>
-                <div>{file.size}</div>
-                <div>{file.date}</div>
+                <div className="text-center">{file.size}</div>
+                <div className="text-center">{file.date}</div>
+                <div className="flex justify-center space-x-3"> {/* Separar los botones con espacio */}
+                  <div className="flex flex-col items-center">
+                    {/* Botón para eliminar */}
+                    <button
+                      className="text-red-600 hover:text-red-800 p-1 rounded-full bg-white flex justify-center items-center"
+                      onClick={() => handleDeleteDocument(file.id)}
+                    >
+                      <TbXboxXFilled className="w-6 h-6" />
+                    </button>
+                    <span className="text-sm text-white">Eliminar</span> {/* Texto debajo del botón */}
+                  </div>
+
+                  {/* Botón para reemplazar */}
+                  <div className="flex flex-col items-center">
+                    {/* Botón para reemplazar */}
+                    <label className="text-green-600 hover:text-green-800 p-1 rounded-full bg-white flex justify-center items-center cursor-pointer">
+                      <TbReplace className="w-6 h-6" />
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg"
+                        className="hidden"
+                        onChange={(e) => handleReplaceDocument(file.id, e)}
+                      />
+                    </label>
+                    <span className="text-sm text-white">Reemplazar</span> {/* Texto debajo del botón */}
+                  </div>
+                </div>
               </div>
             ))
           )}
+          {isDocumentLoading && <LoadingSpinner />} {/* Mostrar spinner discreto si hay carga */}
 
           <div className="flex justify-end mt-6">
             <button
