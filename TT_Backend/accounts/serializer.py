@@ -50,7 +50,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accounts
-        fields = ['id', 'name', 'email', 'category', 'employee_number']  # Incluye todos los campos que desees actualizar
+        fields = "__all__"
         extra_kwargs = {
             'id': {'read_only': True},
         }

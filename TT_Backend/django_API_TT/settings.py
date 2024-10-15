@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'projections',
     'products',
     'default_Projection_Dates',
+    'documents',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -184,6 +185,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+MEDIA_URL = '/docs/'  # La URL base para acceder a archivos subidos
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Directorio donde se almacenarán los archivos
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
