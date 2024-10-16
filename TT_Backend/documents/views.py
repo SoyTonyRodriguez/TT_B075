@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from .models import Document
 from .serializer import DocumentSerializer, RegisterDocumentSerializer
@@ -14,11 +14,8 @@ from django.core.exceptions import PermissionDenied
 class DocumentUploadAPIView(APIView):
     parser_classes = [JSONParser, MultiPartParser, FormParser]
     permission_classes = (IsAuthenticated,)
-    queryset = Document.objects.all()
-    serializer_class = RegisterDocumentSerializer
-
+    
     def post(self, request):
-        print(request.data)
         serializer = RegisterDocumentSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -38,42 +35,39 @@ class DocumentReplace(RetrieveUpdateAPIView):
     lookup_field = 'id'
 
     def get_queryset(self):
-        # Restrict the queryset to only the tasks that belong to the authenticated user's account
         return Document.objects.filter(account_id=self.request.user.id)
 
     def perform_update(self, serializer):
-        # Ensure that the document belongs to the authenticated user's account before updating
         document = self.get_object()
         if document.account_id != self.request.user.id:
-            raise PermissionDenied("You do not have permission to edit this document.")
+            raise PermissionDenied("No tienes permiso para editar este documento.")
 
-        # Check if a new file is being uploaded
-        new_file = self.request.FILES.get('file', None)
-        if new_file:
-            # Delete the old file from the filesystem if a new one is being uploaded
-            if document.file:
-                old_file_path = os.path.join(settings.MEDIA_ROOT, document.file.name)
-                if os.path.isfile(old_file_path):
-                    os.remove(old_file_path)
-
-        # Proceed with the update
+        # Eliminar la lógica de eliminar archivos del sistema de archivos
+        # Ya que ahora los archivos están en MongoDB como binarios
         serializer.save()
     
 class DocumentDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
-    queryset = Document.objects.all()  # Para poder encontrar el documento
+    queryset = Document.objects.all()
 
     def perform_destroy(self, instance):
-        # Asegúrate de que el documento pertenece al usuario autenticado
         if instance.account_id != self.request.user.id:
             raise PermissionDenied("No tienes permiso para eliminar este documento.")
-        
-        # Eliminar el archivo del sistema de archivos
-        if instance.file:
-            file_path = os.path.join(settings.MEDIA_ROOT, instance.file.name)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
 
-        # Llamar a la eliminación del objeto de la base de datos
+        # Solo eliminamos la entrada en MongoDB, no hay archivos en el sistema
         instance.delete()
+
+class DocumentRetrieveAPIView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = DocumentSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Document.objects.filter(account_id=self.request.user.id)
+
+    def get_object(self):
+        document = super().get_object()
+        if document.account_id != self.request.user.id:
+            raise PermissionDenied("No tienes permiso para ver este documento.")
+        return document
