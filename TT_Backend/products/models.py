@@ -37,7 +37,8 @@ class Products(models.Model):
     documents_uploaded = models.JSONField(
         models.CharField(max_length=255),  # IDs de tareas
         blank=True, 
-        null=True
+        null=True,
+        default=list
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
