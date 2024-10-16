@@ -7,7 +7,7 @@ import LoadingAnimation from "../components/LoadingAnimation";
 import { TbXboxXFilled, TbReplace } from "react-icons/tb";
 import LoadingSpinner from '../components/LoadingSpinner';
 
-import { uploadDocument, getDocuments, deleteDocument, replaceDocument } from '../../../api/documents.api';
+import { uploadDocument, getDocuments, deleteDocument, replaceDocument, getDocument } from '../../../api/documents.api';
 import { jwtDecode } from 'jwt-decode';
 
 function Documents() {
@@ -21,8 +21,12 @@ function Documents() {
   const [accountId, setAccountId] = useState('');
   const [projectionId, setProjectionId] = useState(''); // Producto
 
+  const [selectedDocument, setSelectedDocument] = useState(null); // Para el documento seleccionado
+  const [isModalOpen, setIsModalOpen] = useState(false); // Controlar el modal
+
   // Loading state (Pantalla de carga XD)
   const [loading, setLoading] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState("Guardando los cambios...");
   const [isDocumentLoading, setIsDocumentLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
 
     // Decode JWT once at the start and get the user ID
@@ -91,16 +95,24 @@ function Documents() {
       const formData = new FormData();
       formData.append('file_name', newFile.name);
       formData.append('size', newFile.size);
+      formData.append('file_type', newFile.type);  // Asegúrate de que se guarda el tipo de archivo
       formData.append('file', newFile);
 
       try {
         setIsDocumentLoading(true);
         await replaceDocument(documentId, formData); // Llamada al endpoint de reemplazo
+
         // Actualizar la lista de archivos con el archivo reemplazado
         setFileData(prevData =>
           prevData.map(file =>
             file.id === documentId
-              ? { ...file, name: newFile.name, size: `${(newFile.size / 1024 / 1024).toFixed(2)} MB`, date: new Date().toLocaleDateString() }
+              ? {
+                  ...file,
+                  name: newFile.name,
+                  size: `${(newFile.size / 1024 / 1024).toFixed(2)} MB`,
+                  date: new Date().toLocaleDateString(),
+                  type: newFile.type === 'application/pdf' ? 'pdf' : 'image', // Actualiza el tipo de archivo
+                }
               : file
           )
         );
@@ -113,6 +125,52 @@ function Documents() {
         setIsDocumentLoading(false);
       }
     }
+  };
+
+  // Función para manejar la visualización de documentos
+  const handleDocumentClick = async (documentId) => {
+    try {
+      setLoadingMessage("Abriendo archivo...");
+      setIsDocumentLoading(true);
+      const response = await getDocument(documentId);
+      const documentData = response.data.file; // archivo binario desde la API
+      const documentType = response.data.file_type; // tipo de archivo
+      
+      setSelectedDocument({ data: documentData, type: documentType });
+      setIsModalOpen(true); // Mostrar el modal
+    } catch (error) {
+      console.error('Error al obtener el documento:', error);
+      setErrorMessage('Error al visualizar el documento.');
+    } finally {
+      setIsDocumentLoading(false);
+      setLoadingMessage("Guardando los cambios..."); // Vuelve al mensaje por defecto
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedDocument(null);
+  };
+  
+  // Función para renderizar el contenido del documento
+  const renderDocumentContent = () => {
+    if (!selectedDocument) return null;
+  
+    const { data, type } = selectedDocument;
+  
+    if (type === 'application/pdf') {
+      const pdfBlob = new Blob([new Uint8Array(atob(data).split("").map(char => char.charCodeAt(0)))], { type: 'application/pdf' });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      
+      return (
+        <iframe src={pdfUrl} width="100%" height="800px" title="PDF Preview"></iframe>
+      );
+    } else if (type.startsWith('image/')) {
+      const imageUrl = `data:${type};base64,${data}`;
+      return <img src={imageUrl} alt="Document Preview" className="max-w-full h-auto" />;
+    }
+  
+    return <p>Tipo de archivo no soportado para previsualización.</p>;
   };
 
   // Show loading (Mostrar pantalla de carga)
@@ -373,7 +431,9 @@ function Documents() {
               >
                 <div className="flex items-center space-x-2">
                   {file.type === 'pdf' ? <FaFilePdf className="text-red-500 w-6 h-6" /> : <FaFileImage className="text-white w-6 h-6" />}
-                  <span className="truncate max-w-xs" title={file.name}>{file.name}</span>
+                  <span className="truncate max-w-xs underline cursor-pointer hover:text-yellow-300" title={file.name} onClick={() => handleDocumentClick(file.id)}>
+                    {file.name}
+                  </span>
                 </div>
                 <div className="text-center">{file.size}</div>
                 <div className="text-center">{file.date}</div>
@@ -407,7 +467,7 @@ function Documents() {
               </div>
             ))
           )}
-          {isDocumentLoading && <LoadingSpinner />} {/* Mostrar spinner discreto si hay carga */}
+          {isDocumentLoading && <LoadingSpinner message={loadingMessage} />} {/* Mostrar spinner discreto si hay carga */}
 
           <div className="flex justify-end mt-6">
             <button
@@ -419,6 +479,28 @@ function Documents() {
           </div>
         </div>
       </div>
+      {/* Modal para mostrar el documento */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white p-6 rounded-xl shadow-2xl max-w-3xl w-full transform scale-95 transition-transform duration-300 ease-out hover:scale-100 border border-gray-300"
+            onClick={(e) => e.stopPropagation()} // Evita que el clic cierre el modal cuando haces clic dentro del mismo
+          >
+            <button
+              className="absolute top-4 right-4 text-red-600 hover:text-red-800 p-1 rounded-full text-2xl font-bold transition-transform duration-200 transform hover:scale-110"
+              onClick={closeModal}
+            >
+              <TbXboxXFilled className="w-6 h-6" />
+            </button>
+            <div className="mt-6 overflow-auto max-h-[70vh]">
+              {renderDocumentContent()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
