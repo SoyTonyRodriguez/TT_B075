@@ -5,260 +5,397 @@ import Navigation from './Navigation/Navigation';
 
 const actividadesPorFuncion = {
   docencia: [
-    { 
+    {
       actividad: "Carga académica", 
-      documento: "Registro Único de Actividades Académicas (RUAA) o constancia de carga académica emitida por las autoridades competentes, especificando la cantidad de horas y el nivel educativo​.", 
-      up: ['1.00 U.P. por hora impartida frente a grupo en enseñanza media superior y superior.', '1.25 U.P. por hora impartida en posgrado.'], 
+      documento: "Registro Único de Actividades Académicas (RUAA) o constancia de carga académica suscrita por las autoridades competentes.", 
+      up: ['1.00 U.P. por hora en nivel superior.', '1.00 por cada 15 horas de módulos '], 
       condiciones: [
-        'Debe completarse la carga académica mínima requerida por semestre o año.',
-        'Las horas se calculan por semana y se deben cumplir los requisitos establecidos para docencia presencial o a distancia.'
-      ] 
+        'La actividad debe estar registrada en el RUAA o validada por la autoridad correspondiente.'
+      ]
     },
-    { 
+    {
+      actividad: "Elaboración e Impartición de acciones de formación", 
+      documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", 
+      up: ['4.50 U.P. por cada 15 horas impartidas con evaluación.', '2.00 U.P. por cada 15 horas sin evaluación.'], 
+      condiciones: [
+        'La acción formativa debe estar aprobada por las instancias correspondientes.'
+      ]
+    },
+    {
+      actividad: "Programa de inducción", 
+      documento: "Constancia de validación emitida por la DEMS, DES o SIP.", 
+      up: ['5.00 U.P. por programa de inducción al año en nivel medio superior.', '1.00 U.P. por hora/semana/mes en nivel superior.', '1.25 U.P. por hora/semana/mes en posgrado.'], 
+      condiciones: [
+        'El programa debe estar validado por las autoridades académicas correspondientes.'
+      ]
+    },
+    {
       actividad: "Tutorías", 
-      documento: "Constancia emitida por la Coordinación Institucional de Tutoría Politécnica (CITP) que avale las tutorías realizadas​.", 
-      up: [
-        '1.00 U.P. por hora de tutoría individual a la semana durante el semestre (máximo 5.00 U.P.).',
-        '1.00 U.P. por hora de tutoría grupal a la semana durante el semestre (máximo 5.00 U.P.).',
-        '3.00 U.P. por unidad de aprendizaje en tutoría de regularización por semestre.',
-        '5.00 U.P. en tutoría de recuperación académica por semestre.'
-      ], 
+      documento: "Constancia emitida por la Coordinación Institucional de Tutoría Politécnica (CITP).", 
+      up: ['1.00 U.P. por cada hora de tutoría individual a la semana.', 'Máximo: 5.00 U.P. por semestre.'], 
       condiciones: [
-        'Las tutorías pueden ser individuales o grupales.',
-        'Se deben impartir regularmente, cumpliendo con las horas estipuladas por semana y registrarlas oficialmente en el centro de trabajo.','Máximo 5.00 U.P. por tutoría individual y grupal en el semestre.'
-      ] 
-    },
-    { 
-      actividad: "Elaboración de Material Didáctico", 
-      documento: "Constancia emitida por el presidente de la academia con aval de los integrantes y visto bueno del Subdirector Académico​.", 
-      up: [
-        '5.00 U.P. por transparencias, acetatos o rotafolios.',
-        '8.00 U.P. por antología de asignatura.',
-        '10.00 U.P. por problemario o reactivos de evaluación.',
-        '15.00 U.P. por modelos tridimensionales.',
-        '18.00 U.P. por audiovisuales o diaporamas.',
-        '20.00 U.P. por prototipos.',
-      ], 
-      condiciones: [
-        'Máximo: 25.00 U.P. por periodo de promoción, prorrateado entre los coautores.',
-        'El material debe ser aprobado y utilizado en las actividades de enseñanza.',
-        'Se debe contar con la validación del presidente de la academia correspondiente y el Subdirector Académico.'
-      ] 
-    },
-    { 
-      actividad: "Autoría de Libros", 
-      documento: "Constancia de validación emitida por la DEMS, DES o SIP​.", 
-      up: [
-        '80.00 U.P. si es evaluado como excelente.',
-        '50.00 U.P. si es evaluado como bueno.',
-        '20.00 U.P. si es evaluado como regular.'
-      ], 
-      condiciones: [
-        'Los libros deben ser reconocidos y utilizados en el ámbito académico.',
-        'La evaluación del libro debe ser realizada por las instancias académicas correspondientes.'
-      ] 
-    },
-    { 
-      actividad: "Traducción de Libros", 
-      documento: "Oficio de reconocimiento emitido por la academia​.", 
-      up: ['15.00 U.P. por libro traducido.', 'Máximo: 30.00 U.P. por periodo de promoción.'], 
-      condiciones: [
-        'Máximo de 30.00 U.P. acumuladas por periodo de promoción.',
-        'Aplicable a la traducción de libros relevantes para la enseñanza o la investigación en el IPN.',
-        'Debe ser una traducción validada por la academia correspondiente.'
-      ] 
-    },
-    { 
-      actividad: "Evaluación y Rediseño de Programas Académicos", 
-      documento: "Constancia emitida por DEMS, DES o SIP​.", 
-      up: ['U.P. asignadas de acuerdo al nivel de rediseño y su impacto en los programas académicos.'], 
-      condiciones: [
-        'Los programas académicos deben ser aprobados y reestructurados formalmente.'
-      ] 
-    },
-    { 
-      actividad: "Elaboración de Software Educativo", 
-      documento: "Constancia emitida por DEMS, DES o SIP​.", 
-      up: ['8.00 U.P. como profesor-autor o diseñador didáctico.','5.00 U.P. como comunicólogo educativo, programador web o diseñador gráfico.','3.00 U.P. como supervisor editorial o corrector de estilo.'], 
-      condiciones: [
-        'El software debe ser elaborado con fines educativos y estar aprobado para su uso en actividades académicas.'
-      ] 
-    },
-    { 
-      actividad: "Producción de Unidades de Aprendizaje en Línea", 
-      documento: "Constancia emitida por UPEV, avalada por DEMS, DES o SIP​.", 
-      up: ['8.00 U.P. como profesor-autor o diseñador didáctico.','5.00 U.P. como comunicólogo educativo o programador web.','3.00 U.P. como supervisor editorial o corrector de estilo.'], 
-      condiciones: [
-        'Las unidades de aprendizaje deben ser validadas por las autoridades académicas y utilizadas en programas de enseñanza a distancia.'
-      ] 
+        'Las tutorías deben estar registradas oficialmente y validadas por el CITP.'
+      ]
     },
     {
-      actividad: "Elaboración de Material Didáctico Digital", 
-      documento: "Constancia emitida por DEMS, DES o SIP​.", 
-      up: ['Varía dependiendo del tipo de material didáctico digital (p. ej., poli-libros, cursos en línea).'], 
+      actividad: "Diseño y planeación didáctica en el aula", 
+      documento: "Constancia emitida por la DEMS, DES o SIP.", 
+      up: ['10.00 U.P. por grupo al semestre.', 'Máximo: 20.00 U.P. por periodo de promoción.'], 
       condiciones: [
-      'El material debe ser desarrollado y aprobado para su uso en actividades educativas dentro del IPN.'
-    ] 
-  },
-  {
-    actividad: "Proyectos de Aula", 
-    documento: "Constancia emitida por DEMS que indique la participación como coordinador del Proyecto Aula​.​.", 
-    up: ['5.00 U.P. por semestre como coordinador.'], 
-    condiciones: [
-    'Los docentes deben coordinar el proyecto y cumplir con las responsabilidades académicas en el aula, con un enfoque en el aprendizaje práctico y colaborativo.'
-  ] 
-}
+        'La planeación debe estar avalada por las autoridades académicas y ajustarse a los programas oficiales.'
+      ]
+    },
+    {
+      actividad: "Elaboración de material didáctico para la impartición de cátedra", 
+      documento: "Constancia emitida por el presidente de la academia o equivalente, con el aval de los integrantes de la misma y el visto bueno del Subdirector Académico.", 
+      up: ['5.00 U.P. por transparencias, rotafolios.', '10.00 U.P. por problemario.', '20.00 U.P. por prototipos.', 'Máximo: 25.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'El material debe ser aprobado por la academia correspondiente.'
+      ]
+    },
+    {
+      actividad: "Elaboración de material didáctico digital", 
+      documento: "Constancia emitida por la DEMS, DES o SIP.", 
+      up: ['Máximo U.P. definido según el impacto del material elaborado.'], 
+      condiciones: [
+        'El material digital debe estar validado por las instancias correspondientes.'
+      ]
+    },
+    {
+      actividad: "Autoría de libros", 
+      documento: "Constancia de validación emitida por la DEMS, DES o SIP.", 
+      up: ['80.00 U.P. por libro con evaluación excelente.', '50.00 U.P. por libro con evaluación buena.', '20.00 U.P. por libro con evaluación regular.'], 
+      condiciones: [
+        'El libro debe estar aprobado y evaluado por las instancias académicas correspondientes.'
+      ]
+    },
+    {
+      actividad: "Elaboración de apuntes, instructivos de talleres y prácticas de laboratorio", 
+      documento: "Constancia emitida por la DEMS o DES.", 
+      up: ['30.00 U.P. por evaluación excelente.', '20.00 U.P. por evaluación buena.', '15.00 U.P. por evaluación regular.'], 
+      condiciones: [
+        'El material debe ser aprobado por la academia y evaluado por las autoridades competentes.'
+      ]
+    },
+    {
+      actividad: "Elaboración de reactivos para guías de estudio y exámenes de admisión", 
+      documento: "Constancia emitida por la DEMS o DES.", 
+      up: ['30.00 U.P. por evaluación excelente.', '20.00 U.P. por evaluación buena.', '15.00 U.P. por evaluación regular.'], 
+      condiciones: [
+        'Elaboración de reactivos aprobada y validada por las instancias correspondientes.'
+      ]
+    },
+    {
+      actividad: "Evaluación, diseño y/o rediseño de programas académicos", 
+      documento: "Constancia emitida por la DEMS, DES o SIP.", 
+      up: ['15.00 U.P. por programa evaluado o rediseñado.'], 
+      condiciones: [
+        'El programa debe estar aprobado y validado por la instancia correspondiente.'
+      ]
+    },
+    {
+      actividad: "Elaboración de software educativo", 
+      documento: "Constancia emitida por la DEMS, DES o SIP.", 
+      up: ['5.00 U.P. por software validado.'], 
+      condiciones: [
+        'El software debe estar aprobado y validado por la institución correspondiente.'
+      ]
+    },
+    {
+      actividad: "Elaboración de hardware", 
+      documento: "Constancia emitida por la DEMS, DES o SIP.", 
+      up: ['Máximo U.P. a definir según el impacto del hardware elaborado.'], 
+      condiciones: [
+        'El hardware debe ser aprobado por las instancias correspondientes.'
+      ]
+    },
+    {
+      actividad: "Producción de Unidades de Aprendizaje en línea", 
+      documento: "Constancia emitida por la UPEV con el visto bueno de la DEMS, DES o SIP.", 
+      up: ['8.00 U.P. por unidad producida.'], 
+      condiciones: [
+        'La unidad de aprendizaje debe estar aprobada por la UPEV y las instancias académicas correspondientes.'
+      ]
+    },
+    {
+      actividad: "Proyecto Aula", 
+      documento: "Constancia emitida por la DEMS.", 
+      up: ['5.00 U.P. por proyecto.'], 
+      condiciones: [
+        'El proyecto debe estar registrado y aprobado por las instancias académicas.'
+      ]
+    },
+    {
+      actividad: "Certificación de laboratorios y validación de pruebas de laboratorio", 
+      documento: "Certificado emitido por una entidad reconocida y constancia del titular del centro de trabajo.", 
+      up: ['20.00 U.P. por certificación.'], 
+      condiciones: [
+        'La certificación debe estar avalada por una entidad oficial.'
+      ]
+    }
   ],
-  investigacion:
-  [
+  investigacion: [
     {
-    actividad: "Participación en Proyectos de Investigación (Financiamiento Interno)", 
-    documento: "Constancia emitida por SIP, indicando el avance del proyecto y su culminación​​.", 
-    up: ['5.00 U.P. por el 20% de avance inicial como director.','3.00 U.P. por el 20% de avance inicial como participante.','25.00 U.P. por proyecto terminado como director.','15.00 U.P. por proyecto terminado como participante.'], 
-    condiciones: [
-      'Máximo: 2 proyectos como director y 3 proyectos como participante por periodo de promoción.', 'Los proyectos deben estar aprobados y financiados por el IPN.'
-    ]
-  }, 
-  {
-    actividad: " Participación en Proyectos de Investigación (Financiamiento Externo)", 
-    documento: "Carta de aceptación del informe final o carta de finiquito, junto con el contrato o convenio firmado​​.", 
-    up: ['25.00 U.P. por proyecto terminado como director.','15.00 U.P. por proyecto terminado como participante.'], 
-    condiciones: [
-      'El proyecto debe estar vinculado a un financiamiento externo, con contrato o convenio firmado.','Se requiere un informe técnico avalado por el titular del centro de trabajo.'
-    ]
-  },
-  {
-    actividad: "Desarrollo de Patentes", 
-    documento: "Solicitud de registro de patente, resultado del examen de forma, o título de la patente emitido por el IMPI​.", 
-    up: ['40.00 U.P. por la solicitud de registro de patentes nacionales del IPN.',
-      '50.00 U.P. por la aprobación del examen de forma.','60.00 U.P. por la obtención de patentes nacionales con registro en el IMPI.','80.00 U.P. por la obtención de patentes internacionales'
-    ], 
-    condiciones: [
-      'Las U.P. dependen de las distintas etapas del desarrollo y registro de la patente.',
-      'El desarrollo de patentes debe estar relacionado con actividades de innovación académica o de investigación.'
-    ]
-  },
-  {
-    actividad: "Estancias de Investigación", 
-    documento: "Carta de terminación emitida por la institución donde se realizó la estancia​.", 
-    up: ['15.00 U.P. por año de estancia de investigación.'
-    ], 
-    condiciones: [
-      'La estancia debe ser realizada en una institución reconocida, nacional o internacional, y debe estar alineada con los objetivos de investigación del IPN.',
-    ]
-  }
+      actividad: "Proyectos de investigación con financiamiento interno", 
+      documento: "Constancia emitida por la SIP.", 
+      up: ['5.00 U.P. con el 20% de avance inicial como director.', '3.00 U.P. con el 20% de avance inicial como participante.', '25.00 U.P. por proyecto terminado como director.', '15.00 U.P. por proyecto terminado como participante.', 'Máximo 2 proyectos como director y 3 proyectos como participante por periodo de promoción.'], 
+      condiciones: [
+        'El proyecto debe estar registrado y validado por la SIP.'
+      ]
+    },
+    {
+      actividad: "Proyectos vinculados con financiamiento externo", 
+      documento: "Contrato o convenio, carta de aceptación del informe final o carta de finiquito, informe técnico.", 
+      up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], 
+      condiciones: [
+        'El proyecto debe estar avalado por el titular del centro de trabajo.'
+      ]
+    },
+    {
+      actividad: "Publicación de artículos científicos y técnicos", 
+      documento: "Constancia de validación emitida por la SIP.", 
+      up: ['3.00 U.P. por artículo de circulación institucional.', '5.00 U.P. por artículo de circulación nacional.', '10.00 U.P. por artículo de circulación nacional con jurado.', '20.00 U.P. por artículo de circulación internacional.', 'Máximo 5 publicaciones por periodo de promoción.'], 
+      condiciones: [
+        'El artículo debe estar publicado en una revista de reconocido prestigio.'
+      ]
+    },
+    {
+      actividad: "Estancias de Investigación", 
+      documento: "Oficio de aceptación para realizar la estancia, dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica, carta de terminación expedida por la institución donde se realizó la estancia.", 
+      up: ['15.00 U.P. por estancia de investigación.'], 
+      condiciones: [
+        'La estancia debe estar avalada por el COTEBAL y ser diferente a las realizadas para impartir clases.'
+      ]
+    },
+    {
+      actividad: "Desarrollo de patentes", 
+      documento: "Solicitud de registro, resultado del examen de forma, título de la patente.", 
+      up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '], 
+      condiciones: [
+        'El proceso debe estar registrado y aprobado por la instancia correspondiente.'
+      ]
+    }
   ],
   complementarias: [
-    { 
-      actividad: "Jurado de Examen Profesional o de Grado", 
-      documento: "Acta de examen profesional o de grado​.", 
-      up: ['4.00 U.P. por cada participación como jurado en examen profesional o de grado.'], 
+    {
+      actividad: "Distinciones académicas", 
+      documento: "Constancia de validación emitida por la SIP.", 
+      up: ['Se otorgan según el reglamento específico de la distinción.'], 
       condiciones: [
-        'Máximo: 20.00 U.P. por periodo de promoción.',
-        'Se otorgan las U.P. por cada participación, y deben ser registradas oficialmente en la unidad académica.'
-      ] 
+        'La distinción debe estar validada oficialmente por el IPN.'
+      ]
     },
     {
-      actividad: "Certificación de Laboratorios", 
-      documento: "Certificado emitido por la entidad certificadora, con constancia de participación emitida por el titular del centro de trabajo​.", 
-      up: ['20.00 U.P. por la certificación de laboratorios.','5.00 U.P. por la validación de pruebas de laboratorio.'], 
+      actividad: "Actividades académico-administrativas y sindicales", 
+      documento: "Constancia u oficio de designación y documento que acredite el término del cargo.", 
+      up: ['Se otorgan según la función desempeñada en el cargo.'], 
       condiciones: [
-        'La certificación debe ser realizada por una entidad reconocida, y las pruebas de laboratorio deben ser validadas por una autoridad competente.'
-      ] 
+        'El cargo debe ser reconocido oficialmente por el IPN.'
+      ]
     },
     {
-      actividad: "Dirección o Asesoría de Tesis", 
-      documento: "Oficio o constancia de designación emitida por la unidad académica​..", 
-      up: ['5.00 U.P. por trabajo asesorado.'], 
+      actividad: "Dirección o asesoría de trabajos escritos para titulación", 
+      documento: "Oficio, constancia o formato de designación suscrito por el Titular de la unidad académica o autoridad competente.", 
+      up: ['5.00 U.P. por trabajo asesorado.', 'Máximo: 20.00 U.P. por periodo de promoción.'], 
       condiciones: [
-         'Máximo: 20.00 U.P. por periodo de promoción.',
-        'Aplica para la dirección o asesoría de tesis de licenciatura, maestría o doctorado.'
-      ] 
+        'Participación oficial como director o asesor de trabajos de titulación.'
+      ]
     },
     {
-      actividad: "Dirección o Asesoría de Trabajos Escritos para Titulación", 
-      documento: "Oficio o constancia de designación emitida por la unidad académica​..", 
-      up: ['5.00 U.P. por cada trabajo asesorado.'], 
+      actividad: "Jurado de examen profesional o de grado", 
+      documento: "Acta de examen profesional o de grado.", 
+      up: ['4.00 U.P. por jurado.', 'Máximo: 20.00 U.P. por periodo de promoción.'], 
       condiciones: [
-         'Máximo: 20.00 U.P. por periodo de promoción.',
-        'El docente debe estar designado oficialmente como asesor o director del trabajo de titulación.',
-        'Los trabajos deben concluirse exitosamente con la titulación del estudiante.'
-      ] 
+        'Participación en exámenes profesionales o de grado como jurado.'
+      ]
+    },
+    {
+      actividad: "Experiencia profesional no docente relevante", 
+      documento: "Constancia del trabajo profesional desarrollado fuera del IPN con el aval del Titular de la unidad académica.", 
+      up: ['10.00 U.P. al año.', 'Máximo: 20.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Trabajo profesional relevante fuera del IPN con el aval institucional.'
+      ]
+    },
+    {
+      actividad: "Traducciones", 
+      documento: "Oficio de reconocimiento emitido por la academia.", 
+      up: ['15.00 U.P. por libro traducido.', 'Máximo: 30.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Traducción de textos académicos avalada por la academia correspondiente.'
+      ]
+    },
+    {
+      actividad: "Eventos nacionales e internacionales de ciencia y formación integral", 
+      documento: "Constancia emitida por la Subdirección Académica con el visto bueno del Titular de la unidad académica y el aval de la DEMS, DES o SIP.", 
+      up: ['5.00 U.P. por evento nacional.', '7.00 U.P. por evento internacional.', 'Máximo: 12.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Participación como expositor o asistente en eventos académicos nacionales o internacionales.'
+      ]
+    },
+    {
+      actividad: "Evaluación de prácticas escolares", 
+      documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", 
+      up: ['3.00 U.P. por grupo atendido.', 'Máximo: 6.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Participación en la evaluación oficial de prácticas escolares.'
+      ]
+    },
+    {
+      actividad: "Evaluación de informes de los prestadores de servicio social", 
+      documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", 
+      up: ['1.00 U.P. por grupo atendido.', 'Máximo: 2.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Evaluación formal de los informes de servicio social.'
+      ]
+    },
+    {
+      actividad: "Evaluación de certámenes académicos", 
+      documento: "Constancia de participación emitida por la instancia correspondiente.", 
+      up: ['5.00 U.P. por evento evaluado.', 'Máximo: 15.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Participación oficial como evaluador en certámenes académicos.'
+      ]
+    },
+    {
+      actividad: "Servicio externo por obra puntual, sin compensación económica", 
+      documento: "Solicitud del servicio externo, aceptación por el centro de trabajo y constancia de participación.", 
+      up: ['2.00 U.P. por participación.'], 
+      condiciones: [
+        'El servicio debe ser avalado y solicitado por el centro de trabajo.'
+      ]
+    },
+    {
+      actividad: "Ponente en conferencias, videoconferencias y expositor de carteles", 
+      documento: "Constancia de participación como conferencista o expositor de carteles.", 
+      up: ['3.00 U.P. por conferencia o cartel.', 'Máximo: 24.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Participación oficial en eventos académicos nacionales o internacionales.'
+      ]
+    },
+    {
+      actividad: "Expositor y asistente en congresos, simposios, reuniones, mesas redondas, coloquios, encuentros, paneles y foros", 
+      documento: "Constancia de participación emitida por la instancia correspondiente.", 
+      up: ['2.00 U.P. por asistente en evento nacional.', '4.00 U.P. por expositor en evento nacional.', '3.00 U.P. por asistente en evento internacional.', '7.00 U.P. por expositor en evento internacional.'], 
+      condiciones: [
+        'Participación como expositor o asistente en eventos nacionales o internacionales.'
+      ]
+    },
+    {
+      actividad: "Comisiones de evaluación", 
+      documento: "Oficio de designación o constancia emitida por la DEMS, DES o SIP.", 
+      up: ['3.00 U.P. por participación en comisiones.', '5.00 U.P. como coordinador.', 'Máximo: 12.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Participación oficial en comisiones de evaluación académica.'
+      ]
+    },
+    {
+      actividad: "Programas y proyectos institucionales en áreas centrales", 
+      documento: "Constancia de participación emitida por el área correspondiente.", 
+      up: ['3.00 U.P. por participación.', 'Máximo: 9.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'Participación activa en programas y proyectos institucionales aprobados por el IPN.'
+      ]
     }
   ],
   superacion: [
-    { 
-      actividad: "Diplomados", 
-      documento: "Constancia emitida por DEMS, DES, SIP o CGFIE​.", 
-      up: ['40.00 U.P. por diplomado de al menos 180 horas. Si el diplomado tiene menos horas, se otorgará la parte proporcional.'], 
+    {
+      actividad: "Otra licenciatura", 
+      documento: "Constancia de validación emitida por la DES.", 
+      up: ['60.00 U.P. por licenciatura.'], 
       condiciones: [
-        'Los diplomados deben cumplir un mínimo de horas para la acumulación total de U.P.',
-        'El diplomado debe estar alineado con la mejora académica del docente y ser aprobado por el IPN o por una institución externa reconocida.',
-        'Diplomados reconocidos e impartidos por el IPN o por instituciones externas con validación del IPN.'
-      ] 
-    },
-    { 
-      actividad: "Estudios de Especialización, Maestría y Doctorado", 
-      documento: "Constancia emitida por SIP que acredite el cumplimiento del 100% de los créditos​.", 
-      up: [
-        '75.50 U.P. por especialización.',
-        '88.50 U.P. por maestría.',
-        '108.50 U.P. por doctorado (con el 100% de créditos aprobados).'
-      ], 
-      condiciones: [
-        'Deben ser estudios reconocidos por el IPN y cumplir con el 100% de los créditos correspondientes.'
-      ] 
-    },
-    { 
-      actividad: "Cursos de Propósito Específico", 
-      documento: "Constancia emitida por SIP​.", 
-      up: ['6.00 U.P. por cada 30 horas de cursos.'], 
-      condiciones: [
-        'Máximo: 30.00 U.P. por periodo de promoción.',
-        'Los cursos deben estar alineados con los fines académicos del IPN y deben ser acreditados oficialmente.'
-      ] 
+        'La licenciatura debe ser distinta a la presentada en evaluaciones anteriores y estar validada por la DES.'
+      ]
     },
     {
-      actividad: "Cursos de Actualización, Seminarios y Talleres", 
-      documento: "Constancia emitida por DEMS, DES, SIP o CGFIE, según corresponda​.​.", 
-      up: ['3.00 U.P. por cada 15 horas de curso con evaluación.', '1.00 U.P. por cada 15 horas de curso sin evaluación.','8.00 U.P. por cada 20 horas de cursos de identidad institucional con evaluación.'], 
+      actividad: "Cursos de actualización, seminarios y talleres", 
+      documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE si son impartidos por el IPN; Constancia de validación emitida por la DEMS, DES o SIP si son impartidos por otra institución.", 
+      up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'], 
       condiciones: [
-        'Máximo de 7 cursos acumulables por periodo de promoción.',
-        'El docente debe cumplir con todas las horas del curso y, si aplica, presentar una evaluación.',
-        'Los cursos deben estar alineados con la función docente o de investigación, y ser impartidos o validados por el IPN.'
+        'Los cursos deben estar relacionados con la actividad docente y contar con la validación institucional.'
+      ]
+    },
+    {
+      actividad: "Estudios de especialidad, maestría y doctorado", 
+      documento: "Constancia de validación emitida por la SIP.", 
+      up: ['75.50 U.P. por especialidad.', '88.50 U.P. por maestría.', '108.50 U.P. por doctorado.'], 
+      condiciones: [
+        'Los estudios deben estar completamente acreditados con el 100% de los créditos aprobados.'
+      ]
+    },
+    {
+      actividad: "Cursos de propósito específico", 
+      documento: "Constancia emitida por la SIP.", 
+      up: ['6.00 U.P. por cada 30 horas de curso.', 'Máximo: 30.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'El curso debe estar orientado a un propósito específico dentro de la enseñanza o investigación.'
+      ]
+    },
+    {
+      actividad: "Diplomados", 
+      documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", 
+      up: ['40.00 U.P. por diplomado de 180 horas.'], 
+      condiciones: [
+        'Los diplomados deben tener un mínimo de 100 horas y estar validados por la institución correspondiente.'
+      ]
+    },
+    {
+      actividad: "Idiomas", 
+      documento: "Constancia emitida por la Dirección de Formación en Lenguas Extranjeras y/o certificado emitido por el CENLEX Santo Tomás o Zacatenco.", 
+      up: ['8.00 U.P. por expresión oral.', '8.00 U.P. por expresión escrita.', '5.00 U.P. por comprensión de lectura.', '5.00 U.P. por comprensión auditiva.'], 
+      condiciones: [
+        'El dominio del idioma debe estar certificado por el CENLEX o validado por la Dirección de Formación en Lenguas Extranjeras.'
       ]
     }
   ],
   extension: [
     {
-    actividad: "Ponente en Conferencias, Videoconferencias o Expositor de Carteles", 
-    documento: "Constancia de participación emitida por la instancia organizadora​.", 
-    up: ['3.00 U.P. por cartel o conferencia nacional.', '6.00 U.P. por conferencia magistral nacional.','6.00 U.P. por conferencia magistral nacional.','8.00 U.P. por conferencia magistral internacional.','Máximo: 24.00 U.P. por periodo de promoción.'], 
-    condiciones: [
-      'Participación en eventos académicos nacionales o internacionales.'
-    ]
-   },
-  {
-   actividad: "Participación en Encuentros Académicos Interpolitécnicos", 
-   documento: "Constancia de participación emitida por el Titular de la unidad académica​.", 
-   up: ['2.00 U.P. por encuentro.', '6.00 U.P. por conferencia magistral nacional.','Máximo: 8.00 U.P. por periodo de promoción.'], 
-   condiciones: [
-     'Los encuentros deben ser de carácter académico y estar registrados oficialmente.'
-   ]
-  },
-  {
-    actividad: "Participación en Brigadas Multidisciplinarias de Servicio Social", 
-    documento: "Constancia de participación emitida por la Dirección de Egresados y Servicio Social​", 
-    up: ['8.00 U.P. por coordinador de brigada.', '4.00 U.P. por profesor de brigada.','4.00 U.P. por responsable del programa.'], 
-    condiciones: [
-      'Participación activa en las brigadas de servicio social autorizadas por el IPN.'
-    ]
-  }
+      actividad: "Participación en la expo-profesiográfica", 
+      documento: "Constancia emitida por la Secretaría Académica o por la DEMS o DES.", 
+      up: ['2.00 U.P. por expositor.', '3.00 por atención de talleres o concursos', '3.00 por profesor coordinador'], 
+      condiciones: [
+        'La actividad debe ser a nivel nacional y contar con el aval oficial del IPN.'
+      ]
+    },
+    {
+      actividad: "Encuentros Académicos Interpolitécnicos", 
+      documento: "Constancia de participación emitida por el Titular de la unidad académica.", 
+      up: ['2.00 U.P. por evento.', 'Máximo: 8.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'El evento debe ser de carácter académico y estar registrado oficialmente en el IPN.'
+      ]
+    },
+    {
+      actividad: "Brigadas Multidisciplinarias de Servicio Social", 
+      documento: "Constancia de participación emitida por la Dirección de Egresados y Servicio Social.", 
+      up: ['8.00 U.P. por coordinador de brigada.', '4.00 U.P. por profesor de brigada.', '4.00 U.P. por responsable del programa.'], 
+      condiciones: [
+        'Participación activa en las brigadas de servicio social autorizadas por el IPN.'
+      ]
+    },
+    {
+      actividad: "Impartición de disciplinas deportivas y/o talleres culturales", 
+      documento: "Constancia de participación emitida por la autoridad competente.", 
+      up: ['0.50 U.P. por cada hora.'], 
+      condiciones: [
+        'La actividad debe ser avalada por el IPN y contar con la participación de los estudiantes.'
+      ]
+    },
+    {
+      actividad: "Eventos nacionales e internacionales de ciencia y formación integral", 
+      documento: "Constancia emitida por la Subdirección Académica y aval de la DEMS, DES o SIP.", 
+      up: ['5.00 U.P. por evento nacional.', '7.00 U.P. por evento internacional.'], 
+      condiciones: [
+        'Participación como asistente o expositor en eventos académicos nacionales o internacionales avalados por el IPN.'
+      ]
+    }
   ]
+
 };
 
 function InfoProjection({ userName }) {
   const [openSection, setOpenSection] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('docencia'); // Estado para la categoría seleccionada
   const sectionRefs = useRef([]);
 
   const toggleSection = (index) => {
@@ -275,48 +412,71 @@ function InfoProjection({ userName }) {
     transform: openSection === index ? 'rotate(180deg)' : 'rotate(0deg)',
   });
 
-  return (
-<main className="min-h-screen relative overflow-hidden">
-<Navigation />
-      <hr className="border-t-2 border-black my-4" />
-      <div className="container mx-auto mt-8 overflow-hidden">
+  // Función para manejar la selección de categoría
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value); // Actualiza la categoría seleccionada
+    setOpenSection(null); // Cerrar cualquier sección abierta cuando se cambia la categoría
+  };
 
-      <div className="flex items-center justify-between bg-black bg-opacity-40 p-6 rounded-lg shadow-lg">
-      <p className="text-xl text-white leading-relaxed text-justified justify-center">
-        La documentación para las convocatorias de promoción dentro del Instituto Politécnico Nacional (IPN) debe ser muy detallada, ya que cada actividad 
-        realizada por el docente debe estar respaldada por pruebas verificables. Entre los documentos requeridos se encuentran <b>constancias oficiales, registros 
-        académicos, contratos, informes técnicos</b>, y otros documentos que avalen la participación en proyectos de investigación, docencia o superación académica. 
-        Es fundamental que todos estos documentos estén validados por las autoridades correspondientes, como la DEMS, DES o la SIP, según la actividad a presentar. 
-        La falta de estos respaldos o su incorrecta presentación puede resultar en la descalificación o rechazo de la solicitud, por lo que es esencial seguir cuidadosamente
-        las indicaciones de la convocatoria, que incluye fechas y formatos específicos.
-        </p>
+  // Combinar todas las actividades de la categoría seleccionada en una sola lista
+  const actividadesSeleccionadas = actividadesPorFuncion[selectedCategory] || [];
+
+  return (
+    <main className="min-h-screen relative overflow-hidden">
+      <Navigation />
+      <hr className="border-t-2 border-black my-4" />
+      <div className="w-full max-w-screen-2xl mx-auto">
+        <div className="bg-gray-800 bg-opacity-40 p-6 rounded-lg shadow-lg">
+          <p className="text-lg mt-4 text-white text-justify">
+            La documentación para las convocatorias de promoción dentro del Instituto Politécnico Nacional (IPN) debe ser muy detallada, ya que cada actividad 
+            realizada por el docente debe estar respaldada por pruebas verificables. Entre los documentos requeridos se encuentran <b>constancias oficiales, registros 
+            académicos, contratos, informes técnicos</b>, y otros documentos que avalen la participación en proyectos de investigación, docencia o superación académica. 
+            Es fundamental que todos estos documentos estén validados por las autoridades correspondientes, como la DEMS, DES o la SIP, según la actividad a presentar. 
+            La falta de estos respaldos o su incorrecta presentación puede resultar en la descalificación o rechazo de la solicitud, por lo que es esencial seguir cuidadosamente
+            las indicaciones de la convocatoria, que incluye fechas y formatos específicos.
+          </p>
+
+          <p className="text-lg mt-4 text-white text-justify">
+            <b>Las actividades y recursos que puedes desarrollar durante el período de 2 años que dispones para acumular unidades son los siguientes, míralas y considera cuales 
+            se adecuan más a tus actividades y te resultan más interesante ¡Adelante!</b>
+          </p>
+        </div>
       </div>
-      <div className="flex items-center justify-between p-6 rounded-lg shadow-lg">
-      <p className="text-3xl text-grey leading-relaxed text-center justify-center">
-          <b>Las actividades y recursos que puedes desarrollar durante el período de 2 años que dispones para acumular unidades son los siguientes, míralas y considera cuales 
-          se adecuan más a tus actividades y te resultan más interesante ¡Adelante!</b>
-        </p>
+
+      {/* Selector de categorías */}
+      <div className="w-full max-w-screen-2xl mx-auto my-6">
+        <label className="text-black text-lg">Selecciona una categoría:</label>
+        <select
+          className="ml-4 p-2 rounded-lg"
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+        >
+          <option value="docencia">Docencia</option>
+          <option value="investigacion">Investigación</option>
+          <option value="complementarias">Actividades Complementarias</option>
+          <option value="superacion">Superación Académica</option>
+          <option value="extension">Extensión y Vinculación</option>
+        </select>
       </div>
-    </div>
 
       <div className="container mx-auto mt-8">
-        {Object.entries(actividadesPorFuncion).map(([categoria, actividades], index) => (
-          <div key={categoria} className="bg-white p-6 rounded-lg shadow-lg mb-8">
-            <h3 className="text-3xl font-bold mb-4 capitalize">{categoria}</h3>
-            {actividades.map((actividadItem, actividadIndex) => (
-              <div key={actividadIndex} className=" border-gray-700 mb-6">
-                <button
-                  onClick={() => toggleSection(`${categoria}-${actividadIndex}`)}
-                  className="w-full text-left py-3 text-lg font-semibold flex justify-between items-center focus:outline-none bg-blue-700 hover:bg-blue-600 transition-colors duration-300 text-gray-100 rounded-lg px-4"
-                >
-                  {actividadItem.actividad}
-                  <animated.span style={iconSpring(`${categoria}-${actividadIndex}`)}>
-                    <FaChevronDown />
-                  </animated.span>
-                </button>
-                <animated.div style={springStyle(`${categoria}-${actividadIndex}`)}>
-                  <div ref={(el) => sectionRefs.current[`${categoria}-${actividadIndex}`] = el}>
-                    <div className="py-3 px-4 bg-gray-800 text-gray-300 rounded-b-lg">
+        {/* Mostrar todas las actividades de la categoría seleccionada en una sola lista */}
+        {actividadesSeleccionadas.length > 0 ? (
+          actividadesSeleccionadas.map((actividadItem, actividadIndex) => (
+            <div key={actividadIndex} className="bg-gray-800 bg-opacity-40 p-6 rounded-lg shadow-lg mb-8">
+              <button
+                onClick={() => toggleSection(actividadIndex)}
+                className="w-full text-left py-3 text-lg font-semibold flex justify-between items-center focus:outline-none bg-blue-700 hover:bg-blue-600 transition-colors duration-300 text-gray-100 rounded-lg px-4"
+              >
+                {actividadItem.actividad}
+                <span>
+                  <FaChevronDown />
+                </span>
+              </button>
+              {openSection === actividadIndex && (
+                <div>
+                  <div ref={(el) => sectionRefs.current[actividadIndex] = el}>
+                    <div className="py-3 px-4 text-white rounded-b-lg">
                       <p>
                         <b>Valoración:</b>
                         <ul className="list-disc ml-5">
@@ -334,14 +494,17 @@ function InfoProjection({ userName }) {
                       </ul>
                     </div>
                   </div>
-                </animated.div>
-              </div>
-            ))}
-          </div>
-        ))}
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-lg text-gray-500">No hay actividades disponibles para la categoría seleccionada.</p>
+        )}
       </div>
     </main>
   );
 }
 
 export default InfoProjection;
+
