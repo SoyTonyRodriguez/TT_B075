@@ -20,7 +20,8 @@ class Document(models.Model):
     size = models.IntegerField()                  # Tamaño del archivo en bytes
     projection_id = models.CharField(max_length=255) 
     upload_date = models.DateTimeField(auto_now_add=True)  # Fecha de subida
-    file = models.FileField(upload_to='documents/', verbose_name="Archivo del documento")  # Ruta donde se almacenan los archivos
+    # file = models.FileField(upload_to='documents/', verbose_name="Archivo del documento")  # Ruta donde se almacenan los archivos
+    file = models.BinaryField()  # Almacena el archivo como datos binarios
 
     def __str__(self):
         return f"{self.file_name} ({self.file_type})"

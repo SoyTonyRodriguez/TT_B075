@@ -26,6 +26,15 @@ export const getDocuments = (account_id) => {
     });
 }
 
+export const getDocument = (document_id) => {
+    const token = localStorage.getItem('token');
+    return TasksAPI.get(`document/${document_id}/`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        }
+    });
+}
+
 export const deleteDocument = (document_id) => {
     const token = localStorage.getItem('token');
     return TasksAPI.delete(`document/${document_id}/delete/`, {
