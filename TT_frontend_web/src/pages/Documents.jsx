@@ -90,6 +90,7 @@ function Documents() {
   // Función para eliminar un documento
   const handleDeleteDocument = async (documentId) => {
     try {
+      setLoadingMessage("Eliminando archivo...");
       setIsDocumentLoading(true); // Mostrar loading al eliminar
       await deleteDocument(documentId); // Llamada a la API para eliminar el documento
       setFileData(prevData => prevData.filter(file => file.id !== documentId)); // Actualizar el estado para eliminar el archivo
@@ -97,7 +98,9 @@ function Documents() {
     } catch (error) {
       console.error('Error al eliminar el documento:', error);
       setErrorMessage('Error al eliminar el documento.');
+    } finally {
       setIsDocumentLoading(false);
+      setLoadingMessage("Guardando los cambios..."); // Vuelve al mensaje por defecto
     }
   };
 
@@ -246,7 +249,7 @@ function Documents() {
 
     // Verifica si se ha seleccionado una proyección
     if (!selectedProjection) {
-      setErrorMessage("Por favor selecciona una proyección antes de subir el archivo.");
+      setErrorMessage("Por favor selecciona una actividad para poder subir un nuevo documento.");
       return;
     }    
 
@@ -352,14 +355,14 @@ function Documents() {
 
         {/* Dropdown para seleccionar una proyección */}
         <div className="mb-4">
-          <label htmlFor="projection" className="block text-gray-700 font-bold mb-2">Selecciona una proyección:</label>
+          <label htmlFor="projection" className="block text-gray-700 font-bold mb-2">Selecciona una actividad para subir un documento nuevo:</label>
           <select
             id="projection"
             value={selectedProjection}
             onChange={(e) => setSelectedProjection(e.target.value)}
             className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">Selecciona una proyección</option>
+            <option value="">Selecciona una actividad relacionada a un documento</option>
             {projections.map(projection => (
               <option key={projection.id} value={projection.id}>
                 {projection.activity} / {projection.function}{/* Mostramos el campo activity */}
@@ -435,7 +438,11 @@ function Documents() {
           <div className="mb-6 flex items-center justify-start">
             <label
               htmlFor="file-upload"
-              className="flex items-center space-x-2 cursor-pointer bg-blue-500 text-white border border-blue-500 rounded-full p-2 px-4 shadow-md hover:bg-blue-600 hover:border-blue-600 transition duration-300"
+              className={`flex items-center space-x-2 cursor-pointer p-2 px-4 rounded-full shadow-md transition duration-300 ${
+                selectedProjection
+                  ? "bg-blue-500 text-white hover:bg-blue-600"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
             >
               <span className="text-lg">+</span>
               <span>Nuevo</span>
@@ -447,6 +454,7 @@ function Documents() {
               onChange={handleFileUpload}
               accept=".pdf, .jpg, .jpeg"
               className="hidden"
+              disabled={!selectedProjection} // Deshabilita el input si no hay proyección seleccionada
             />
           </div>
 
@@ -457,7 +465,7 @@ function Documents() {
             <div>Nombre</div>
             <div className="text-center">Tamaño</div>
             <div className="text-center">Subido</div>
-            <div className="text-center">Proyección</div> {/* Nueva columna para la proyección */}
+            <div className="text-center">Actividad</div> {/* Nueva columna para la proyección */}
             <div className="text-center">Acciones</div> {/* Alineación de la columna de acciones */}
           </div>
 

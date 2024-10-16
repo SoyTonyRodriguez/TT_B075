@@ -499,10 +499,17 @@ function KanbanBoard() {
                         <h2 className="text-2xl font-bold mb-2">Progresos de Actividades</h2>
                         <div className="space-y-4">
                             {projections.map(projection => {
+                                    console.log("Projection object:", projection); // Depuración
+
                                 // Filtrar las tareas asociadas a la proyección actual
                                 const projectionTasks = tasks.filter(task => task.projection_id === projection.id);
                                 const doneTasks = projectionTasks.filter(task => task.status === 'done').length;
                                 const totalTasks = projectionTasks.length;
+
+                                // Aquí agregamos la conversión a array de 'documents_uploaded'
+                                const projectionDocuments = Array.isArray(projection.documents_uploaded) 
+                                    ? projection.documents_uploaded 
+                                    : JSON.parse(projection.documents_uploaded.replace(/'/g, '"') || '[]');
 
                                 return (
                                     <div key={projection.id} className="bg-white shadow-lg p-6 rounded-xl hover:shadow-2xl transition-all duration-300">
@@ -515,12 +522,20 @@ function KanbanBoard() {
                                         <p className="text-sm text-gray-500">
                                             <strong>Documentos Requeridos:</strong> {projection.documents_required}
                                         </p>
-                                        <Link to="/documents" className="text-sm text-gray-500 flex items-center">
-                                            <AiOutlinePaperClip className="mr-2 text-blue-500" size={18} />
-                                            <span className="text-blue-500 hover:underline cursor-pointer">
+
+                                        {projectionDocuments.length > 0 ? (
+                                            <div className="flex items-center text-green-500">
+                                                <AiOutlinePaperClip className="mr-2" size={18} />
+                                                <span>Documentos subidos: {projectionDocuments.length}</span>
+                                            </div>
+                                            ) : (
+                                            <Link to="/documents" className="text-sm text-gray-500 flex items-center">
+                                                <AiOutlinePaperClip className="mr-2 text-blue-500" size={18} />
+                                                <span className="text-blue-500 hover:underline cursor-pointer">
                                                 Clic aquí para subir documento
-                                            </span>
-                                        </Link>
+                                                </span>
+                                            </Link>
+                                        )}
                                     </div>
                                 );
                             })}
