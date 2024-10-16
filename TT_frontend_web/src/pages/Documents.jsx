@@ -8,6 +8,8 @@ import { TbXboxXFilled, TbReplace } from "react-icons/tb";
 import LoadingSpinner from '../components/LoadingSpinner';
 
 import { uploadDocument, getDocuments, deleteDocument, replaceDocument, getDocument } from '../../../api/documents.api';
+import { getProduct } from '../../../api/products.api'; // Importa la función que obtiene las proyecciones
+
 import { jwtDecode } from 'jwt-decode';
 
 function Documents() {
@@ -19,15 +21,17 @@ function Documents() {
   const [showFileTypeDropdown, setShowFileTypeDropdown] = useState(false); 
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [accountId, setAccountId] = useState('');
-  const [projectionId, setProjectionId] = useState(''); // Producto
+  const [projectionId, setProjectionId] = useState(''); // Proyección seleccionada
 
-  const [selectedDocument, setSelectedDocument] = useState(null); // Para el documento seleccionado
-  const [isModalOpen, setIsModalOpen] = useState(false); // Controlar el modal
+  const [projections, setProjections] = useState([]); // Estado para las proyecciones
+  const [selectedProjection, setSelectedProjection] = useState(''); // Proyección seleccionada por el usuario
 
-  // Loading state (Pantalla de carga XD)
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState("Guardando los cambios...");
-  const [isDocumentLoading, setIsDocumentLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
+  const [isDocumentLoading, setIsDocumentLoading] = useState(false);
 
     // Decode JWT once at the start and get the user ID
     useEffect(() => {
@@ -42,35 +46,45 @@ function Documents() {
       } else {
           setLoading(false); // Stop loading if no token is found
       }
-      setProjectionId('product_6797221c-8597-44b3-9a47-5be922873a52')
     }, []);
 
-  // Llamada al endpoint para obtener los documentos
+  // Obtener tanto los documentos como las proyecciones y hacer el enlace
   useEffect(() => {
-    const fetchDocuments = async () => {
-      if (accountId) {
-        setLoading(true); // Mostrar pantalla de carga
-        try {
-          const response = await getDocuments(accountId);
-          const documents = response.data.map(doc => ({
-            id: doc.id,
-            name: doc.file_name,
-            size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
-            date: new Date(doc.upload_date).toLocaleDateString(),
-            type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
-          }));
-          console.log('Documentos obtenidos:', documents);
-          setFileData(documents); // Actualizar el estado con los documentos obtenidos
-        } catch (error) {
-          console.error('Error al obtener los documentos:', error);
-          setErrorMessage('Error al cargar los documentos.');
-        } finally {
-          setLoading(false); // Ocultar pantalla de carga
-        }
+    const fetchDocumentsAndProjections = async () => {
+      try {
+        setLoading(true);
+        const [documentsResponse, projectionsResponse] = await Promise.all([
+          getDocuments(accountId),
+          getProduct(accountId),
+        ]);
+
+        const projectionsMap = projectionsResponse.data.reduce((map, projection) => {
+          map[projection.id] = projection;
+          return map;
+        }, {});
+
+        const documents = documentsResponse.data.map(doc => ({
+          id: doc.id,
+          name: doc.file_name,
+          size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
+          date: new Date(doc.upload_date).toLocaleDateString(),
+          type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
+          projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección', // Obtenemos la proyección
+        }));
+
+        setFileData(documents);
+        setProjections(projectionsResponse.data);
+      } catch (error) {
+        console.error('Error al obtener los documentos y proyecciones:', error);
+        setErrorMessage('Error al cargar los documentos.');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchDocuments();
+    if (accountId) {
+      fetchDocumentsAndProjections();
+    }
   }, [accountId]);
 
   // Función para eliminar un documento
@@ -230,6 +244,12 @@ function Documents() {
     const files = Array.from(event.target.files);
     const validFiles = [];
 
+    // Verifica si se ha seleccionado una proyección
+    if (!selectedProjection) {
+      setErrorMessage("Por favor selecciona una proyección antes de subir el archivo.");
+      return;
+    }    
+
     for (const file of files) {
       const fileType = file.type;
       const fileSizeInKB = file.size / 1024;
@@ -269,7 +289,7 @@ function Documents() {
       formData.append('file_name', file.name);
       formData.append('file_type', fileType);
       formData.append('size', file.size);
-      formData.append('projection_id', projectionId);
+      formData.append('projection_id', selectedProjection); // Se envía la proyección seleccionada
       formData.append('file', file);
 
       try {
@@ -316,7 +336,7 @@ function Documents() {
       <Navigation />
       <hr className="border-t-2 border-black my-4" />
 
-      <div className="p-6 max-w-5xl mx-auto">
+      <div className="p-6 max-w-6xl mx-auto">
         <div className="mb-6 flex items-center">
           <div className="relative w-full">
             <input
@@ -329,6 +349,25 @@ function Documents() {
             </span>
           </div>
         </div>
+
+        {/* Dropdown para seleccionar una proyección */}
+        <div className="mb-4">
+          <label htmlFor="projection" className="block text-gray-700 font-bold mb-2">Selecciona una proyección:</label>
+          <select
+            id="projection"
+            value={selectedProjection}
+            onChange={(e) => setSelectedProjection(e.target.value)}
+            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">Selecciona una proyección</option>
+            {projections.map(projection => (
+              <option key={projection.id} value={projection.id}>
+                {projection.activity} / {projection.function}{/* Mostramos el campo activity */}
+              </option>
+            ))}
+          </select>
+        </div>
+
 
         <div className="flex justify-center space-x-4 mb-6">
           <div className="relative">
@@ -414,10 +453,11 @@ function Documents() {
           {errorMessage && <div className="mb-4 text-red-500 font-medium">{errorMessage}</div>}
 
           {/* Encabezados de la tabla */}
-          <div className="grid grid-cols-4 text-left font-bold p-2 border-b-2 border-gray-200 text-gray-600">
+          <div className="grid grid-cols-5 text-left font-bold p-2 border-b-2 border-gray-200 text-gray-600">
             <div>Nombre</div>
             <div className="text-center">Tamaño</div>
             <div className="text-center">Subido</div>
+            <div className="text-center">Proyección</div> {/* Nueva columna para la proyección */}
             <div className="text-center">Acciones</div> {/* Alineación de la columna de acciones */}
           </div>
 
@@ -427,7 +467,7 @@ function Documents() {
             fileData.map((file, index) => (
               <div
                 key={index}
-                className={`grid grid-cols-4 items-center p-3 rounded-lg shadow-sm transform transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md`}
+                className={`grid grid-cols-5 items-center p-3 rounded-lg shadow-sm transform transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md`}
               >
                 <div className="flex items-center space-x-2">
                   {file.type === 'pdf' ? <FaFilePdf className="text-red-500 w-6 h-6" /> : <FaFileImage className="text-white w-6 h-6" />}
@@ -437,6 +477,7 @@ function Documents() {
                 </div>
                 <div className="text-center">{file.size}</div>
                 <div className="text-center">{file.date}</div>
+                <div className="text-center">{file.projection}</div> {/* Mostrar el nombre de la proyección */}
                 <div className="flex justify-center space-x-3"> {/* Separar los botones con espacio */}
                   <div className="flex flex-col items-center">
                     {/* Botón para eliminar */}
