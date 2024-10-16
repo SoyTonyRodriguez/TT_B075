@@ -372,8 +372,8 @@ function Documents() {
                 className={`grid grid-cols-4 items-center p-3 rounded-lg shadow-sm transform transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md`}
               >
                 <div className="flex items-center space-x-2">
-                  {file.type === 'pdf' ? <FaFilePdf className="text-red-500 w-6 h-6" /> : <FaFileImage className="text-blue-500 w-6 h-6" />}
-                  <span>{file.name}</span>
+                  {file.type === 'pdf' ? <FaFilePdf className="text-red-500 w-6 h-6" /> : <FaFileImage className="text-white w-6 h-6" />}
+                  <span className="truncate max-w-xs" title={file.name}>{file.name}</span>
                 </div>
                 <div className="text-center">{file.size}</div>
                 <div className="text-center">{file.date}</div>
