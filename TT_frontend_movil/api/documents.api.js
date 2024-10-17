@@ -1,5 +1,4 @@
 import axios from "axios";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 
 // Initial set-up
 const TasksAPI = axios.create({
@@ -7,12 +6,12 @@ const TasksAPI = axios.create({
     baseURL: 'http://192.168.1.143:8000/api/v1/'
 })
 
-// create task method
-export const createTask = async (task) => {
+// upload document method
+export const uploadDocument = async (document) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
-    
-    return TasksAPI.post('task/register/', task, {
+
+    return TasksAPI.post('document/upload/', document, {
         headers: {
             'Content-Type': 'application/json', // Agrega este header
             Authorization: `Bearer ${cleanToken}`,
@@ -20,12 +19,36 @@ export const createTask = async (task) => {
     });
 }
 
-// getTasks from account method
-export const getTasks = async (account_id) => {
+// getDocuments from account method
+export const getDocuments = async (account_id) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
 
-    return TasksAPI.get(`tasks/${account_id}/`, {
+    return TasksAPI.get(`documents/${account_id}/`, {
+        headers: {
+            'Content-Type': 'application/json', // Agrega este header
+            Authorization: `Bearer ${cleanToken}`,
+        },
+    });
+}
+
+export const getDocument = async (document_id) => {
+    const token = await AsyncStorage.getItem('token');
+    const cleanToken = token.replace(/["]/g, '').trim();
+
+    return TasksAPI.get(`document/${document_id}/`, {
+        headers: {
+            'Content-Type': 'application/json', // Agrega este header
+            Authorization: `Bearer ${cleanToken}`,
+        },
+    });
+}
+
+export const deleteDocument = async (document_id) => {
+    const token = await AsyncStorage.getItem('token');
+    const cleanToken = token.replace(/["]/g, '').trim();
+
+    return TasksAPI.delete(`document/${document_id}/delete/`, {
         headers: {
             'Content-Type': 'application/json', // Agrega este header
             Authorization: `Bearer ${cleanToken}`,
@@ -33,26 +56,14 @@ export const getTasks = async (account_id) => {
     });
 };
 
-export const updateTaskStatus = async (taskId, updatedData) => {
+export const replaceDocument = async (document_id, document) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
     
-    return TasksAPI.patch(`tasks/${taskId}/edit/`, updatedData, {
+    return TasksAPI.patch(`document/${document_id}/replace/`, document, {
         headers: {
             'Content-Type': 'application/json', // Agrega este header
             Authorization: `Bearer ${cleanToken}`,
         },
     });
-};
-
-export const deleteTask = async (taskId) => {
-    const token = await AsyncStorage.getItem('token');
-    const cleanToken = token.replace(/["]/g, '').trim();
-    
-    return TasksAPI.delete(`tasks/${taskId}/delete/`, {
-        headers: {
-            'Content-Type': 'application/json', // Agrega este header
-            Authorization: `Bearer ${cleanToken}`,
-        },
-    });
-};
+}
