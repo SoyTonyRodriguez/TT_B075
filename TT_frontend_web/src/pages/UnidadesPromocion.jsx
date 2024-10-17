@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
-
 import { createProduct } from '../../../api/products.api';
 
 function UnidadesPromocion() {
@@ -19,6 +18,7 @@ function UnidadesPromocion() {
   const [scope, setScope] = useState('');
   const [activity, setActivity] = useState('');
   const [documents_required, setDocumentsRequired] = useState('');
+  const [unitsOptions, setUnitsOptions] = useState([]);
   const [units, setUnits] = useState('');
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,6 +32,10 @@ function UnidadesPromocion() {
   const [roleError, setRoleError] = useState(false);
   const [scopeError, setScopeError] = useState(false);
   const [priorityError, setPriorityError] = useState(false);
+//este pedo es para que funcione el rol y el alcance 
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [scopeOptions, setScopeOptions] = useState([]);
+
 
   // Definición de la función para obtener el color según la prioridad
   const getColorForPriority = (priority) => {
@@ -58,49 +62,61 @@ function UnidadesPromocion() {
 
   // Opciones de actividades por función con documentos requeridos y U.P
   const actividadesPorFuncion = {
-    docencia: [
-      { actividad: "Carga académica", documento: "Registro Único de Actividades Académicas (RUAA) o constancia de carga académica suscrita por las autoridades competentes.", up: 1.25 },
-      { actividad: "Elaboración e Impartición de acciones de formación", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", up: 4.5 },
-      { actividad: "Programa de inducción", documento: "Constancia de validación emitida por la DEMS, DES o SIP.", up: 5 },
-      { actividad: "Tutorías", documento: "Constancia emitida por la Coordinación Institucional de Tutoría Politécnica (CITP).", up: 5 },
-      { actividad: "Diseño y planeación didáctica en el aula", documento: "Constancia emitida por la DEMS, DES o SIP.", up: 20 },
-      { actividad: "Elaboración de material didáctico", documento: "Constancia emitida por el presidente de la academia o equivalente, con el aval de los integrantes de la misma y el visto bueno del Subdirector Académico.", up: 25 },
-      { actividad: "Autoría de libros", documento: "Constancia de validación emitida por la DEMS, DES o SIP.", up: 6 },
-      { actividad: "Elaboración de software educativo", documento: "Constancia emitida por la DEMS, DES o SIP.", up: 5 },
-      { actividad: "Producción de Unidades de Aprendizaje en línea", documento: "Constancia emitida por la UPEV con el visto bueno de la DEMS, DES o SIP.", up: 0 }
-    ],
+    docencia: [ //OKKKKK
+      { actividad: "Carga académica", documento: "Registro Único de Actividades Académicas (RUAA) o constancia de carga académica suscrita por las autoridades competentes.", up: ['1.00 U.P. por hora en nivel superior.', '1.00 por cada 15 horas de módulos '] },
+      { actividad: "Elaboración e Impartición de acciones de formación", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", up: ['4.50 U.P. por cada 15 horas impartidas con evaluación.', '2.00 U.P. por cada 15 horas sin evaluación.'] },
+      { actividad: "Programa de inducción", documento: "Constancia de validación emitida por la DEMS, DES o SIP.", up: ['5.00 U.P. por programa de inducción al año en nivel medio superior.', '1.00 U.P. por hora/semana/mes en nivel superior.', '1.25 U.P. por hora/semana/mes en posgrado.'] },
+      { actividad: "Tutorías", documento: "Constancia emitida por la Coordinación Institucional de Tutoría Politécnica (CITP).", up: '1.00 U.P. por cada hora de tutoría individual a la semana. Máximo: 5.00 U.P. por semestre.' },
+      { actividad: "Diseño y planeación didáctica en el aula", documento: "Constancia emitida por la DEMS, DES o SIP.", up: '10.00 U.P. por grupo al semestre. Máximo: 20.00 U.P. por periodo de promoción.' },
+      { actividad: "Elaboración de material didáctico para la impartición de catedra", documento: "Constancia emitida por el presidente de la academia o equivalente, con el aval de los integrantes de la misma y el visto bueno del Subdirector Académico.", up: ['5.00 U.P. por transparencias, rotafolios.', '10.00 U.P. por problemario.', '20.00 U.P. por prototipos.', 'Máximo: 25.00 U.P. por periodo de promoción.'] },
+      { actividad: "Elaboración de material didáctico digital", documento: "Constancia emitida por la DEMS, DES o SIP.", up: "Pendiente" },
+      { actividad: "Autoría de libros", documento: "Constancia de validación emitida por la DEMS, DES o SIP.", up: ['80.00 U.P. por libro con evaluación excelente.', '50.00 U.P. por libro con evaluación buena.', '20.00 U.P. por libro con evaluación regular.'] },
+      { actividad: "Elaboración de apuntes, instructivos de talleres y prácticas de laboratorio", documento: "Constancia emitida por la DEMS o DES.", up: ['30.00 U.P. por evaluación excelente.', '20.00 U.P. por evaluación buena.', '15.00 U.P. por evaluación regular.'] },
+      { actividad: "Elaboración de reactivos para guías de estudio y exámenes de admisión", documento: "Constancia emitida por la DEMS o DES.", up: ['30.00 U.P. por evaluación excelente.', '20.00 U.P. por evaluación buena.', '15.00 U.P. por evaluación regular.'] },
+      { actividad: "Evaluación, diseño y/o rediseño de programas académicos", documento: "Constancia emitida por la DEMS, DES o SIP.", up: 15.00 },
+      { actividad: "Elaboración de software educativo", documento: "Constancia emitida por la DEMS, DES o SIP.", up: 5.00 },
+      { actividad: "Elaboración de hardware", documento: "Constancia emitida por la DEMS, DES o SIP.", up: "Pendiente" },
+      { actividad: "Producción de Unidades de Aprendizaje en línea", documento: "Constancia emitida por la UPEV con el visto bueno de la DEMS, DES o SIP.", up: 8.00 },
+      { actividad: "Proyecto Aula", documento: "Constancia emitida por la DEMS.", up: "5.00 U.P. por proyecto" },
+      { actividad: "Certificación de laboratorios y validación de pruebas de laboratorio", documento: "Certificado emitido por una entidad reconocida y constancia del titular del centro de trabajo.", up: 20.00 },
+    ],    
     investigacion: [
-      { actividad: "Proyectos de investigación con financiamiento interno", documento: "Constancia emitida por la SIP.", up: 50.00 },
-      { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio, carta de aceptación del informe final o carta de finiquito, informe técnico.", up: 25.00 },
-      { actividad: "Publicación de artículos científicos y técnicos", documento: "Constancia de validación emitida por la SIP.", up: 20.00 },
-      { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia, dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica, carta de terminación expedida por la institución donde se realizó la estancia.", up: 15.00 },
-      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro, resultado del examen de forma, título de la patente.", up: 80.00 }
+      { actividad: "Proyectos de investigación con financiamiento interno", documento: "Constancia emitida por la SIP.", up: ['5.00 U.P. con el 20% de avance inicial como director.', '3.00 U.P. con el 20% de avance inicial como participante.', '25.00 U.P. por proyecto terminado como director.', '15.00 U.P. por proyecto terminado como participante.'], rol: "Director o Participante", alcance: "Nacional" }, // OK //'Máximo 2 proyectos como director y 3 proyectos como participante por periodo de promoción.'
+      { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio, carta de aceptación del informe final o carta de finiquito, informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante", alcance: "Nacional" }, //OK
+      { actividad: "Publicación de artículos científicos y técnicos", documento: "Constancia de validación emitida por la SIP.", up:['3.00 U.P. por artículo de circulación institucional.', '5.00 U.P. por artículo de circulación nacional.', '10.00 U.P. por artículo de circulación nacional con jurado.', '20.00 U.P. por artículo de circulación internacional.'], rol: "Autor", alcance: "Nacional o Internacional"  },//OK  //'Máximo 5 publicaciones por periodo de promoción.'
+      { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia, dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica, carta de terminación expedida por la institución donde se realizó la estancia.", up: "15.00 U.P. por año" }, //OK
+      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro, resultado del examen de forma, título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante", alcance: "Nacional o Internacional" } //OK
     ],
     superacion: [
-      { actividad: "Otra licenciatura", documento: "Constancia de validación emitida por la DES.", up: 60.00 },
-      { actividad: "Cursos de actualización, seminarios y talleres", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE para impartidos por el IPN, Constancia de validación emitida por la DEMS, DES o SIP para impartidos en institución distinta al IPN.", up: 8.00 },
-      { actividad: "Estudios de especialidad, maestría y doctorado", documento: "Constancia de validación emitida por la SIP.", up: 108.50 },
-      { actividad: "Cursos de propósito específico", documento: "Constancia emitida por la SIP.", up: 30.00 },
-      { actividad: "Diplomados", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", up: 40.00 },
-      { actividad: "Idiomas", documento: "Constancia emitida por la Dirección de Formación en Lenguas Extranjeras y/o certificado emitido por el CENLEX Santo Tomás o Zacatenco.", up: 8.00 }
+      { actividad: "Otra licenciatura", documento: "Constancia de validación emitida por la DES.", up: ['60.00 U.P. por licenciatura.'] }, //OK
+      { actividad: "Cursos de actualización, seminarios y talleres", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE para impartidos por el IPN, Constancia de validación emitida por la DEMS, DES o SIP para impartidos en institución distinta al IPN.", up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'] }, //OK
+      { actividad: "Estudios de especialidad, maestría y doctorado", documento: "Constancia de validación emitida por la SIP.", up: ['75.50 U.P. por especialidad.', '88.50 U.P. por maestría.', '108.50 U.P. por doctorado.'] }, //OK
+      { actividad: "Cursos de propósito específico", documento: "Constancia emitida por la SIP.", up: ['6.00 U.P. por cada 30 horas de curso. Máximo: 30.00 U.P. por periodo de promoción.'] }, //OK
+      { actividad: "Diplomados", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", up: ['40.00 U.P. por diplomado de 180 horas.'] }, //OK
+      { actividad: "Idiomas", documento: "Constancia emitida por la Dirección de Formación en Lenguas Extranjeras y/o certificado emitido por el CENLEX Santo Tomás o Zacatenco.", up: ['8.00 U.P. por expresión oral.', '8.00 U.P. por expresión escrita.', '5.00 U.P. por comprensión de lectura.', '5.00 U.P. por comprensión auditiva.'] } //OK
     ],
     complementarias: [
-      { actividad: "Distinciones académicas", documento: "Constancia de validación emitida por la SIP.", up: 0 },
-      { actividad: "Actividades académico-administrativas y sindicales", documento: "Constancia u oficio de designación y documento que acredite el término del cargo.", up: 0 },
-      { actividad: "Dirección o asesoría de trabajos escritos para titulación", documento: "Oficio, constancia o formato de designación suscrito por el Titular de la unidad académica o autoridad competente.", up: 20 },
-      { actividad: "Jurado de examen profesional o de grado", documento: "Acta de examen profesional o de grado.", up: 20 },
-      { actividad: "Experiencia profesional no docente relevante", documento: "Constancia del trabajo profesional desarrollado fuera del IPN con el aval del Titular de la unidad académica.", up: 20 },
-      { actividad: "Traducciones", documento: "Oficio de reconocimiento emitido por la academia.", up: 30 },
-      { actividad: "Eventos nacionales e internacionales de ciencia y formación integral", documento: "Constancia emitida por la Subdirección Académica con el visto bueno del Titular de la unidad académica y el aval de la DEMS, DES o SIP.", up: 12 },
-      { actividad: "Evaluación de prácticas escolares", documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", up: 6.00},
-      { actividad: "Evaluación de prácticas escolares", documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", up: 6.00},
-      { actividad: "Evaluación de prácticas escolares", documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", up: 6.00}
+      { actividad: "Distinciones académicas", documento: "Constancia de validación emitida por la SIP.", up: "Pendiente" },
+      { actividad: "Actividades académico-administrativas y sindicales", documento: "Constancia u oficio de designación y documento que acredite el término del cargo.", up: "Pendiente" },
+      { actividad: "Dirección o asesoría de trabajos escritos para titulación", documento: "Oficio, constancia o formato de designación suscrito por el Titular de la unidad académica o autoridad competente.", up: '5.00 U.P. por trabajo asesorado. Máximo: 20.00 U.P. por periodo de promoción.' },
+      { actividad: "Jurado de examen profesional o de grado", documento: "Acta de examen profesional o de grado.", up: '4.00 U.P. por jurado. Máximo: 20.00 U.P. por periodo de promoción.' },
+      { actividad: "Experiencia profesional no docente relevante", documento: "Constancia del trabajo profesional desarrollado fuera del IPN con el aval del Titular de la unidad académica.", up: '10.00 U.P. al año. Máximo: 20.00 U.P. por periodo de promoción.' },
+      { actividad: "Traducciones", documento: "Oficio de reconocimiento emitido por la academia.", up: '15.00 U.P. por libro traducido. Máximo: 30.00 U.P. por periodo de promoción.' },
+      { actividad: "Eventos nacionales e internacionales de ciencia y formación integral", documento: "Constancia emitida por la Subdirección Académica con el visto bueno del Titular de la unidad académica y el aval de la DEMS, DES o SIP.", up: ['5.00 U.P. por evento nacional.', '7.00 U.P. por evento internacional.', 'Máximo: 12.00 U.P. por periodo de promoción.'], alcance: "Nacional o Internacional" }, //OK
+      { actividad: "Evaluación de prácticas escolares", documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", up: '3.00 U.P. por grupo atendido. Máximo: 6.00 U.P. por periodo de promoción.'},
+      { actividad: "Evaluación de informes de los prestadores de servicio social", documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", up: '1.00 U.P. por grupo atendido. Máximo: 2.00 U.P. por periodo de promoción.' },
+      { actividad: "Evaluación de certámenes académicos", documento: "Constancia de participación emitida por la instancia correspondiente.", up: '5.00 U.P. por evento evaluado. Máximo: 15.00 U.P. por periodo de promoción.' },
+      { actividad: "Servicio externo por obra puntual, sin compensación económica", documento: "Solicitud del servicio externo, aceptación por el centro de trabajo y constancia de participación.", up: '2.00 por cada 80 horas de servicio externo' },
+      { actividad: "Ponente en conferencias, videoconferencias y expositor de carteles", documento: "Constancia de participación como conferencista o expositor de carteles.", up: ['Nacional 3.00 por cartel o por conferencia.', 'Nacional 4.00 por videoconferencia.', 'Nacional 6.00 por conferencia magistral.', 'Internacional 6.00 por cartel o por conferencia.', 'Internacional 7.00 por videoconferencia.', 'Internacional 8.00 por conferencia magistral.', 'Máximo: 24.00 U.P. por periodo de promoción.'], rol: "Expositor", alcance: "Nacional o Internacional"}, //OK
+      { actividad: "Expositor y asistente en congresos, simposios, reuniones, mesas redondas, coloquios, encuentros, paneles y foros", documento: "Constancia de participación emitida por la instancia correspondiente.", up: ['2.00 U.P. por asistente en evento nacional.', '4.00 U.P. por expositor en evento nacional.', '3.00 U.P. por asistente en evento internacional.', '7.00 U.P. por expositor en evento internacional.'], rol: "Expositor o Asistente", alcance: "Nacional o Internacional"}, //AQUI TODAVIA NO
+      { actividad: "Comisiones de evaluación", documento: "Oficio de designación o constancia emitida por la DEMS, DES o SIP.", up: ['5.00 U.P. como coordinador.', '3.00 U.P. como analista'], rol: "Coordinador o Analista"},
+      { actividad: "Programas y proyectos institucionales en áreas centrales", documento: "Constancia de participación emitida por el área correspondiente.", up: ['Programa institucional: 9.00 por coordinador.', 'Programa institucional: 7.00 por analista.', 'Proyecto institucional: 7.00 por coordinador.', 'Proyecto institucional: 5.00 por analista.', 'Proyecto de dependencia: 5.00 por coordinador.', 'Proyecto de dependencia: 3.00 por analista.'], rol: "Coordinador o Analista"} // OK 
     ],
     extension: [
-      { actividad: "Participación en la expoprofesiográfica", documento: "Constancia emitida por la Secretaría Académica o por la DEMS o DES.", up: 3.00 },
-      { actividad: "Encuentros Académicos Interpolitécnicos", documento: "Constancia de participación emitida por el Titular de la unidad académica.", up: 8.00 },
-      { actividad: "Brigadas multidisciplinarias de servicio social", documento: "Constancia de participación emitida por la Dirección de Egresados y Servicio Social.", up: 8.00 },
-      { actividad: "Impartición de disciplinas deportivas y/o talleres culturales", documento: "Constancia de participación emitida por la autoridad competente.", up: 0.50 }
+      { actividad: "Participación en la expo-profesiográfica", documento: "Constancia emitida por la Secretaría Académica o por la DEMS o DES.", up: ['2.00 U.P. por expositor.', '3.00 por atención de talleres o concursos', '3.00 por profesor coordinador'], rol: "Expositor o Atención o Profesor", alcance: "Nacional" }, //OK
+      { actividad: "Encuentros Académicos Interpolitécnicos", documento: "Constancia de participación emitida por el Titular de la unidad académica.", up: ['2.00 U.P. por evento como asistente. Máximo: 8.00 U.P. por periodo de promoción.'], rol: "Asistente", alcance: "Nacional"  }, //OK
+      { actividad: "Brigadas multidisciplinarias de servicio social", documento: "Constancia de participación emitida por la Dirección de Egresados y Servicio Social.", up: ['8.00 U.P. por coordinador de brigada.', '4.00 U.P. por profesor de brigada.', '4.00 U.P. por responsable del programa.'], rol: "Profesor o Coordinador o Responsable", alcance: "Nacional" }, //OK
+      { actividad: "Impartición de disciplinas deportivas y/o talleres culturales", documento: "Constancia de participación emitida por la autoridad competente.", up: ['0.50 U.P. por cada hora.'], rol: "Instructor" }, //OK
     ],
   };
 
@@ -137,6 +153,9 @@ function UnidadesPromocion() {
     setUnits('');
     setTasks([]);
     setDocumentUploaded([]);
+    setRoleOptions([]);
+    setScopeOptions([]);
+    setUnitsOptions([]);
   };
 
   const getActividades = () => {
@@ -157,18 +176,156 @@ function UnidadesPromocion() {
     setActivity(selectedActivity);
     setActivityError(false); // Elimina el error al seleccionar algo
 
-    // Mapeo de la función seleccionada al conjunto de actividades
     const mappedFunction = functionMapping[functionField];
-    const activityInfo = actividadesPorFuncion[mappedFunction].find(item => item.actividad === selectedActivity);
+    const activityInfo = actividadesPorFuncion[mappedFunction]?.find(
+      (item) => item.actividad === selectedActivity
+    );
 
     if (activityInfo) {
       setDocumentsRequired(activityInfo.documento);
-      setUnits(activityInfo.up); // Actualiza las unidades (U.P) basadas en la actividad seleccionada
+
+      // Si `up` es un array, lo usamos como opciones; si es un string, lo convertimos en array
+      const upsArray = Array.isArray(activityInfo.up) ? activityInfo.up : [activityInfo.up];
+      setUnitsOptions(upsArray);
+
+      // Si hay solo una opción de U.P., la seleccionamos automáticamente
+      if (upsArray.length === 1) {
+        setUnits(upsArray[0]);
+      } else {
+        setUnits(''); // Limpiamos si hay múltiples opciones
+      }
+
+      // Si hay roles disponibles, los establecemos; si no, dejamos vacío
+      if (activityInfo.rol) {
+        const rolesArray = activityInfo.rol.split(" o ");
+        setRoleOptions(rolesArray);
+      } else {
+        setRoleOptions([]);
+      }
+
+      // Si hay alcances disponibles, los establecemos; si no, dejamos vacío
+      if (activityInfo.alcance) {
+        const scopeArray = activityInfo.alcance.split(" o ");
+        setScopeOptions(scopeArray);
+        if (scopeArray.length === 1) setScope(scopeArray[0]);
+        else setScope(''); // Limpiamos si hay múltiples opciones
+      } else {
+        setScopeOptions([]);
+        setScope('');
+      }
     } else {
+      // Reseteamos los valores si no hay actividad seleccionada
       setDocumentsRequired('');
+      setUnitsOptions([]);
       setUnits('');
+      setRoleOptions([]);
+      setScopeOptions([]);
+      setScope('');
     }
   };
+
+  const handleRoleChange = (e) => {
+    const selectedRole = e.target.value;
+    setRole(selectedRole);
+    filterUPByRoleAndScope(selectedRole, scope);
+    
+    const mappedFunction = functionMapping[functionField];
+    const activityInfo = actividadesPorFuncion[mappedFunction]?.find(
+      (item) => item.actividad === activity
+    );
+  
+    if (activityInfo) {
+      const upsArray = Array.isArray(activityInfo.up) ? activityInfo.up : [activityInfo.up];
+  
+      // Filtramos las U.P. por el rol seleccionado, si corresponde
+      const filteredUPs = upsArray.filter((up) =>
+        up.toLowerCase().includes(selectedRole.toLowerCase())
+      );
+  
+      setUnitsOptions(filteredUPs);
+  
+      // Si solo hay una opción de U.P., seleccionarla automáticamente
+      if (filteredUPs.length === 1) {
+        setUnits(filteredUPs[0]);
+      } else {
+        setUnits(''); // Limpiamos si hay múltiples opciones
+      }
+    }
+  };
+  
+  const handleScopeChange = (e) => {
+    const selectedScope = e.target.value;
+    setScope(selectedScope);
+    filterUPByRoleAndScope(role, selectedScope);
+  
+    const mappedFunction = functionMapping[functionField];
+    const activityInfo = actividadesPorFuncion[mappedFunction]?.find(
+      (item) => item.actividad === activity
+    );
+  
+    if (activityInfo) {
+      const upsArray = Array.isArray(activityInfo.up) ? activityInfo.up : [activityInfo.up];
+  
+      // Filtro preciso de las U.P. según el alcance seleccionado
+      const filteredUPs = upsArray.filter((up) => {
+        const lowerUp = up.toLowerCase();
+        const lowerScope = selectedScope.toLowerCase();
+  
+        // Si el alcance es "nacional", evitamos las U.P. que contengan "internacional"
+        if (lowerScope === 'nacional') {
+          return lowerUp.includes('nacional') && !lowerUp.includes('internacional');
+        }
+        // Si el alcance es "internacional", aceptamos combinaciones y las internacionales
+        if (lowerScope === 'internacional') {
+          return lowerUp.includes('internacional');
+        }
+        return false; // Por seguridad, si no encaja, descartamos
+      });
+  
+      setUnitsOptions(filteredUPs);
+  
+      // Si solo hay una opción de U.P., seleccionarla automáticamente
+      if (filteredUPs.length === 1) {
+        setUnits(filteredUPs[0]);
+      } else {
+        setUnits(''); // Limpiamos si hay múltiples opciones
+      }
+    }
+  };  
+
+  const filterUPByRoleAndScope = (selectedRole, selectedScope) => {
+    const mappedFunction = functionMapping[functionField];
+    const activityInfo = actividadesPorFuncion[mappedFunction]?.find(
+      (item) => item.actividad === activity
+    );
+  
+    if (activityInfo) {
+      const upsArray = Array.isArray(activityInfo.up) ? activityInfo.up : [activityInfo.up];
+  
+      // Filtrar las U.P. basadas en rol y alcance simultáneamente
+      const filteredUPs = upsArray.filter((up) => {
+        const lowerUp = up.toLowerCase();
+        const lowerRole = selectedRole?.toLowerCase() || "";
+        const lowerScope = selectedScope?.toLowerCase() || "";
+  
+        const matchesRole = lowerUp.includes(`por ${lowerRole}`);
+        const matchesScope = lowerUp.includes(lowerScope);
+  
+        // Retornar solo si ambas condiciones se cumplen
+        return matchesRole && matchesScope;
+      });
+  
+      setUnitsOptions(filteredUPs);
+  
+      // Si solo hay una opción, seleccionarla automáticamente
+      if (filteredUPs.length === 1) {
+        setUnits(filteredUPs[0]);
+      } else {
+        setUnits(''); // Limpiar si hay múltiples opciones
+      }
+    }
+  };
+    
 
   const validateForm = () => {
     let isValid = true;
@@ -293,46 +450,56 @@ function UnidadesPromocion() {
                 className="w-full p-2 rounded-lg border border-gray-400"
               >
                 <option value="" disabled>Selecciona una actividad</option>
-                {getActividades()}
+                {functionMapping[functionField] &&
+                  actividadesPorFuncion[functionMapping[functionField]].map((item, index) => (
+                    <option key={index} value={item.actividad}>{item.actividad}</option>
+                ))}
               </select>
               {activityError && <span className="text-red-500">Por favor, selecciona una actividad.</span>}
 
             </div>
 
-            <div className="mb-4">
-              <label className="block text-white text-sm font-semibold mb-2">Rol de participación</label>
-              <select
-                value={role}
-                onChange={(e) => {
-                  setRole(e.target.value);
-                  setRoleError(false); // Elimina el error al seleccionar un rol
-                }}
-                className="w-full p-2 rounded-lg border border-gray-400"
-              >
-                <option value="" disabled>Selecciona un rol de participación</option>
-                <option value="expositor">Expositor</option>
-                <option value="asistente">Asistente</option>
-                <option value="organizador">Organizador</option>
-              </select>
-              {roleError && <span className="text-red-500">Por favor, selecciona un rol.</span>}
-            </div>
+            {roleOptions.length > 1 ? (
+              <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">Rol de participación</label>
+                <select
+                  value={role}
+                  onChange={handleRoleChange}
+                  className="w-full p-2 rounded-lg border border-gray-400"
+                >
+                  <option value="" disabled>Selecciona un rol</option>
+                  {roleOptions.map((rolOption, index) => (
+                    <option key={index} value={rolOption}>{rolOption}</option>
+                  ))}
+                </select>
+              </div>
+            ) : roleOptions.length === 1 && (
+              <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">Rol de participación</label>
+                <p className="bg-white p-2 rounded-lg border border-gray-400">{roleOptions[0]}</p>
+              </div>
+            )}
 
-            <div className="mb-4">
-              <label className="block text-white text-sm font-semibold mb-2">Alcance</label>
-              <select
-                value={scope}
-                onChange={(e) => {
-                  setScope(e.target.value);
-                  setScopeError(false); // Elimina el error al seleccionar un alcance
-                }}
-                className="w-full p-2 rounded-lg border border-gray-400"
-              >
-                <option value="" disabled>Selecciona un alcance</option>
-                <option value="nacional">Nacional</option>
-                <option value="internacional">Internacional</option>
-              </select>
-              {scopeError && <span className="text-red-500">Por favor, selecciona un alcance.</span>}
-            </div>
+            {scopeOptions.length > 1 ? (
+              <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">Alcance</label>
+                <select
+                  value={scope}
+                  onChange={handleScopeChange}
+                  className="w-full p-2 rounded-lg border border-gray-400"
+                >
+                  <option value="" disabled>Selecciona un alcance</option>
+                  {scopeOptions.map((scopeOption, index) => (
+                    <option key={index} value={scopeOption}>{scopeOption}</option>
+                  ))}
+                </select>
+              </div>
+            ) : scopeOptions.length === 1 && (
+              <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">Alcance</label>
+                <p className="bg-white p-2 rounded-lg border border-gray-400">{scopeOptions[0]}</p>
+              </div>
+            )}
 
             {documents_required && (
               <div className="mb-4">
@@ -340,12 +507,28 @@ function UnidadesPromocion() {
                 <p className="bg-white p-2 rounded-lg border border-gray-400">{documents_required}</p>
               </div>
             )}
-            {units && (
+
+            {unitsOptions.length > 1 ? (
               <div className="mb-4">
-                <label className="block text-white text-sm font-semibold mb-2">U.P aproximadas a obtener</label>
-                <input type="text" value={units} className="w-full p-2 rounded-lg border border-gray-400" readOnly />
+                <label className="block text-white text-sm font-semibold mb-2">U.P. aproximadas</label>
+                <select 
+                  value={units} 
+                  onChange={(e) => setUnits(e.target.value)} 
+                  className="w-full p-2 rounded-lg border border-gray-400"
+                >
+                  <option value="" disabled>Selecciona una opción</option>
+                  {unitsOptions.map((up, index) => (
+                    <option key={index} value={up}>{up}</option>
+                  ))}
+                </select>
+              </div>
+            ) : unitsOptions.length === 1 && (
+              <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">U.P. aproximadas</label>
+                <p className="bg-white p-2 rounded-lg border border-gray-400">{unitsOptions[0]}</p>
               </div>
             )}
+            
             <div className="flex items-center justify-between">
               <div className="w-1/2 mr-2">
                 <label className="block text-white text-sm font-semibold mb-2">Prioridad</label>

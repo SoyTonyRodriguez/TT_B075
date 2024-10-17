@@ -280,16 +280,6 @@ const KanbanBoard = () => {
                 placeholderTextColor="#999"
               />
 
-              {/* Campo de fecha de vencimiento */}
-              <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Fecha de Vencimiento</Text>
-              <TextInput
-                placeholder="dd/mm/aaaa"
-                value={newTask.end_date}
-                onChangeText={(text) => handleTaskChange('end_date', text)}
-                style={tw`border border-gray-300 rounded-lg px-4 py-2 mb-4 bg-white`}
-                placeholderTextColor="#999"
-              />
-
               {/* Selector de prioridad */}
               <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Prioridad</Text>
               <TouchableOpacity
