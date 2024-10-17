@@ -405,25 +405,16 @@ function Documents() {
               <span>Modificado</span>
             </button>
             {showDateDropdown && (
-              <div className="absolute mt-2 bg-white rounded-lg shadow-lg p-4">
-                <button onClick={() => handleDateFilter('today')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                  Hoy
-                </button>
-                <button onClick={() => handleDateFilter('this-week')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                  Últimos 7 días
-                </button>
-                <button onClick={() => handleDateFilter('this-month')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                  Último mes
-                </button>
-                <button onClick={() => handleDateFilter('this-year')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                  Este año
-                </button>
-                <button onClick={closeDropdowns} className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100">
-                  Cancelar
-                </button>
+              <div className="absolute z-20 mt-2 bg-white rounded-lg shadow-lg p-4">
+                <button onClick={() => handleDateFilter('today')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Hoy</button>
+                <button onClick={() => handleDateFilter('this-week')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Últimos 7 días</button>
+                <button onClick={() => handleDateFilter('this-month')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Último mes</button>
+                <button onClick={() => handleDateFilter('this-year')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Este año</button>
+                <button onClick={closeDropdowns} className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100">Cancelar</button>
               </div>
             )}
           </div>
+
 
           <button
             className="px-4 py-2 rounded-full border bg-gray-200 hover:bg-blue-500 text-gray-600 hover:text-white shadow-md hover:shadow-lg transition duration-300 flex items-center space-x-2"

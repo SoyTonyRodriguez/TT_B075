@@ -3,7 +3,6 @@ import { IoSchoolOutline, IoChevronDown} from "react-icons/io5";
 import Navigation from './Navigation/Navigation'; 
 
 export default function ProyeccionGrado() {
-  const [nombre, setNombre] = useState('');
   const [grado, setGrado] = useState('');
   const [documentoRequerido, setDocumentoRequerido] = useState(''); 
   const [modalVisible, setModalVisible] = useState(false);
@@ -40,17 +39,6 @@ export default function ProyeccionGrado() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-white">Obtención grado académico</h1>
           <IoSchoolOutline size={40} color="#fff" />
-        </div>
-
-        <div className="mb-4">
-          <label className="text-lg font-semibold text-white">Nombre completo</label>
-          <input
-            type="text"
-            placeholder="Nombre completo"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            className="w-full p-4 border border-gray-400 rounded-lg mt-2 bg-white"
-          />
         </div>
 
         {/* Selector de Grado Académico */}
