@@ -17,10 +17,13 @@ import UnidadesPromocion from './screens/UnidadesPromocion';
 import KanbanBoard from './screens/KanbanBoard';
 import FilesScreen from './screens/FilesScreen';
 
+import { AuthProvider } from './components/AuthContext';
+
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
+    <AuthProvider>
     <SafeAreaView className="flex-auto">
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
@@ -51,6 +54,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
+    </AuthProvider>
   );
 }
 

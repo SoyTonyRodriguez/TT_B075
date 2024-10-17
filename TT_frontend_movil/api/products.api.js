@@ -7,12 +7,11 @@ const TasksAPI = axios.create({
     baseURL: 'http://192.168.1.143:8000/api/v1/'
 })
 
-// create task method
-export const createTask = async (task) => {
+// create projection method
+export const createProduct = async (product) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
-    
-    return TasksAPI.post('task/register/', task, {
+    return TasksAPI.post('product/register/', product, {
         headers: {
             'Content-Type': 'application/json', // Agrega este header
             Authorization: `Bearer ${cleanToken}`,
@@ -21,11 +20,11 @@ export const createTask = async (task) => {
 }
 
 // getTasks from account method
-export const getTasks = async (account_id) => {
+export const getProduct = async (account_id) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
-
-    return TasksAPI.get(`tasks/${account_id}/`, {
+    
+    return TasksAPI.get(`products/${account_id}/`, {
         headers: {
             'Content-Type': 'application/json', // Agrega este header
             Authorization: `Bearer ${cleanToken}`,
@@ -33,11 +32,11 @@ export const getTasks = async (account_id) => {
     });
 };
 
-export const updateTaskStatus = async (taskId, updatedData) => {
+export const updateProduct = async (product_id, updatedData) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
-    
-    return TasksAPI.patch(`tasks/${taskId}/edit/`, updatedData, {
+
+    return TasksAPI.patch(`products/${product_id}/edit/`, updatedData, {
         headers: {
             'Content-Type': 'application/json', // Agrega este header
             Authorization: `Bearer ${cleanToken}`,
@@ -45,11 +44,11 @@ export const updateTaskStatus = async (taskId, updatedData) => {
     });
 };
 
-export const deleteTask = async (taskId) => {
+export const deleteProduct = async (product_id) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
     
-    return TasksAPI.delete(`tasks/${taskId}/delete/`, {
+    return TasksAPI.delete(`products/${product_id}/delete/`, {
         headers: {
             'Content-Type': 'application/json', // Agrega este header
             Authorization: `Bearer ${cleanToken}`,

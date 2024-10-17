@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import Toast from 'react-native-toast-message'; 
+import LoadingScreen from './LoadingScreen'; // Pantalla de carga
+
+import { AuthContext } from '../components/AuthContext';
+
+import { getTasks } from '../api/tasks.api';
+import { getProduct } from '../api/products.api';
 
 const KanbanBoard = () => {
   const [tasks, setTasks] = useState([]);
@@ -12,8 +18,62 @@ const KanbanBoard = () => {
   const [showInProcess, setShowInProcess] = useState(false);
   const [showDone, setShowDone] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);  // Carga para el spinner
   const [showPriorityModal, setShowPriorityModal] = useState(false);
+
+  const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
+
+
+  const [loading, setLoading] = useState(true); // Estado de carga inicial
+  const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
+
+  useEffect(() => {
+    setLoadingMessage("Cargando tareas"); // Mensaje de carga
+    const fetchTasks = async () => {
+      try {
+        const response = await getTasks(userId);
+        setTasks(response.data);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'No se pudieron obtener las tareas.',
+        });
+        throw error; // Lanza el error para que `Promise.all` lo detecte
+      }
+    };
+
+    const fetchProjections = async () => {
+      try {
+        const response = await getProduct(userId);
+        console.log("Respuesta de la API con proyecciones:", response.data);
+        setProjections(response.data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'No se pudieron obtener los productos.',
+        });
+        throw error; // Lanza el error para que `Promise.all` lo detecte
+      }
+    };
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchTasks(), fetchProjections()]); // Ejecuta ambas en paralelo
+      } catch (error) {
+        console.error('Error in one or both requests:', error);
+      } finally {
+        setLoading(false); // Finaliza la carga independientemente del resultado
+      }
+    };
+
+    if (userId) {
+      fetchData(); // Llama a la función si existe un `userId`
+    }
+  }, [userId]); // Se ejecuta cada vez que `userId` cambia
 
   const handleTaskChange = (name, value) => {
     setNewTask({ ...newTask, [name]: value });
@@ -56,6 +116,70 @@ const KanbanBoard = () => {
     });
   };
 
+  const TaskCard = ({ task, onDelete }) => {
+    const getPriorityColor = () => {
+      switch (task.priority) {
+        case 'Alta':
+          return 'bg-red-200';
+        case 'Media':
+          return 'bg-yellow-200';
+        case 'Baja':
+          return 'bg-blue-200';
+        default:
+          return 'bg-gray-200';
+      }
+    };
+
+    // Buscar el nombre de la proyección en base al projection_id
+    const projection = projections.find(proj => proj.id === task.projection_id);
+    const projectionName = projection ? projection.function : 'Sin proyección';
+    const projectionActivity = projection ? projection.activity : 'Sin actividad';
+    const projectionColor =  projection ? projection.color : '#f0f0f0'; // Usar el color de la proyección de la API
+  
+    return (
+      <View style={tw`p-4 rounded-md shadow-md mb-3 ${getPriorityColor()} min-h-[120px]`}>
+        {/* Botón de eliminar */}
+        <TouchableOpacity
+          style={tw`absolute top-2 right-2`}
+          onPress={() => onDelete(task.id)}
+        >
+          <Ionicons name="close-circle" size={24} color="red" />
+        </TouchableOpacity>
+  
+        {/* Contenedor principal de título y fecha */}
+        <View style={tw`flex-row justify-between items-center mb-2`}>
+          {/* Título */}
+          <Text style={tw`text-base font-semibold text-gray-800 flex-shrink`} numberOfLines={1}>
+            {task.title}
+          </Text>
+  
+          {/* Fecha de vencimiento */}
+          <View style={tw`flex-row items-center ml-2 top-5 right-1`}>
+            <Ionicons name="time-outline" size={16} color="gray" style={tw`mr-1`} />
+            <Text style={tw`text-xs text-gray-600`} numberOfLines={1}>
+              {task.end_date}
+            </Text>
+          </View>
+        </View>
+  
+        {/* Descripción o proyección */}
+        <View
+          style={[
+            tw`mt-2 px-3 py-2 rounded-md border shadow-sm`,
+            { backgroundColor: projectionColor, borderColor: projectionColor },
+          ]}
+        >
+          <Text style={tw`text-xs text-gray-700 italic mb-1`} numberOfLines={1}>
+            {projectionActivity}
+          </Text>
+          <Text style={tw`text-xs text-gray-600 italic`} numberOfLines={1}>
+            {projectionName}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
   const priorities = ['Alta', 'Media', 'Baja'];
 
   return (
@@ -64,15 +188,16 @@ const KanbanBoard = () => {
       style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
+      
+      {/* Pantalla de carga */}
+      {loading && <LoadingScreen message={loadingMessage} />}
+      
       <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
         <Text style={tw`text-2xl font-bold text-black`}>Mi proyección</Text>
         <Ionicons name="glasses-outline" size={40} color="#000" style={tw`ml-2`} />
       </View>
 
       <ScrollView style={tw`p-5`}>
-        {/* Mostrar loader si está cargando */}
-        {loading && <ActivityIndicator size="large" color="#0000ff" />}
-
         {/* Sección To-Do */}
         <TouchableOpacity onPress={() => setShowTodo(!showTodo)}>
           <View style={tw`bg-yellow-200 p-4 rounded-xl`}>
@@ -82,7 +207,7 @@ const KanbanBoard = () => {
         {showTodo && (
           <View style={tw`bg-white p-4 rounded-xl mt-2`}>
             {tasks.filter(task => task.status === 'todo').map(task => (
-              <Text key={task.id} style={tw`text-gray-600`}>{task.title}</Text>
+              <TaskCard key={task.id} task={task}  />
             ))}
           </View>
         )}
@@ -96,8 +221,8 @@ const KanbanBoard = () => {
         {showInProcess && (
           <View style={tw`bg-white p-4 rounded-xl mt-2`}>
             {tasks.filter(task => task.status === 'in-progress').map(task => (
-              <Text key={task.id} style={tw`text-gray-600`}>{task.title}</Text>
-            ))}
+              <TaskCard key={task.id} task={task}  />
+          ))}
           </View>
         )}
 
