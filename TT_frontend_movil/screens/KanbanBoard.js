@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TextInput, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, 
+  TextInput, Modal, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import Toast from 'react-native-toast-message'; 
@@ -7,18 +8,20 @@ import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 
 import { AuthContext } from '../components/AuthContext';
 
-import { getTasks } from '../api/tasks.api';
+import { getTasks, createTask } from '../api/tasks.api';
 import { getProduct } from '../api/products.api';
 
 const KanbanBoard = () => {
   const [tasks, setTasks] = useState([]);
   const [projections, setProjections] = useState([]);
-  const [newTask, setNewTask] = useState({ title: '', description: '', end_date: '', priority: 'Media', projection_id: '' });
+  const [newTask, setNewTask] = useState({ title: '', description: '', priority: 'Media', projection_id: '' });
   const [showTodo, setShowTodo] = useState(false);
   const [showInProcess, setShowInProcess] = useState(false);
   const [showDone, setShowDone] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPriorityModal, setShowPriorityModal] = useState(false);
+  const [showProjectionModal, setShowProjectionModal] = useState(false); // Estado del modal de proyección
+  const [isTaskLoading, setIsTaskLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
 
   const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
 
@@ -89,31 +92,32 @@ const KanbanBoard = () => {
     setIsModalOpen(false);
   };
 
-  // Función para crear nueva tarea
-  const handleCreateTask = () => {
-    if (!newTask.title || !newTask.description || !newTask.end_date || !newTask.projection_id) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Por favor, llena todos los campos',
-      });
+  const handleCreateTask = async () => {
+    if (!newTask.title || !newTask.description || !newTask.projection_id) {
+      Alert.alert('Error', 'Todos los campos son obligatorios.');
       return;
     }
 
-    // Agregar la nueva tarea al estado de tareas
-    setTasks([...tasks, { ...newTask, id: Date.now(), status: 'todo' }]);
-
-    // Limpiar el formulario
-    setNewTask({ title: '', description: '', end_date: '', priority: 'Media', projection_id: '' });
-
-    // Cerrar el modal
-    closeModal();
-
-    Toast.show({
-      type: 'success',
-      text1: 'Tarea creada',
-      text2: 'La tarea ha sido creada exitosamente.',
-    });
+    try {
+      setLoadingMessage("Creando tarea..."); // Mensaje de carga
+      setIsTaskLoading(true);
+      const response = await createTask(newTask);
+      setTasks([...tasks, response.data]);
+      setNewTask({
+        title: '',
+        description: '',
+        priority: 'Media',
+        status: 'todo',
+        projection_id: '',
+      });
+      setIsModalOpen(false);
+      Alert.alert('Éxito', 'Tarea creada con éxito.');
+    } catch (error) {
+      console.error('Error creando tarea:', error);
+      Alert.alert('Error', 'No se pudo crear la tarea.');
+    } finally {
+      setIsTaskLoading(false);
+    }
   };
 
   const TaskCard = ({ task, onDelete }) => {
@@ -152,14 +156,6 @@ const KanbanBoard = () => {
           <Text style={tw`text-base font-semibold text-gray-800 flex-shrink`} numberOfLines={1}>
             {task.title}
           </Text>
-  
-          {/* Fecha de vencimiento */}
-          <View style={tw`flex-row items-center ml-2 top-5 right-1`}>
-            <Ionicons name="time-outline" size={16} color="gray" style={tw`mr-1`} />
-            <Text style={tw`text-xs text-gray-600`} numberOfLines={1}>
-              {task.end_date}
-            </Text>
-          </View>
         </View>
   
         {/* Descripción o proyección */}
@@ -289,13 +285,21 @@ const KanbanBoard = () => {
                 <Text style={tw`text-gray-800 text-lg`}>{newTask.priority}</Text>
               </TouchableOpacity>
 
-              {/* Selector de proyección (sin funcionalidad por ahora) */}
-              <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Proyección</Text>
+              {/* Selector de proyección */}
+              <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>
+                Proyección
+              </Text>
               <TouchableOpacity
+                onPress={() => setShowProjectionModal(true)}
                 style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
-                disabled={true}
               >
-                <Text style={tw`text-gray-500 text-lg`}>Selecciona una proyección (no disponible)</Text>
+                <Text style={tw`text-gray-800 text-lg`}>
+                  {newTask.projection_id
+                    ? projections.find(
+                        (proj) => proj.id === newTask.projection_id
+                      )?.activity
+                    : 'Selecciona una proyección'}
+                </Text>
               </TouchableOpacity>
 
               {/* Botones para cancelar o crear */}
@@ -307,7 +311,10 @@ const KanbanBoard = () => {
                   <Text style={tw`text-white font-semibold`}>Cancelar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={handleCreateTask}
+                  onPress={() => {
+                    handleCreateTask();
+                    setIsModalOpen(false);
+                  }}
                   style={tw`bg-green-500 px-4 py-2 rounded-lg shadow-lg`}
                 >
                   <Text style={tw`text-white font-semibold`}>Crear</Text>
@@ -345,8 +352,38 @@ const KanbanBoard = () => {
         </Modal>
       )}
 
+      {/* Modal para seleccionar proyección */}
+      {showProjectionModal && (
+        <Modal
+          transparent={true}
+          visible={showProjectionModal}
+          onRequestClose={() => setShowProjectionModal(false)}
+        >
+          <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
+            <View style={tw`bg-white p-4 rounded-lg w-80`}>
+              <Text style={tw`text-lg font-semibold mb-4`}>Selecciona una actividad</Text>
+              {projections.map((projection) => (
+                <TouchableOpacity
+                  key={projection.id}
+                  onPress={() => {
+                    setNewTask({ ...newTask, projection_id: projection.id });
+                    setShowProjectionModal(false);
+                  }}
+                  style={tw`py-2`}
+                >
+                  <Text style={tw`text-gray-800 text-center`}>{projection.activity}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </Modal>
+      )}
+
       {/* Toast container */}
       <Toast />
+
+      {/* Pantalla de carga */}
+      {isTaskLoading && <LoadingScreen message={loadingMessage} />}
     </ImageBackground>
   );
 };
