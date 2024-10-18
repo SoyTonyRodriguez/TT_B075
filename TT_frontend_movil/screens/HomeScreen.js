@@ -8,6 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa
 import { jwtDecode } from "jwt-decode";
 import tw from 'twrnc';
 
+import CustomToast from '../components/CustomToast'; // Toast personalizado
+import Toast from 'react-native-toast-message'; 
+
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [userId, setUserId] = useState(null);
@@ -24,6 +27,7 @@ const HomeScreen = () => {
   useEffect(() => {
     const loadAccountData = async () => {
       try {
+        Toast.show({ type: 'success', text1: 'Bienvenido!', visibilityTime: 1000 });
         // Verifica si los datos de la cuenta están almacenados
         const storedAccountData = await AsyncStorage.getItem('accountDetails');
         
@@ -181,6 +185,9 @@ const HomeScreen = () => {
           </View>
         </TouchableOpacity>
       </ScrollView>
+      
+      {/* Toast container */}
+      <CustomToast />
     </ImageBackground>
   );
 };

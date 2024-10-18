@@ -9,7 +9,7 @@ import CustomToast from '../components/CustomToast'; // Toast personalizado
 
 import { AuthContext } from '../components/AuthContext';
 
-import { getTasks, createTask, deleteTask } from '../api/tasks.api';
+import { getTasks, createTask, deleteTask, updateTask } from '../api/tasks.api';
 import { getProduct } from '../api/products.api';
 
 const KanbanBoard = () => {
@@ -22,7 +22,11 @@ const KanbanBoard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPriorityModal, setShowPriorityModal] = useState(false);
   const [showProjectionModal, setShowProjectionModal] = useState(false); // Estado del modal de proyección
+  const [showStatusModal, setShowStatusModal] = useState(false); // Controla el modal de status
   const [isTaskLoading, setIsTaskLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
+
+  const [taskToEdit, setTaskToEdit] = useState(null); // Nueva tarea para editar
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Estado del modal de edición
 
   const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
 
@@ -79,6 +83,32 @@ const KanbanBoard = () => {
     }
   }, [userId]); // Se ejecuta cada vez que `userId` cambia
 
+  const openEditModal = (task) => {
+    setTaskToEdit(task);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setTaskToEdit(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleUpdateTask = async () => {
+    try {
+      setLoadingMessage("Actualizando tarea..."); // Mensaje de carga
+      setIsTaskLoading(true);
+      await updateTask(taskToEdit.id, taskToEdit);
+      setTasks(tasks.map((task) => (task.id === taskToEdit.id ? taskToEdit : task)));
+      Toast.show({ type: 'success', text1: 'Tarea actualizada', visibilityTime: 1000});
+      closeEditModal();
+    } catch (error) {
+      console.error('Error updating task:', error);
+      Toast.show({ type: 'error', text1: 'Error', text2: 'No se pudo actualizar la tarea.', visibilityTime: 1000 });
+    } finally {
+      setIsTaskLoading(false);
+    }
+  };
+
   const handleTaskChange = (name, value) => {
     setNewTask({ ...newTask, [name]: value });
   };
@@ -112,11 +142,7 @@ const KanbanBoard = () => {
         projection_id: '',
       });
       setIsModalOpen(false);
-      Toast.show({
-        type: 'success',
-        text1: 'Tarea Creada',
-        text2: 'La tarea se ha creado correctamente.',
-      });
+      Toast.show({type: 'success', text1: 'Tarea Creada', visibilityTime: 1000});
     } catch (error) {
       console.error('Error creando tarea:', error);
       Alert.alert('Error', 'No se pudo crear la tarea.');
@@ -138,11 +164,7 @@ const KanbanBoard = () => {
       await deleteTask(taskId);
   
       // Muestra un mensaje de éxito
-      Toast.show({
-        type: 'success',
-        text1: 'Tarea eliminada',
-        text2: 'La tarea se eliminó correctamente.',
-      });
+      Toast.show({ type: 'success', text1: 'Tarea eliminada', visibilityTime: 1000 });
     } catch (error) {
       console.error('Error eliminando tarea:', error);
   
@@ -151,14 +173,15 @@ const KanbanBoard = () => {
   
       // Muestra un mensaje de error
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'No se pudo eliminar la tarea. Inténtalo de nuevo.',
-      });
+        type: 'error', text1: 'Error', text2: 'No se pudo eliminar la tarea. Inténtalo de nuevo.'});
     }
   };
 
-  const TaskCard = ({ task, onDelete }) => {
+  const handleEditTaskChange = (name, value) => {
+    setTaskToEdit({ ...taskToEdit, [name]: value });
+  };
+
+  const TaskCard = ({ task }) => {
     const getPriorityColor = () => {
       switch (task.priority) {
         case 'Alta':
@@ -171,50 +194,52 @@ const KanbanBoard = () => {
           return 'bg-gray-200';
       }
     };
-
+  
     // Buscar el nombre de la proyección en base al projection_id
-    const projection = projections.find(proj => proj.id === task.projection_id);
+    const projection = projections.find((proj) => proj.id === task.projection_id);
     const projectionName = projection ? projection.function : 'Sin proyección';
     const projectionActivity = projection ? projection.activity : 'Sin actividad';
-    const projectionColor =  projection ? projection.color : '#f0f0f0'; // Usar el color de la proyección de la API
+    const projectionColor = projection ? projection.color : '#f0f0f0'; // Usar el color de la proyección de la API
   
     return (
-      <View style={tw`p-4 rounded-md shadow-md mb-3 ${getPriorityColor()} min-h-[120px]`}>
-        {/* Botón de eliminar */}
+      <View style={tw`p-4 rounded-md shadow-md mb-3 ${getPriorityColor()} min-h-[120px] relative`}>
+        {/* Botón de eliminar (más grande y con padding) */}
         <TouchableOpacity
-          style={tw`absolute top-2 right-2`}
+          style={tw`absolute -top-3 -right-3 p-2 bg-white rounded-full shadow-md`}
           onPress={() => handleDeleteTask(task.id)}
         >
-          <Ionicons name="close-circle" size={24} color="red" />
+        <Ionicons name="close-circle" size={36} color="red" />
         </TouchableOpacity>
   
-        {/* Contenedor principal de título y fecha */}
-        <View style={tw`flex-row justify-between items-center mb-2`}>
-          {/* Título */}
-          <Text style={tw`text-base font-semibold text-gray-800 flex-shrink`} numberOfLines={1}>
-            {task.title}
-          </Text>
-        </View>
+        <TouchableOpacity onPress={() => openEditModal(task)} style={tw`flex-1`}>
+          {/* Contenedor principal de título y fecha */}
+          <View style={tw`flex-row justify-between items-center mb-2`}>
+            <Text style={tw`text-base font-semibold text-gray-800 flex-shrink`} numberOfLines={1}>
+              {task.title}
+            </Text>
+          </View>
   
-        {/* Descripción o proyección */}
-        <View
-          style={[
-            tw`mt-2 px-3 py-2 rounded-md border shadow-sm`,
-            { backgroundColor: projectionColor, borderColor: projectionColor },
-          ]}
-        >
-          <Text style={tw`text-xs text-gray-700 italic mb-1`} numberOfLines={1}>
-            {projectionActivity}
-          </Text>
-          <Text style={tw`text-xs text-gray-600 italic`} numberOfLines={1}>
-            {projectionName}
-          </Text>
-        </View>
+          {/* Descripción o proyección */}
+          <View
+            style={[
+              tw`mt-2 px-3 py-2 rounded-md border shadow-sm`,
+              { backgroundColor: projectionColor, borderColor: projectionColor },
+            ]}
+          >
+            <Text style={tw`text-xs text-gray-700 italic mb-1`} numberOfLines={1}>
+              {projectionActivity}
+            </Text>
+            <Text style={tw`text-xs text-gray-600 italic`} numberOfLines={1}>
+              {projectionName}
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   };
 
   const priorities = ['Alta', 'Media', 'Baja'];
+  const statuses = ['todo', 'in-progress', 'done']; // Lista de estados
 
   return (
     <ImageBackground
@@ -377,8 +402,8 @@ const KanbanBoard = () => {
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    handleTaskChange('priority', priority);
-                    setShowPriorityModal(false);
+                    handleEditTaskChange('priority', priority); // Actualiza la prioridad
+                    setShowPriorityModal(false); // Cierra el modal
                   }}
                   style={tw`py-2`}
                 >
@@ -417,11 +442,122 @@ const KanbanBoard = () => {
         </Modal>
       )}
 
+      {/* Modal de selección de status */}
+      {showStatusModal && (
+        <Modal
+          transparent={true}
+          visible={showStatusModal}
+          onRequestClose={() => setShowStatusModal(false)}
+        >
+          <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
+            <View style={tw`bg-white p-4 rounded-lg w-80`}>
+              <Text style={tw`text-lg font-semibold mb-4`}>Selecciona el estado</Text>
+              {statuses.map((status, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    handleEditTaskChange('status', status);
+                    setShowStatusModal(false);
+                  }}
+                  style={tw`py-2`}
+                >
+                  <Text style={tw`text-gray-800 text-center`}>{status}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </Modal>
+    )}
+
+      {/* Modal para editar tarea */}
+      <Modal
+        transparent={true}
+        visible={isEditModalOpen}
+        onRequestClose={closeEditModal}
+      >
+        <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
+          <View style={tw`bg-white p-8 rounded-lg shadow-xl w-96`}>
+            <Text style={tw`text-3xl font-bold mb-6 text-center text-gray-800`}>Editar Tarea</Text>
+
+            {/* Campo del título */}
+            <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Título de la tarea</Text>
+            <TextInput
+              placeholder="Escribe el título"
+              value={taskToEdit?.title || ''}
+              onChangeText={(text) => setTaskToEdit({ ...taskToEdit, title: text })}
+              style={tw`border border-gray-300 rounded-lg px-4 py-2 mb-4 bg-white`}
+              placeholderTextColor="#999"
+            />
+
+            {/* Campo de la descripción */}
+            <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Descripción</Text>
+            <TextInput
+              placeholder="Escribe la descripción"
+              value={taskToEdit?.description || ''}
+              onChangeText={(text) => setTaskToEdit({ ...taskToEdit, description: text })}
+              style={tw`border border-gray-300 rounded-lg px-4 py-2 mb-4 bg-white`}
+              placeholderTextColor="#999"
+            />
+
+            {/* Selector de prioridad */}
+            <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Prioridad</Text>
+            <TouchableOpacity
+              onPress={() => setShowPriorityModal(true)}
+              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
+            >
+              <Text style={tw`text-gray-800 text-lg`}>{taskToEdit?.priority || 'Selecciona una prioridad'}</Text>
+            </TouchableOpacity>
+
+            {/* Selector de estado */}
+            <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Estado</Text>
+            <TouchableOpacity
+              onPress={() => setShowStatusModal(true)}
+              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
+            >
+              <Text style={tw`text-gray-800 text-lg`}>{taskToEdit?.status || 'Selecciona un estado'}</Text>
+            </TouchableOpacity>
+
+            {/* Selector de proyección */}
+            <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Proyección</Text>
+            <TouchableOpacity
+              onPress={() => setShowProjectionModal(true)}
+              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
+              disabled={true}
+            >
+              <Text style={tw`text-gray-800 text-lg`}>
+                {taskToEdit?.projection_id
+                  ? projections.find((proj) => proj.id === taskToEdit.projection_id)?.activity
+                  : 'Selecciona una proyección'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Botones para cancelar o guardar */}
+            <View style={tw`flex-row justify-between mt-6`}>
+              <TouchableOpacity
+                onPress={closeEditModal}
+                style={tw`bg-gray-500 px-4 py-2 rounded-lg shadow-lg`}
+              >
+                <Text style={tw`text-white font-semibold`}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  handleUpdateTask();
+                  setIsEditModalOpen(false);
+                }}
+                style={tw`bg-green-500 px-4 py-2 rounded-lg shadow-lg`}
+              >
+                <Text style={tw`text-white font-semibold`}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       {/* Toast container */}
       <CustomToast />
 
       {/* Pantalla de carga */}
       {isTaskLoading && <LoadingScreen message={loadingMessage} />}
+      
     </ImageBackground>
   );
 };

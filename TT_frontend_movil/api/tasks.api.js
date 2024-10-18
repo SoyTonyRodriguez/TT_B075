@@ -33,7 +33,7 @@ export const getTasks = async (account_id) => {
     });
 };
 
-export const updateTaskStatus = async (taskId, updatedData) => {
+export const updateTask = async (taskId, updatedData) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
     
