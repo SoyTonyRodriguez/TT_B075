@@ -329,32 +329,35 @@ function UnidadesPromocion() {
 
   const validateForm = () => {
     let isValid = true;
-
-    if (!functionField) {
+  
+    if (functionField === '') {
       setFunctionError(true);
       isValid = false;
     }
-
-    if (!activity) {
+  
+    if (activity === '') {
       setActivityError(true);
       isValid = false;
     }
-
-    if (!role) {
+  
+    // Validar rol solo si hay opciones de rol
+    if (roleOptions.length > 0 && role === '') {
       setRoleError(true);
       isValid = false;
     }
-
-    if (!scope) {
+  
+    // Validar alcance solo si hay opciones de alcance
+    if (scopeOptions.length > 0 && scope === '') {
       setScopeError(true);
       isValid = false;
     }
-
-    if (!priority) {
+  
+    // Validar prioridad solo si el campo es visible
+    if (priority === '') {
       setPriorityError(true);
       isValid = false;
     }
-
+  
     return isValid;
   };
 
