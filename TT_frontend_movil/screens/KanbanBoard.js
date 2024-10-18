@@ -5,10 +5,11 @@ import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import Toast from 'react-native-toast-message'; 
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
+import CustomToast from '../components/CustomToast'; // Toast personalizado
 
 import { AuthContext } from '../components/AuthContext';
 
-import { getTasks, createTask } from '../api/tasks.api';
+import { getTasks, createTask, deleteTask } from '../api/tasks.api';
 import { getProduct } from '../api/products.api';
 
 const KanbanBoard = () => {
@@ -111,12 +112,49 @@ const KanbanBoard = () => {
         projection_id: '',
       });
       setIsModalOpen(false);
-      Alert.alert('Éxito', 'Tarea creada con éxito.');
+      Toast.show({
+        type: 'success',
+        text1: 'Tarea Creada',
+        text2: 'La tarea se ha creado correctamente.',
+      });
     } catch (error) {
       console.error('Error creando tarea:', error);
       Alert.alert('Error', 'No se pudo crear la tarea.');
     } finally {
       setIsTaskLoading(false);
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    // Almacena las tareas actuales para revertir si la API falla
+    const previousTasks = [...tasks];
+  
+    // Elimina la tarea localmente de inmediato
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    setTasks(updatedTasks);
+  
+    try {
+      // Intenta eliminar la tarea desde la API
+      await deleteTask(taskId);
+  
+      // Muestra un mensaje de éxito
+      Toast.show({
+        type: 'success',
+        text1: 'Tarea eliminada',
+        text2: 'La tarea se eliminó correctamente.',
+      });
+    } catch (error) {
+      console.error('Error eliminando tarea:', error);
+  
+      // Restaura las tareas originales en caso de error
+      setTasks(previousTasks);
+  
+      // Muestra un mensaje de error
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No se pudo eliminar la tarea. Inténtalo de nuevo.',
+      });
     }
   };
 
@@ -145,7 +183,7 @@ const KanbanBoard = () => {
         {/* Botón de eliminar */}
         <TouchableOpacity
           style={tw`absolute top-2 right-2`}
-          onPress={() => onDelete(task.id)}
+          onPress={() => handleDeleteTask(task.id)}
         >
           <Ionicons name="close-circle" size={24} color="red" />
         </TouchableOpacity>
@@ -380,7 +418,7 @@ const KanbanBoard = () => {
       )}
 
       {/* Toast container */}
-      <Toast />
+      <CustomToast />
 
       {/* Pantalla de carga */}
       {isTaskLoading && <LoadingScreen message={loadingMessage} />}
