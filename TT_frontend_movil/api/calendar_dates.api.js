@@ -3,7 +3,7 @@ import axios from "axios";
 // Initial set-up
 const accountsAPI = axios.create({
     //baseURL: 'http://192.168.1.11:8000/api/v1/'
-    baseURL: 'http://192.168.1.14:8000/api/v1/'
+    baseURL: 'http://192.168.1.143:8000/api/v1/'
 })
 
 // getall dates
