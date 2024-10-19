@@ -1,4 +1,5 @@
 import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 
 // Initial set-up
 const TasksAPI = axios.create({
