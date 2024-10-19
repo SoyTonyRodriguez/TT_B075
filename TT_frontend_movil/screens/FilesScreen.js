@@ -1,18 +1,128 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, ImageBackground, Alert, Platform } from 'react-native';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, ImageBackground, Image, Platform, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker'; 
 import * as MediaLibrary from 'expo-media-library'; // Importa MediaLibrary para permisos de archivos
 import tw from 'twrnc'; 
+import { WebView } from 'react-native-webview';
+
+import Toast from 'react-native-toast-message'; 
+import LoadingScreen from './LoadingScreen'; // Pantalla de carga
+import CustomToast from '../components/CustomToast'; // Toast personalizado
+
+import { AuthContext } from '../components/AuthContext'; // Contexto de autenticación (Pasar token entre pantallas)
+import { getDocuments, getDocument } from '../api/documents.api'; // Endpoints de documentos
+import { getProduct } from '../api/products.api'; // Endpoints de productos
 
 const Documents = () => {
   const [fileData, setFileData] = useState([]);
   const [selectedFileIndex, setSelectedFileIndex] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [fileTypeFilter, setFileTypeFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [showFileTypeDropdown, setShowFileTypeDropdown] = useState(false);
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [projections, setProjections] = useState([]); // Estado para las proyecciones
+  const [selectedProjection, setSelectedProjection] = useState(''); // Proyección seleccionada por el usuario
+
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [documentLoading, setDocumentLoading] = useState(false); // Estado de carga del documento
+
+  const [loading, setLoading] = useState(true); // Estado de carga inicial
+  const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
+
+  const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
+
+  // Obtener documentos desde la API
+  // Obtener documentos y proyecciones desde la API
+  useEffect(() => {
+    const fetchDocumentsAndProjections = async () => {
+      try {
+        setLoadingMessage("Cargando documentos ...");
+        setLoading(true); 
+
+        const [documentsResponse, projectionsResponse] = await Promise.all([
+          getDocuments(userId), // Llamada a la API de documentos
+          getProduct(userId), // Llamada a la API de proyecciones
+        ]);
+
+        // Crear un mapa de proyecciones por ID para referencia rápida
+        const projectionsMap = projectionsResponse.data.reduce((map, projection) => {
+          map[projection.id] = projection;
+          return map;
+        }, {});
+
+        // Formatear los documentos con la proyección correspondiente
+        const documents = documentsResponse.data.map((doc) => ({
+          id: doc.id,
+          name: doc.file_name,
+          size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
+          date: new Date(doc.upload_date).toLocaleDateString(),
+          type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
+          projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección', // Obtener el nombre de la proyección
+        }));
+
+        setFileData(documents);
+        setProjections(projectionsResponse.data);
+        setErrorMessage('');
+      } catch (error) {
+        console.error('Error al obtener documentos y proyecciones:', error);
+        setErrorMessage('No se pudieron cargar los documentos y proyecciones.');
+      } finally {
+        setLoading(false); 
+      }
+    };
+
+    fetchDocumentsAndProjections();
+  }, [userId]);
+
+  const handleDocumentClick = async (documentId) => {
+    try {
+      setDocumentLoading(true);
+      const response = await getDocument(documentId);
+      const { file, file_type } = response.data;
+
+      setSelectedDocument({ data: file, type: file_type });
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching document:', error);
+      setErrorMessage('Error al visualizar el documento.');
+    } finally {
+      setDocumentLoading(false);
+    }
+  };
+
+  const renderDocumentContent = () => {
+    if (!selectedDocument) return null;
+  
+    const { data, type } = selectedDocument;
+  
+    if (type === 'application/pdf') {
+      // Generar la URI en formato base64 para el PDF
+      const pdfUri = `data:application/pdf;base64,${data}`;
+      return (
+        <WebView
+          originWhitelist={['*']}
+          source={{ uri: pdfUri }}
+          style={{ flex: 1 }}
+          onError={(error) => console.log('Error en WebView:', error)}
+        />
+      );
+
+    } else if (type.startsWith('image/')) {
+      const imageUrl = `data:${type};base64,${data}`;
+      return (
+        <Image
+          source={{ uri: imageUrl }}
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="contain"
+        />
+      );
+    }
+  
+    return <Text>Tipo de archivo no soportado.</Text>;
+  };
 
   // Cerrar todos los dropdowns
   const closeDropdowns = () => {
@@ -147,6 +257,10 @@ const Documents = () => {
       style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
+
+      {/* Pantalla de carga */}
+      {loading && <LoadingScreen message={loadingMessage} />}
+
         {/* Título principal */}
       <View style={tw`flex-row justify-between items-center px-5 mt-10`}>
         <Text style={tw`text-2xl font-bold text-black`}>Mis documentos</Text>
@@ -231,39 +345,73 @@ const Documents = () => {
           ) : null}
 
           {/* Encabezado de la lista */}
-          <View style={tw`flex-row justify-between py-2 border-b border-gray-300`}>
-            <Text style={tw`font-bold`}>Nombre</Text>
-            <Text style={tw`font-bold`}>Tamaño</Text>
-            <Text style={tw`font-bold`}>Subido</Text>
+          <View style={tw`flex-row py-2 border-b border-gray-300`}>
+            {["Nombre", "Tamaño", "Subido", "Proyección"].map((header) => (
+              <View key={header} style={tw`flex-1 items-center`}>
+                <Text style={tw`font-bold text-sm`}>{header}</Text>
+              </View>
+            ))}
           </View>
 
           {/* Renderizar los documentos filtrados */}
-          {filteredFileData.length === 0 ? (
-            <Text style={tw`text-center py-4 text-gray-500`}>No tienes documentos cargados</Text>
+          {fileData.length === 0 ? (
+            <Text style={tw`text-center text-gray-500 mt-4`}>No tienes documentos cargados</Text>
           ) : (
             <FlatList
-              data={filteredFileData}
-              keyExtractor={(item, index) => item.name + index}
+              data={fileData}
+              keyExtractor={(item) => item.id}
               renderItem={({ item, index }) => (
                 <TouchableOpacity
-                  onPress={() => setSelectedFileIndex(index)}
-                  style={[
-                    tw`flex-row justify-between items-center py-3 border-b border-gray-300`,
-                    selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`
+                onPress={() => handleDocumentClick(item.id)}
+                style={[
+                    tw`flex-row items-center py-3 border-b border-gray-300`,
+                    selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`,
                   ]}
                 >
-                  <View style={tw`flex-row items-center`}>
-                    <Ionicons name={item.type === 'pdf' ? 'document' : 'image'} size={24} color={item.type === 'pdf' ? 'red' : 'blue'} />
-                    <Text style={tw`ml-2`}>{item.name}</Text>
+                  <View style={tw`flex-1 items-center justify-center`}>
+                    <Ionicons 
+                      name={item.type === 'pdf' ? 'document' : 'image'} 
+                      size={20} 
+                      color={item.type === 'pdf' ? 'red' : 'blue'} 
+                    />
+                    <Text 
+                      style={tw`ml-2`} 
+                      numberOfLines={1} 
+                      ellipsizeMode="tail"
+                    >
+                      {item.name}
+                    </Text>
                   </View>
-                  <Text>{item.size}</Text>
-                  <Text>{item.date}</Text>
+                  <View style={tw`flex-1 items-center`}>
+                    <Text numberOfLines={1} ellipsizeMode="tail">{item.size}</Text>
+                  </View>
+                  <View style={tw`flex-1 items-center`}>
+                    <Text numberOfLines={1} ellipsizeMode="tail">{item.date}</Text>
+                  </View>
+                  <View style={tw`flex-1 items-center`}>
+                    <Text numberOfLines={1} ellipsizeMode="tail">{item.projection}</Text>
+                  </View>
                 </TouchableOpacity>
               )}
             />
           )}
         </View>
       </View>
+
+      {/* Modal para visualizar documentos */}
+      <Modal visible={isModalOpen} animationType="slide" onRequestClose={() => setIsModalOpen(false)}>
+        <View style={{ flex: 1 }}>
+        <TouchableOpacity
+          onPress={() => setIsModalOpen(false)}
+          style={tw`bg-blue-500 p-3 mx-4 my-4 rounded-lg`}
+          >
+            <Text style={tw`text-white text-center text-lg`}>Cerrar</Text>
+          </TouchableOpacity>
+          {/* <TouchableOpacity title="Cerrar" onPress={() => setIsModalOpen(false)} /> */}
+          <View style={{ flex: 1, marginTop: 10 }}>{renderDocumentContent()}</View>
+        </View>
+      </Modal>
+      {/* {selectedFile && <LoadingScreen message={loadingMessage} />} */}
 
       {/* Botón flotante de nuevo archivo en la esquina inferior derecha */}
       <TouchableOpacity
