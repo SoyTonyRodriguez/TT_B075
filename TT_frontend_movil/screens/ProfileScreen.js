@@ -1,9 +1,38 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';  
 import tw from 'twrnc'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = () => {
+
+  const navigation = useNavigation(); 
+
+  const handleLogout = () => {
+    // Función para mostrar un diálogo de confirmación
+    Alert.alert(
+      "Cerrar Sesión",
+      "¿Estás seguro que quieres cerrar sesión?", 
+      [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancel Pressed"), 
+          style: "cancel"
+        },
+        { 
+          text: "Aceptar", 
+          onPress: async () => {
+            await AsyncStorage.removeItem('token'); 
+            navigation.replace('Login'); // Redirige a la pantalla de inicio de sesión
+          }
+        }
+      ],
+      { cancelable: false } 
+    );
+  };
+  
+
   return (
     <ImageBackground 
       source={require('../assets/images/fondo.jpg')} 
@@ -65,6 +94,7 @@ const ProfileScreen = ({ navigation }) => {
         {/* Cerrar sesión */}
         <TouchableOpacity 
           style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-5`}
+          onPress={handleLogout} 
         >
           <Ionicons name="log-out-outline" size={40} color="#fff" />
           <Text style={tw`mt-2 text-white text-center text-base`}>Cerrar sesión</Text>

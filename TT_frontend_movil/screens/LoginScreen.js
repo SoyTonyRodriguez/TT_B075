@@ -1,4 +1,4 @@
- import React, { useState } from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput, Image, ImageBackground, TouchableOpacity, ScrollView, Dimensions, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native'; 
@@ -10,9 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa
 import CustomToast from '../components/CustomToast'; // Toast personalizado
 import Toast from 'react-native-toast-message'; 
 
-
 const { width, height } = Dimensions.get('window');
-
 
 // Helper function to display styled error messages
 const renderErrorMessage = (error) => {
