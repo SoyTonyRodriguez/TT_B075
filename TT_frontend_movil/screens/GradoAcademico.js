@@ -44,16 +44,6 @@ export default function ProyeccionGrado() {
 
       <ScrollView style={tw`px-5`}>
         <View style={tw`mb-4`}>
-          {/* Campo de Nombre */}
-          <Text style={tw`text-base font-bold text-black`}>Nombre completo</Text>
-          <View style={tw`mb-4 flex-row items-center`}>
-            <TextInput
-              placeholder="Nombre completo"
-              value={nombre}
-              onChangeText={setNombre}
-              style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 flex-row justify-between items-center bg-white`}
-            />
-          </View>
 
           {/* Selector de Grado Académico */}
           <Text style={tw`text-base font-bold text-black`}>Seleccione su grado académico obtenido</Text>
