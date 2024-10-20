@@ -49,39 +49,39 @@ function Documents() {
     }, []);
 
   // Obtener tanto los documentos como las proyecciones y hacer el enlace
+  const fetchDocumentsAndProjections = async () => {
+    try {
+      setLoading(true);
+      const [documentsResponse, projectionsResponse] = await Promise.all([
+        getDocuments(accountId),
+        getProduct(accountId),
+      ]);
+
+      const projectionsMap = projectionsResponse.data.reduce((map, projection) => {
+        map[projection.id] = projection;
+        return map;
+      }, {});
+
+      const documents = documentsResponse.data.map(doc => ({
+        id: doc.id,
+        name: doc.file_name,
+        size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
+        date: new Date(doc.upload_date).toLocaleDateString(),
+        type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
+        projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección', // Obtenemos la proyección
+      }));
+
+      setFileData(documents);
+      setProjections(projectionsResponse.data);
+    } catch (error) {
+      console.error('Error al obtener los documentos y proyecciones:', error);
+      setErrorMessage('Error al cargar los documentos.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDocumentsAndProjections = async () => {
-      try {
-        setLoading(true);
-        const [documentsResponse, projectionsResponse] = await Promise.all([
-          getDocuments(accountId),
-          getProduct(accountId),
-        ]);
-
-        const projectionsMap = projectionsResponse.data.reduce((map, projection) => {
-          map[projection.id] = projection;
-          return map;
-        }, {});
-
-        const documents = documentsResponse.data.map(doc => ({
-          id: doc.id,
-          name: doc.file_name,
-          size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
-          date: new Date(doc.upload_date).toLocaleDateString(),
-          type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
-          projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección', // Obtenemos la proyección
-        }));
-
-        setFileData(documents);
-        setProjections(projectionsResponse.data);
-      } catch (error) {
-        console.error('Error al obtener los documentos y proyecciones:', error);
-        setErrorMessage('Error al cargar los documentos.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (accountId) {
       fetchDocumentsAndProjections();
     }
@@ -241,6 +241,15 @@ function Documents() {
     }
     return true;
   });
+
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };  
   
   // Función para manejar la subida de archivos
   const handleFileUpload = async (event) => {
@@ -256,6 +265,9 @@ function Documents() {
     for (const file of files) {
       const fileType = file.type;
       const fileSizeInKB = file.size / 1024;
+
+      const fileBase64 = await convertFileToBase64(file);
+      const base64Content = fileBase64.split(",")[1]; // Extrae el contenido Base64 sin el encabezado
 
       if (fileType === "application/pdf") {
         if (fileSizeInKB <= 2048) {
@@ -293,20 +305,18 @@ function Documents() {
       formData.append('file_type', fileType);
       formData.append('size', file.size);
       formData.append('projection_id', selectedProjection); // Se envía la proyección seleccionada
-      formData.append('file', file);
+      formData.append('file', base64Content);
+      console.log('formData:', formData.get('file'));
 
       try {
         setIsDocumentLoading(true);
         const response = await uploadDocument(formData);
         console.log('Archivo subido con éxito', response.data);
-        setFileData([...fileData, {
-          id: response.data.id,
-          name: file.name,
-          size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-          date: new Date().toLocaleDateString(),
-          type: fileType === 'application/pdf' ? 'pdf' : 'image',
-        }]);
+
         setErrorMessage("");
+
+        await fetchDocumentsAndProjections(); // Actualizar la lista de documentos
+
       } catch (error) {
         console.error('Error al subir el archivo:', error);
         setErrorMessage("Error al subir el archivo.");

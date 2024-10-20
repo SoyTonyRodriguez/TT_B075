@@ -5,13 +5,14 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as MediaLibrary from 'expo-media-library'; // Importa MediaLibrary para permisos de archivos
 import tw from 'twrnc'; 
 import { WebView } from 'react-native-webview';
+import * as FileSystem from 'expo-file-system';
 
 import Toast from 'react-native-toast-message'; 
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import CustomToast from '../components/CustomToast'; // Toast personalizado
 
 import { AuthContext } from '../components/AuthContext'; // Contexto de autenticación (Pasar token entre pantallas)
-import { getDocuments, getDocument } from '../api/documents.api'; // Endpoints de documentos
+import { getDocuments, getDocument, uploadDocument } from '../api/documents.api'; // Endpoints de documentos
 import { getProduct } from '../api/products.api'; // Endpoints de productos
 
 const Documents = () => {
@@ -23,7 +24,9 @@ const Documents = () => {
   const [showFileTypeDropdown, setShowFileTypeDropdown] = useState(false);
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [projections, setProjections] = useState([]); // Estado para las proyecciones
-  const [selectedProjection, setSelectedProjection] = useState(''); // Proyección seleccionada por el usuario
+  const [selectedProjection, setSelectedProjection] = useState(''); // Proyección seleccionada
+
+  const [isProjectionModalOpen, setIsProjectionModalOpen] = useState(false); // Estado del modal de proyecciones
 
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,49 +39,49 @@ const Documents = () => {
 
   // Obtener documentos desde la API
   // Obtener documentos y proyecciones desde la API
+  const fetchDocumentsAndProjections = async () => {
+    try {
+      setLoadingMessage("Cargando documentos ...");
+      setLoading(true); 
+  
+      const [documentsResponse, projectionsResponse] = await Promise.all([
+        getDocuments(userId), // Llamada a la API de documentos
+        getProduct(userId), // Llamada a la API de proyecciones
+      ]);
+  
+      // Crear un mapa de proyecciones por ID para referencia rápida
+      const projectionsMap = projectionsResponse.data.reduce((map, projection) => {
+        map[projection.id] = projection;
+        return map;
+      }, {});
+  
+      // Formatear los documentos con la proyección correspondiente
+      const documents = documentsResponse.data.map((doc) => ({
+        id: doc.id,
+        name: doc.file_name,
+        size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
+        date: new Date(doc.upload_date).toLocaleDateString(),
+        type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
+        projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección',
+      }));
+  
+      setFileData(documents);
+      setProjections(projectionsResponse.data);
+      setErrorMessage('');
+    } catch (error) {
+      console.error('Error al obtener documentos y proyecciones:', error);
+      setErrorMessage('No se pudieron cargar los documentos y proyecciones.');
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchDocumentsAndProjections = async () => {
-      try {
-        setLoadingMessage("Cargando documentos ...");
-        setLoading(true); 
-
-        const [documentsResponse, projectionsResponse] = await Promise.all([
-          getDocuments(userId), // Llamada a la API de documentos
-          getProduct(userId), // Llamada a la API de proyecciones
-        ]);
-
-        // Crear un mapa de proyecciones por ID para referencia rápida
-        const projectionsMap = projectionsResponse.data.reduce((map, projection) => {
-          map[projection.id] = projection;
-          return map;
-        }, {});
-
-        // Formatear los documentos con la proyección correspondiente
-        const documents = documentsResponse.data.map((doc) => ({
-          id: doc.id,
-          name: doc.file_name,
-          size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
-          date: new Date(doc.upload_date).toLocaleDateString(),
-          type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
-          projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección', // Obtener el nombre de la proyección
-        }));
-
-        setFileData(documents);
-        setProjections(projectionsResponse.data);
-        setErrorMessage('');
-      } catch (error) {
-        console.error('Error al obtener documentos y proyecciones:', error);
-        setErrorMessage('No se pudieron cargar los documentos y proyecciones.');
-      } finally {
-        setLoading(false); 
-      }
-    };
-
     fetchDocumentsAndProjections();
   }, [userId]);
 
   const handleDocumentClick = async (documentId) => {
     try {
+      setLoadingMessage("Abriendo documento ...");
       setDocumentLoading(true);
       const response = await getDocument(documentId);
       const { file, file_type } = response.data;
@@ -186,13 +189,18 @@ const Documents = () => {
 
   // Subir y validar archivos
   const handleFileUpload = useCallback(async () => {
+    if (!selectedProjection) {
+      setErrorMessage('Seleccione una proyección antes de subir un archivo.');
+      return;
+    }
+
     try {
       let result = await DocumentPicker.getDocumentAsync({
         type: ['application/pdf', 'image/jpeg', 'image/jpg'],
-        copyToCacheDirectory: false,
+        copyToCacheDirectory: true, // Asegúrate de copiar al directorio de caché si es necesario
       });
-  
-      if (result.type === 'success') {
+
+      if (!result.canceled) {
         console.log('Archivo seleccionado:', result);
   
         const getFileTypeFromName = (name) => {
@@ -208,48 +216,94 @@ const Documents = () => {
           }
         };
   
-        const fileType = result.mimeType || getFileTypeFromName(result.name);
-        const fileSizeInKB = result.size / 1024;
+        const fileType = result.assets[0].mimeType || getFileTypeFromName(result.assets[0].name);
+        const fileSizeInKB = result.assets[0].size / 1024;
   
-        // Lógica de validación de archivos
-        if (fileType === "application/pdf") {
+        console.log('result', result);
+        // Validación del archivo
+        if (fileType === 'application/pdf') {
           if (fileSizeInKB <= 2048) {
-            setFileData(prevFiles => [...prevFiles, {
-              name: result.name,
-              size: `${(result.size / 1024 / 1024).toFixed(2)} Mb`,
-              date: new Date().toLocaleDateString(),
-              type: 'pdf'
-            }]);
-            setErrorMessage('');
+            await uploadFileToAPI(result.assets[0], fileType);
           } else {
-            setErrorMessage("El archivo PDF debe ser de un tamaño máximo de 2MB.");
+            setErrorMessage('El archivo PDF debe ser de un tamaño máximo de 2MB.');
           }
-        } else if (fileType === "image/jpeg") {
+        } else if (fileType === 'image/jpeg') {
           if (fileSizeInKB >= 50 && fileSizeInKB <= 700) {
-            setFileData(prevFiles => [...prevFiles, {
-              name: result.name,
-              size: `${(result.size / 1024).toFixed(2)} Kb`,
-              date: new Date().toLocaleDateString(),
-              type: 'image'
-            }]);
-            setErrorMessage('');
+            await uploadFileToAPI(result.assets[0], fileType);
           } else {
-            setErrorMessage("Las imágenes deben tener un tamaño entre 50KB y 700KB.");
+            setErrorMessage('Las imágenes deben tener un tamaño entre 50KB y 700KB.');
           }
         } else {
-          setErrorMessage("Solo se permiten archivos PDF y JPG/JPEG.");
+          setErrorMessage('Solo se permiten archivos PDF y JPG/JPEG.');
         }
-      } else if (result.type === 'cancel') {
+
+      } else if (result.canceled) {
         console.log('Selección de archivo cancelada');
       } else {
-        console.log('Resultado inesperado del DocumentPicker:', result.type);
+        console.log('Resultado inesperado del DocumentPicker:', result.assets[0].mimeType);
       }
     } catch (error) {
       console.error('Error en handleFileUpload:', error);
       setErrorMessage(`Error al seleccionar el archivo: ${error.message}`);
     }
-  }, [fileData]);
+  }, [selectedProjection]);
+
+  const uploadFileToAPI = async (file, fileType) => {
+    console.log('Subiendo archivo:', file);
   
+    try {
+      // Leer el archivo y convertirlo a base64
+      const fileUri = file.uri;
+      const fileData = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+  
+      const document = {
+        file_name: file.name,
+        file_type: fileType,
+        size: file.size,
+        file: fileData, // Archivo en formato base64
+        projection_id: projections.find(p => p.id === selectedProjection).id,
+        account_id: userId,
+      };
+  
+      setLoading(true); // Mostrar pantalla de carga
+      setLoadingMessage('Subiendo documento...');
+  
+      const response = await uploadDocument(document); // Llamada a la API para subir
+      console.log('Documento subido:', response);
+  
+      Toast.show({
+        type: 'success',
+        text1: 'Documento subido',
+        text2: 'El archivo se subió exitosamente.',
+      });
+  
+      // Ejecutar fetchDocumentsAndProjections para actualizar la lista de documentos
+      await fetchDocumentsAndProjections();
+    } catch (error) {
+      console.error('Error al subir el documento:', error);
+
+      // Manejamos diferentes tipos de errores
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        'Error desconocido al subir el documento.';
+      
+      setErrorMessage(errorMsg); // Mostrar mensaje de error
+    } finally {
+      setLoading(false); // Ocultar pantalla de carga
+    }
+  };
+
+  const openProjectionModal = () => {
+    setIsProjectionModalOpen(true);
+  };
+
+  const selectProjection = (projection) => {
+    setSelectedProjection(projection.id);
+    setIsProjectionModalOpen(false);
+  };
 
   return (
     <ImageBackground 
@@ -338,6 +392,20 @@ const Documents = () => {
           </TouchableOpacity>
         </View>
 
+        {/* Botón para abrir el modal de proyecciones */}
+        <Text style={tw`block text-gray-700 font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
+        <TouchableOpacity
+          onPress={openProjectionModal}
+          style={tw`bg-white p-4 rounded-lg mb-4 border border-gray-300 flex-row justify-between items-center`}
+        >
+          <Text>
+            {selectedProjection 
+              ? projections.find(p => p.id === selectedProjection)?.activity 
+              : 'Seleccione una proyección'}
+          </Text>
+          <Ionicons name="chevron-down" size={20} color="gray" />
+        </TouchableOpacity>
+
         {/* Lista de documentos */}
         <View style={tw`bg-white p-4 rounded-lg shadow-lg`}>
           {errorMessage ? (
@@ -411,14 +479,45 @@ const Documents = () => {
           <View style={{ flex: 1, marginTop: 10 }}>{renderDocumentContent()}</View>
         </View>
       </Modal>
-      {/* {selectedFile && <LoadingScreen message={loadingMessage} />} */}
+      {documentLoading && <LoadingScreen message={loadingMessage} />}
+
+      {/* Modal para seleccionar proyección */}
+      <Modal
+          visible={isProjectionModalOpen}
+          animationType="slide"
+          onRequestClose={() => setIsProjectionModalOpen(false)}
+        >
+          <View style={tw`flex-1 p-6`}>
+            <Text style={tw`text-xl font-bold mb-4`}>Seleccione una Proyección</Text>
+            <FlatList
+              data={projections}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => selectProjection(item)}
+                  style={tw`p-4 border-b border-gray-300`}
+                >
+                  <Text>{item.activity}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              onPress={() => setIsProjectionModalOpen(false)}
+              style={tw`bg-red-500 p-3 mt-4 rounded-lg`}
+            >
+              <Text style={tw`text-white text-center`}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
 
       {/* Botón flotante de nuevo archivo en la esquina inferior derecha */}
       <TouchableOpacity
         onPress={handleFileUpload}
+        disabled={!selectedProjection} // Botón deshabilitado si no se selecciona proyección
         style={[
           tw`bg-blue-500 p-4 rounded-full shadow-lg`,
           { position: 'absolute', bottom: 20, right: 20 },
+          selectedProjection ? tw`bg-blue-500` : tw`bg-gray-300 opacity-50`
         ]}
       >
         <Ionicons name="add" size={30} color="white" />

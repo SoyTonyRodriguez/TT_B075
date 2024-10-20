@@ -294,7 +294,7 @@ const KanbanBoard = () => {
         {showDone && (
           <View style={tw`bg-white p-4 rounded-xl mt-2`}>
             {tasks.filter(task => task.status === 'done').map(task => (
-              <Text key={task.id} style={tw`text-gray-600`}>{task.title}</Text>
+              <TaskCard key={task.id} task={task} />
             ))}
           </View>
         )}
