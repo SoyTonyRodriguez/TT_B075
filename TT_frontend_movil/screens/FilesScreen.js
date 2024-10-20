@@ -12,7 +12,7 @@ import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import CustomToast from '../components/CustomToast'; // Toast personalizado
 
 import { AuthContext } from '../components/AuthContext'; // Contexto de autenticación (Pasar token entre pantallas)
-import { getDocuments, getDocument, uploadDocument } from '../api/documents.api'; // Endpoints de documentos
+import { getDocuments, getDocument, uploadDocument, deleteDocument, replaceDocument } from '../api/documents.api'; // Endpoints de documentos
 import { getProduct } from '../api/products.api'; // Endpoints de productos
 
 const Documents = () => {
@@ -27,6 +27,8 @@ const Documents = () => {
   const [selectedProjection, setSelectedProjection] = useState(''); // Proyección seleccionada
 
   const [isProjectionModalOpen, setIsProjectionModalOpen] = useState(false); // Estado del modal de proyecciones
+  const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false); // Modal para opciones de documento
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null); // ID del documento seleccionado
 
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -296,6 +298,85 @@ const Documents = () => {
     }
   };
 
+  const handleDeleteDocument = async () => {
+    try {
+      setLoading(true);
+      setLoadingMessage('Eliminando documento...');
+      setIsOptionsModalOpen(false);
+
+      await deleteDocument(selectedDocumentId); // Llamada al endpoint delete
+
+      Toast.show({
+        type: 'success',
+        text1: 'Documento Eliminado',
+        text2: 'El documento fue eliminado correctamente.',
+      });
+
+      await fetchDocumentsAndProjections();
+    } catch (error) {
+      console.error('Error al eliminar documento:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No se pudo eliminar el documento.',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReplaceDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'image/jpeg', 'image/jpg'],
+      });
+      console.log('Archivo seleccionado:', result);
+  
+      if (!result.canceled) {
+        const fileData = await FileSystem.readAsStringAsync(result.assets[0].uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+  
+        const document = {
+          file_name: result.assets[0].name || 'documento_reemplazo',
+          file_type: result.assets[0].mimeType || 'application/octet-stream',
+          size: result.assets[0].size || 0,
+          file: fileData,
+        };
+  
+        setLoading(true);
+        setLoadingMessage('Reemplazando documento...');
+        setIsOptionsModalOpen(false);
+  
+        await replaceDocument(selectedDocumentId, document);
+  
+        Toast.show({
+          type: 'success',
+          text1: 'Documento Reemplazado',
+          text2: 'El documento fue reemplazado exitosamente.',
+        });
+  
+        await fetchDocumentsAndProjections();
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'No se seleccionó un archivo válido.',
+        });
+      }
+    } catch (error) {
+      console.error('Error al reemplazar documento:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No se pudo reemplazar el documento.',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const openProjectionModal = () => {
     setIsProjectionModalOpen(true);
   };
@@ -303,6 +384,11 @@ const Documents = () => {
   const selectProjection = (projection) => {
     setSelectedProjection(projection.id);
     setIsProjectionModalOpen(false);
+  };
+
+  const openOptionsModal = (documentId) => {
+    setSelectedDocumentId(documentId);
+    setIsOptionsModalOpen(true);
   };
 
   return (
@@ -431,6 +517,7 @@ const Documents = () => {
               renderItem={({ item, index }) => (
                 <TouchableOpacity
                 onPress={() => handleDocumentClick(item.id)}
+                onLongPress={() => openOptionsModal(item.id)} 
                 style={[
                     tw`flex-row items-center py-3 border-b border-gray-300`,
                     selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`,
@@ -510,6 +597,38 @@ const Documents = () => {
           </View>
         </Modal>
 
+        {/* Modal para opciones de documento */}
+        <Modal
+          visible={isOptionsModalOpen}
+          animationType="slide"
+          onRequestClose={() => setIsOptionsModalOpen(false)}
+        >
+          <View style={tw`flex-1 p-6`}>
+            <Text style={tw`text-xl font-bold mb-4`}>Opciones del Documento</Text>
+
+            <TouchableOpacity
+              onPress={handleDeleteDocument}
+              style={tw`bg-red-500 p-4 rounded-lg mb-4`}
+            >
+              <Text style={tw`text-white text-center`}>Eliminar Documento</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleReplaceDocument}
+              style={tw`bg-blue-500 p-4 rounded-lg`}
+            >
+              <Text style={tw`text-white text-center`}>Reemplazar Documento</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setIsOptionsModalOpen(false)}
+              style={tw`mt-6 p-3 bg-gray-300 rounded-lg`}
+            >
+              <Text style={tw`text-center`}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
       {/* Botón flotante de nuevo archivo en la esquina inferior derecha */}
       <TouchableOpacity
         onPress={handleFileUpload}
@@ -522,6 +641,9 @@ const Documents = () => {
       >
         <Ionicons name="add" size={30} color="white" />
       </TouchableOpacity>
+
+    {/* Toast container */}
+    <CustomToast />
     </ImageBackground>
   );
 };

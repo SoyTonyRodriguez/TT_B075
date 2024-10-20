@@ -10,6 +10,7 @@ import os
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 import base64
+from django.core.files.base import ContentFile
 
 
 class DocumentUploadAPIView(APIView):
@@ -59,12 +60,39 @@ class DocumentReplace(RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         document = self.get_object()
+
+        # Verificar permisos
         if document.account_id != self.request.user.id:
             raise PermissionDenied("No tienes permiso para editar este documento.")
 
-        # Eliminar la lógica de eliminar archivos del sistema de archivos
-        # Ya que ahora los archivos están en MongoDB como binarios
-        serializer.save()
+        try:
+            # Obtener los datos del request
+            file_name = self.request.data.get('file_name')
+            file_type = self.request.data.get('file_type')
+            size = self.request.data.get('size')
+            encoded_file = self.request.data.get('file')
+
+            if not all([file_name, file_type, size, encoded_file]):
+                raise ValueError("Faltan datos para actualizar el documento.")
+
+            # Decodificar el archivo base64
+            binary_file = base64.b64decode(encoded_file)
+
+            # Actualizar los campos del documento
+            serializer.save(
+                file_name=file_name,
+                file_type=file_type,
+                size=size,
+                file=binary_file  # Guardar el archivo como binario en MongoDB
+            )
+
+            return Response({"message": "Documento actualizado correctamente."}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
     
 class DocumentDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
