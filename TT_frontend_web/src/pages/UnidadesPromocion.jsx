@@ -54,7 +54,8 @@ function UnidadesPromocion() {
 
    // Mapeo de nombres legibles a claves en actividadesPorFuncion
   const functionMapping = {
-    'Docencia (carga académica y otras actividades)': 'docencia',
+    'Docencia': 'docencia',
+    'Otras actividades en docencia': 'otras',
     'Investigación': 'investigacion',
     'Superación académica': 'superacion',
     'Actividades complementarias de apoyo a la docencia y a la investigación': 'complementarias',
@@ -65,9 +66,11 @@ function UnidadesPromocion() {
   const actividadesPorFuncion = {
     docencia: [ //OKKKKK
       { actividad: "Carga académica", documento: "Registro Único de Actividades Académicas (RUAA) o constancia de carga académica suscrita por las autoridades competentes.", up: ['1.00 U.P. por hora en nivel superior.', '1.00 por cada 15 horas de módulos '] },
+    ],   
+    otras: [
       { actividad: "Elaboración e Impartición de acciones de formación", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", up: ['4.50 U.P. por cada 15 horas impartidas con evaluación.', '2.00 U.P. por cada 15 horas sin evaluación.'] },
       { actividad: "Programa de inducción", documento: "Constancia de validación emitida por la DEMS, DES o SIP.", up: ['1.00 U.P. por hora/semana/mes en nivel superior.'] },
-      { actividad: "Tutorías", documento: "Constancia emitida por la Coordinación Institucional de Tutoría Politécnica (CITP).", up: ['1.00 U.P. por cada hora de tutoría individual a la semana. Máximo: 5.00 U.P. por semestre.', '1.00 U.P. en tutoría grupal por cada hora a la semana en el semestre. Máximo: 5.00 U.P.', '3.00 U.P. en tutoría de regularización por unidad de aprendizaje al semestre.', '5.00 U.P. en tutoría de recuperación académica por unidad de aprendizaje al semestre.', '3.00 U.P. en tutoría a distancia por grupo atendido al semestre.']},
+      { actividad: "Tutorías", documento: "Constancia emitida por la Coordinación Institucional de Tutoría Politécnica (CITP).", up: ['1.00 U.P. por cada hora de tutoría individual a la semana.', '1.00 U.P. en tutoría grupal por cada hora a la semana en el semestre.', '3.00 U.P. en tutoría de regularización por unidad de aprendizaje al semestre.', '5.00 U.P. en tutoría de recuperación académica por unidad de aprendizaje al semestre.', '3.00 U.P. en tutoría a distancia por grupo atendido al semestre.']},
       { actividad: "Diseño y planeación didáctica en el aula", documento: "Constancia emitida por la DEMS, DES o SIP.", up: ['10.00 U.P. por grupo al semestre.', 'Máximo: 20.00 U.P. por periodo de promoción.'] },
       { actividad: "Elaboración de material didáctico para la impartición de catedra", documento: "Constancia emitida por el presidente de la academia o equivalente, con el aval de los integrantes de la misma y el visto bueno del Subdirector Académico.", up: ['5.00 U.P. por transparencias, rotafolios.', '8.00 U.P. por antología de la asignatura', '10.00 U.P. por problemario.', '15.00 U.P. por modelos tridimensionales.', '20.00 U.P. por prototipos.', 'Máximo: 25.00 U.P. por periodo de promoción.'] },
       { actividad: "Elaboración de material didáctico digital", documento: "Constancia emitida por la DEMS, DES o SIP.", up: ['Tratamiento educativo: Curso completo 60.00 U.P.', 'Apoyo educativo: Curso completo 40.00 U.P.', 'Informativos: Curso completo 20.00 U.P.', 'Tratamiento educativo: Unidad o Módulo 40.00 U.P.', 'Apoyo educativo: Unidad o Módulo 20.00 U.P.', 'Indormativos: Unidad o Módulo 5.00 U.P.'] },
@@ -80,7 +83,7 @@ function UnidadesPromocion() {
       { actividad: "Producción de Unidades de Aprendizaje en línea", documento: "Constancia emitida por la UPEV con el visto bueno de la DEMS, DES o SIP.", rol: "Profesor-autor o Diseñador o Comunicólo o Programador web o Diseñador gráfico o Supervisor", up: ['Profesor-autor 8.00 U.P.', 'Diseñador 8.00 U.P.', 'Comunicólo 5.00 U.P.', 'Programador web 5.00 U.P.', 'Diseñador gráfico 5.00 U.P.', 'Supervisor 3.00 U.P.'] },
       { actividad: "Proyecto Aula", documento: "Constancia emitida por la DEMS.", up: "5.00 U.P. por proyecto semestral" },
       { actividad: "Certificación de laboratorios y validación de pruebas de laboratorio", documento: "Certificado emitido por una entidad reconocida y constancia del titular del centro de trabajo.", up: ['20.00 U.P. para certificación de laboratorios.', '5.00 U.P. para validación de pruebas de laboratorio'] },
-    ],    
+    ],
     investigacion: [ // TODO BIEN
       { actividad: "Proyectos de investigación con financiamiento interno", documento: "Constancia emitida por la SIP.", up: ['5.00 U.P. con el 20% de avance inicial como director.', '3.00 U.P. con el 20% de avance inicial como participante.', '25.00 U.P. por proyecto terminado como director.', '15.00 U.P. por proyecto terminado como participante.', 'Máximo 2 proyectos como director y 3 proyectos como participante.'], rol: "Director o Participante", alcance: "Nacional" }, // OK //'Máximo 2 proyectos como director y 3 proyectos como participante por periodo de promoción.'
       { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio\n Carta de aceptación del informe final o carta de finiquito\n Informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante", alcance: "Nacional" }, //OK
@@ -186,8 +189,11 @@ function UnidadesPromocion() {
       setDocumentsRequired(activityInfo.documento);
 
       // Si `up` es un array, lo usamos como opciones; si es un string, lo convertimos en array
-      const upsArray = Array.isArray(activityInfo.up) ? activityInfo.up : [activityInfo.up];
-      setUnitsOptions(upsArray);
+      let upsArray = Array.isArray(activityInfo.up) ? activityInfo.up : [activityInfo.up];
+      
+      // Filtrar las opciones que no contengan la palabra "máximo"
+      const filteredUpsArray = upsArray.filter((up) => !up.toLowerCase().includes('máximo'));
+      setUnitsOptions(filteredUpsArray);
 
       // Aseguramos que solo se almacena un "Máximo" si existe
       const maxOption = upsArray.find((up) => up.toLowerCase().includes('máximo'));
@@ -447,7 +453,8 @@ function UnidadesPromocion() {
                 className="w-full p-2 rounded-lg border border-gray-400"
               >
                 <option value="" disabled>Selecciona una función</option>
-                <option value="Docencia (carga académica y otras actividades)">Docencia (carga académica y otras actividades)</option>
+                <option value="Docencia">Docencia</option>
+                <option value="Otras actividades en docencia">Otras actividades en docencia</option>
                 <option value="Investigación">Investigación</option>
                 <option value="Superación académica">Superación académica</option>
                 <option value="Actividades complementarias de apoyo a la docencia y a la investigación">Actividades complementarias de apoyo a la docencia y a la investigación</option>
