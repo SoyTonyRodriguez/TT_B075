@@ -13,15 +13,19 @@ class RegisterDocumentSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         request = self.context.get('request')
-        file = request.FILES.get('file')
-        if file:
-            validated_data['file_name'] = file.name
-            validated_data['file_type'] = file.content_type
-            validated_data['size'] = file.size
-            validated_data['file'] = file.read()  # Lee el archivo como binario
+        file = request.FILES.get('file')  # Asegúrate de obtener el archivo correctamente
+
+        if not file:
+            raise serializers.ValidationError({"file": "Debe subir un archivo válido."})
+
+        validated_data['file_name'] = file.name
+        validated_data['file_type'] = file.content_type
+        validated_data['size'] = file.size
+        validated_data['file'] = file.read()  # Leer como binario
 
         account_id = request.auth.get('user_id') if request.auth else request.user.id
         validated_data['account_id'] = account_id
+
         return super().create(validated_data)
     
     def update(self, instance, validated_data):
@@ -38,11 +42,6 @@ class RegisterDocumentSerializer(serializers.ModelSerializer):
 
         # Actualiza el objeto
         return super().update(instance, validated_data)
-
-    def validate(self, data):
-        if 'file' not in self.context.get('request').FILES:
-            raise serializers.ValidationError("Debe subir un archivo.")
-        return data
 
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:

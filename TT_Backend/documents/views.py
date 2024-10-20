@@ -9,17 +9,37 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 import os
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+import base64
 
 
 class DocumentUploadAPIView(APIView):
     parser_classes = [JSONParser, MultiPartParser, FormParser]
     permission_classes = (IsAuthenticated,)
     
-    def post(self, request):
-        serializer = RegisterDocumentSerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+    def post(self, request, *args, **kwargs):
+        try:
+            file_name = request.data['file_name']
+            file_type = request.data['file_type']
+            size = request.data['size']
+            account_id = request.data['account_id']
+            projection_id = request.data['projection_id']
+
+            # Decodificar archivo Base64
+            binary_file = base64.b64decode(request.data['file'])
+
+            # Guardar documento en la base de datos
+            document = Document.objects.create(
+                file_name=file_name,
+                file_type=file_type,
+                size=size,
+                account_id=account_id,
+                projection_id=projection_id,
+                file=binary_file,
+            )
+
+            return Response({"message": "¡Documento subido exitosamente!"}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DocumentListCreateAPIView(ListAPIView):
     permission_classes = (IsAuthenticated,)
