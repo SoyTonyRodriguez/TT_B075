@@ -7,7 +7,6 @@ import LoadingAnimation from "../components/LoadingAnimation";
 
 import { jwtDecode } from "jwt-decode";
 import { getAccount } from "../../../api/accounts.api";
-import { getProjection } from "../../../api/projections.api";
 
 
 function MainContent() {
@@ -22,29 +21,26 @@ function MainContent() {
     const [phone, setPhone] = useState('');
     const [units_projection, setUnitsProjection] = useState('');
     const [projection_id, setProjectionId] = useState('');
-    const [projectionData, setProjectionData] = useState({});
 
     // Loading state
     const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
+      // Verify if the userName is stored in the localStorage
       const storedAccountData = localStorage.getItem('accountDetails');
-      const storedProjectionData = localStorage.getItem('projectionDetails');
 
+      // If the account is stored, set data and skip loading animation
       if (storedAccountData) {
-          const { userName, fullName, email, category, phone, units_projection, projection_id } = JSON.parse(storedAccountData);
-          setUserName(userName);
-          setFullName(fullName);
-          setEmail(email);
-          setCategory(category);
-          setPhone(phone);
-          setUnitsProjection(units_projection);
-          setProjectionId(projection_id);
-      }
-
-      if (storedProjectionData) {
-          setProjectionData(JSON.parse(storedProjectionData));
-          console.log('Projection data:', storedProjectionData);
+        const { userName, fullName, email, category, phone, units_projection, projection_id } = JSON.parse(storedAccountData);
+        setUserName(userName);
+        setFullName(fullName);
+        setEmail(email);
+        setCategory(category);
+        setPhone(phone);
+        setUnitsProjection(units_projection);
+        setProjectionId(projection_id);
+        setLoading(false);
+        console.log('Account details loaded from localStorage' + storedAccountData);
       } else {
           const token = localStorage.getItem('token');
           if (token) {
@@ -56,8 +52,6 @@ function MainContent() {
               }
           }
       }
-
-      setLoading(false);
     }, []);
 
     useEffect(() => {
@@ -107,23 +101,6 @@ function MainContent() {
           fetchAccountDetails();
       }
   }, [userId, userName]);
-
-  useEffect(() => {
-    if (projection_id) {
-        const fetchProjectionDetails = async () => {
-            try {
-                const response = await getProjection(userId);
-                const data = response.data || {}; // Manejar objeto vacío
-
-                setProjectionData(data);
-                localStorage.setItem('projectionDetails', JSON.stringify(data));
-            } catch (error) {
-                console.error('Error fetching projection details:', error);
-            }
-        };
-        fetchProjectionDetails();
-    }
-  }, [projection_id]);
 
     // Show loading animation while fetching the account details
     if (loading) {

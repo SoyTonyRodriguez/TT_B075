@@ -3,19 +3,13 @@ import { Link } from 'react-router-dom';
 import { IoCreateOutline, IoGlassesOutline, IoHelpCircleOutline } from "react-icons/io5";
 import { motion } from 'framer-motion';
 import Navigation from './Navigation/Navigation'; 
-import { jwtDecode } from "jwt-decode";
-
 
 function ProyeccionSeguimiento() {
-  // Get user ID from the token
-  const [userId, setUserId] = useState(null);
-
   const [hoveredButton, setHoveredButton] = useState(null); 
 
 
     // Store data account
   const [projection_id, setProjectionId] = useState('');
-  const [projectionExists, setProjectionExists] = useState(false); // Estado para saber si existe una proyección
 
   // Loading state
   const [loading, setLoading] = useState(true); 
@@ -43,17 +37,6 @@ function ProyeccionSeguimiento() {
     }
   }, []);
 
-  useEffect(() => {
-    const storedProjectionData = localStorage.getItem('projectionDetails');
-    
-    if (storedProjectionData) {
-      const projectionData = JSON.parse(storedProjectionData);
-      setProjectionExists(Object.keys(projectionData).length > 0); // Verifica si la proyección no está vacía
-    }
-    
-    setLoading(false);
-  }, []);
-
   const handleMouseEnter = (button) => {
     setHoveredButton(button); 
   };
@@ -67,9 +50,7 @@ function ProyeccionSeguimiento() {
       case 'crear':
         return "Inicia una proyección en cualquiera de las dos modalidades disponibles. Elige entre una proyección por unidades de promoción o por obtención de grado académico según tus necesidades y preferencias. Además, puedes gestionar varias proyecciones simultáneamente, facilitando el seguimiento de diferentes objetivos.";
       case 'ver':
-        return projectionExists 
-        ? "Ve todos los detalles de tu proyección actual y consulta el progreso de tus objetivos. Ajusta tus tareas en el tablero según tus avances y mantente al tanto de tus plazos importantes gracias a las alertas automáticas. Esta herramienta te permite tener control total sobre el estado de tu proyección en cualquier momento."
-        : "Aún no tienes una proyección activa. Crea una proyección para comenzar a planificar tus objetivos y tareas. Una vez que hayas creado tu proyección, podrás verla aquí y comenzar a gestionar tus tareas de manera eficiente.";
+        return "Ve todos los detalles de tu proyección actual y consulta el progreso de tus objetivos. Ajusta tus tareas en el tablero según tus avances y mantente al tanto de tus plazos importantes gracias a las alertas automáticas. Esta herramienta te permite tener control total sobre el estado de tu proyección en cualquier momento.";
       case 'guia':
         return "¿No sabes cómo iniciar una proyección? Consulta nuestra guía para obtener instrucciones detalladas. Sigue a detalle la explicación que tenemos que te ayudarán a comenzar, los cuáles te explican paso a paso cómo usar cada función. Además, encontrarás consejos útiles para aprovechar al máximo las herramientas de proyección y seguimiento.";
       default:
@@ -113,15 +94,14 @@ function ProyeccionSeguimiento() {
           </motion.div>
 
           <motion.div
-            whileHover={{ scale: projectionExists ? 1 : 1, boxShadow: projectionExists ? "0px 0px 15px rgba(0, 0, 0, 0.2)" : "none" }}
+            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }} // Animación al hover
             transition={{ type: 'spring', stiffness: 300 }}
-            className={`${projectionExists ? "" : "opacity-50 cursor-not-allowed"}`} // Cambia la apariencia si está deshabilitado
           >
             <Link
-              to={projectionExists ? "/KanbanBoard" : ""}
+              to="/KanbanBoard"
               onMouseEnter={() => handleMouseEnter('ver')}
               onMouseLeave={handleMouseLeave}
-              className={`bg-blue-500 text-white p-8 rounded-lg shadow-lg transition-transform transform w-56 h-56 flex flex-col items-center justify-center ${projectionExists ? "hover:bg-blue-600 hover:scale-105" : ""}`}
+              className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
             >
               <IoGlassesOutline className="mb-4 w-20 h-20" />
               <p className="text-center text-lg font-semibold">Ver mi proyección</p>

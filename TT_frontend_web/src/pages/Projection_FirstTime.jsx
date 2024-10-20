@@ -3,31 +3,12 @@ import { IoChevronBackOutline, IoChevronForwardOutline, IoSchoolOutline, IoStarO
 import { useNavigate } from 'react-router-dom';
 import Navigation from './Navigation/Navigation';
 import LoadingAnimation from "../components/LoadingAnimation";
-import { createProjection, getProjection } from '../../../api/projections.api';
-import { getAccount } from '../../../api/accounts.api';
+import { createProjection } from '../../../api/projections.api';
 
 function ProjectionFirstTime() {
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0); // Estado para controlar el índice del carrusel
   const navigate = useNavigate();
-
-  // const refreshLocalStorage = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const token = localStorage.getItem('token');
-  //     const projectionData = await getProjection(accountData.data.projection_id);
-
-  //     // Almacenar los datos actualizados en el localStorage
-  //     localStorage.setItem('projectionDetails', JSON.stringify(projectionData.data));
-      
-  //     alert('Datos actualizados correctamente.');
-  //   } catch (error) {
-  //     console.error('Error al actualizar los datos:', error);
-  //     alert('Hubo un problema al actualizar los datos.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleCreateProjection = async () => {
     setLoading(true);
@@ -38,9 +19,6 @@ function ProjectionFirstTime() {
         const accountDetails = JSON.parse(localStorage.getItem('accountDetails')) || {};
         accountDetails.projection_id = projectionId;
         localStorage.setItem('accountDetails', JSON.stringify(accountDetails));
-        
-        console.log('Proyección creada:', response.data);
-        localStorage.setItem('projectionDetails', JSON.stringify(response.data));
         navigate('/new-projection');
       } else {
         alert('Error al crear la proyección');
