@@ -385,6 +385,13 @@ function UnidadesPromocion() {
       return; // Si el formulario no es válido, no se envía
     }
     
+    // Extraer la primera palabra del campo 'units'
+    const cleanedUnits = units.split(' ')[0];
+
+    // Calcular la longitud de los documentos requeridos
+    const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);
+    const documentsCount = documentsList.length;
+    
     // Prepara los datos para la proyección con los nombres correctos
     const projectionData = {
       function: functionField,
@@ -392,8 +399,9 @@ function UnidadesPromocion() {
       role,
       scope,
       documents_required,
+      documents_number: documentsCount,
       priority,
-      units,
+      units: cleanedUnits,
       tasks,
       projection_id,
       documents_uploaded
