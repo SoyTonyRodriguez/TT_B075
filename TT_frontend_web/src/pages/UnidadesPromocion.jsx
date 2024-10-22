@@ -89,7 +89,7 @@ function UnidadesPromocion() {
       { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio\n Carta de aceptación del informe final o carta de finiquito\n Informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante", alcance: "Nacional" }, //OK
       { actividad: "Publicación de artículos científicos y técnicos", documento: "Constancia de validación emitida por la SIP.", up:['3.00 U.P. por artículo de circulación institucional.', '5.00 U.P. por artículo de circulación nacional.', '10.00 U.P. por artículo de circulación nacional con jurado.', '20.00 U.P. por artículo de circulación internacional.', 'Máximo 5 publicaciones por periodo de promoción.'], rol: "Autor", alcance: "Nacional o Internacional"  },//OK  //'Máximo 5 publicaciones por periodo de promoción.'
       { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia\n Dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica\n Carta de terminación expedida por la institución donde se realizó la estancia.", up: "15.00 U.P. por año" }, //OK
-      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro\n Resultado del examen de forma\n Título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante", alcance: "Nacional o Internacional" } //OK
+      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro\n Resultado del examen de forma\n Título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante o ", alcance: "Nacional o Internacional" } //OK
     ],
     superacion: [ //TODAS BIEN
       { actividad: "Otra licenciatura", documento: "Constancia de validación emitida por la DES.", up: ['60.00 U.P. por licenciatura.'] }, //OK
@@ -118,7 +118,7 @@ function UnidadesPromocion() {
     ],
     extension: [ //TODAS BIEN 
       { actividad: "Participación en la expo-profesiográfica", documento: "Constancia emitida por la Secretaría Académica o por la DEMS o DES.", up: ['2.00 U.P. por expositor.', '3.00 por atención de talleres o concursos', '3.00 por profesor coordinador'], rol: "Expositor o Atención o Profesor", alcance: "Nacional" }, //OK
-      { actividad: "Encuentros Académicos Interpolitécnicos", documento: "Constancia de participación emitida por el Titular de la unidad académica.", up: ['2.00 U.P. por evento como asistente. Máximo: 8.00 U.P. por periodo de promoción.'], rol: "Asistente", alcance: "Nacional"  }, //OK
+      { actividad: "Encuentros Académicos Interpolitécnicos", documento: "Constancia de participación emitida por el Titular de la unidad académica.", up: ['2.00 U.P. por evento como asistente', 'Máximo: 8.00 U.P. por periodo de promoción.'], rol: "Asistente", alcance: "Nacional"  }, //OK
       { actividad: "Brigadas multidisciplinarias de servicio social", documento: "Constancia de participación emitida por la Dirección de Egresados y Servicio Social.", up: ['8.00 U.P. por coordinador de brigada.', '4.00 U.P. por profesor de brigada.', '4.00 U.P. por responsable del programa.'], rol: "Profesor o Coordinador o Responsable", alcance: "Nacional" }, //OK
       { actividad: "Impartición de disciplinas deportivas y/o talleres culturales", documento: "Constancia de participación emitida por la autoridad competente.", up: ['0.50 U.P. por cada hora.'], rol: "Instructor" }, //OK
     ],
@@ -195,37 +195,41 @@ function UnidadesPromocion() {
       const filteredUpsArray = upsArray.filter((up) => !up.toLowerCase().includes('máximo'));
       setUnitsOptions(filteredUpsArray);
 
-      // Aseguramos que solo se almacena un "Máximo" si existe
+      // Asegurar que "Máximo" solo se muestra como texto si existe
       const maxOption = upsArray.find((up) => up.toLowerCase().includes('máximo'));
-      if (maxOption) {
-        setMaxText(maxOption); // Guardamos el texto máximo si existe
-        console.log('Máximo:', maxOption);
-        console.log('Unidades:', filteredUpsArray);
+      setMaxText(maxOption || ''); // Establecer el máximo o limpiar
+  
+      // **Selecciona automáticamente la única opción de U.P. si existe**
+      if (filteredUpsArray.length === 1) {
+        setUnits(filteredUpsArray[0]); // Asignar automáticamente
+        console.log('Unidades seleccionadas:', filteredUpsArray[0]);
       } else {
-        setMaxText(''); // Limpiamos si no hay "Máximo"
-      }
+        setUnits(''); // Limpiar si hay múltiples opciones
+      }  
 
       // Si hay solo una opción de U.P., la seleccionamos automáticamente
-      if (upsArray.length === 1) {
-        setUnits(upsArray[0]);
-      } else {
-        setUnits(''); // Limpiamos si hay múltiples opciones
-      }
+      // if (upsArray.length === 1) {
+      //   setUnits(upsArray[0]);
+      // } else {
+      //   setUnits(''); // Limpiamos si hay múltiples opciones
+      // }
 
       // Si hay roles disponibles, los establecemos; si no, dejamos vacío
+      // Configurar y asignar rol automáticamente si hay una opción
       if (activityInfo.rol) {
         const rolesArray = activityInfo.rol.split(" o ");
         setRoleOptions(rolesArray);
+        if (rolesArray.length === 1) setRole(rolesArray[0]); // Asignar automáticamente
       } else {
         setRoleOptions([]);
+        setRole('');
       }
 
-      // Si hay alcances disponibles, los establecemos; si no, dejamos vacío
+      // Configurar y asignar alcance automáticamente si hay una opción
       if (activityInfo.alcance) {
         const scopeArray = activityInfo.alcance.split(" o ");
         setScopeOptions(scopeArray);
-        if (scopeArray.length === 1) setScope(scopeArray[0]);
-        else setScope(''); // Limpiamos si hay múltiples opciones
+        if (scopeArray.length === 1) setScope(scopeArray[0]); // Asignar automáticamente
       } else {
         setScopeOptions([]);
         setScope('');
@@ -385,16 +389,31 @@ function UnidadesPromocion() {
     
     if (!validateForm()) {
       return; // Si el formulario no es válido, no se envía
+    }  
+    // Si `units` está vacío y hay un máximo, lo usamos como valor por defecto
+    const parts = units.split(' '); // Divide la cadena en partes
+    let result = ''; // Resultado final
+    
+    // Función para encontrar la primera parte que sea un número
+    for (let i = 0; i < parts.length; i++) {
+      if (!isNaN(Number(parts[i])) && parts[i].trim() !== '') {
+        result = parts[i]; // Si es un número, se guarda
+        break; // Termina el bucle si encuentra un número
+      }
     }
     
-    // Extraer la primera palabra del campo 'units'
-    const cleanedUnits = units.split(' ')[0];
+    // Si no encontró un número, guarda la siguiente parte disponible
+    if (result === '' && parts.length > 1) {
+      result = parts[1]; // Guarda la segunda parte si no encontró ningún número
+    }
+    
+    console.log(result);
 
     // Calcular la longitud de los documentos requeridos
     const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);
     const documentsCount = documentsList.length;
-    
-    // Prepara los datos para la proyección con los nombres correctos
+  
+    // Preparar los datos para la proyección
     const projectionData = {
       function: functionField,
       activity,
@@ -403,32 +422,33 @@ function UnidadesPromocion() {
       documents_required,
       documents_number: documentsCount,
       priority,
-      units: cleanedUnits,
+      units: result,
       tasks,
       projection_id,
-      documents_uploaded
+      documents_uploaded,
     };
-
+  
     try {
       setLoading(true);
       setError(null);
 
+
+      // Llama al método createProjection con los datos del formulario
+  
       // Llama al método createProjection con los datos del formulario
       const response = await createProduct(projectionData);
       console.log('Proyección creada:', response.data);
-      toast.success('Proyección creada con éxito');  // Mostrar toast de éxito
-      navigate('/KanbanBoard'); // Redirect to login or another page
+      toast.success('Proyección creada con éxito');
+      navigate('/KanbanBoard');
     } catch (error) {
-      const apiErrors = error.response.data || {};
-      if (error.response.status === 400) {
-          const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
-          toast.error(errorMessage);
-      }else {
-          console.error('Error creando proyeccion:', error);
-          // Mostrar un toast si ocurre un error
-          toast.error('Error creando la proyeccion. Verifica los datos.');
+      const apiErrors = error.response?.data || {};
+      if (error.response?.status === 400) {
+        const errorMessage = apiErrors.non_field_errors[0] || "Error en la solicitud. Verifica los datos.";
+        toast.error(errorMessage);
+      } else {
+        console.error('Error creando proyección:', error);
+        toast.error('Error creando la proyección. Verifica los datos.');
       }
-
     } finally {
       setLoading(false);
     }
