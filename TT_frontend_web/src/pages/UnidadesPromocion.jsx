@@ -199,6 +199,8 @@ function UnidadesPromocion() {
       const maxOption = upsArray.find((up) => up.toLowerCase().includes('máximo'));
       if (maxOption) {
         setMaxText(maxOption); // Guardamos el texto máximo si existe
+        console.log('Máximo:', maxOption);
+        console.log('Unidades:', filteredUpsArray);
       } else {
         setMaxText(''); // Limpiamos si no hay "Máximo"
       }
