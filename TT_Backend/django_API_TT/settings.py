@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'products',
     'default_Projection_Dates',
     'documents',
+    'conditions_categories',
+    'check_products',
+    'conditions_max',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -109,6 +112,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_API_TT.wsgi.application'
 
+MIGRATION_MODULES = {
+    'token_blacklist': None,
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

@@ -7,9 +7,13 @@ import { Link } from 'react-router-dom';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { createProduct } from '../../../api/products.api';
+import { get_Check_Products } from '../../../api/check_products.api';
 
 function UnidadesPromocion() {
   const navigate = useNavigate();
+
+  const [checkProductData, setCheckProductData] = useState(null); // Datos recibidos
+  const [userId, setUserId] = useState(null);
 
   // Estados para los campos del formulario
   const [priority, setPriority] = useState('');
@@ -37,6 +41,125 @@ function UnidadesPromocion() {
   const [roleOptions, setRoleOptions] = useState([]);
   const [scopeOptions, setScopeOptions] = useState([]);
 
+  // Nuevos estados
+  const [showWorkTime, setShowWorkTime] = useState(false); // Controla la visibilidad del campo
+
+  const [workTime, setWorkTime] = useState(''); // Almacena el tiempo seleccionado
+  const [category, setCategory] = useState(''); // Categoría del usuario
+  const [conditions, setConditions] = useState(null); // Condiciones desde localStorage
+  const [calculatedUnits, setCalculatedUnits] = useState(''); // U.P. calculadas
+
+  const [hours, setHours] = useState(''); // Estado para almacenar las horas
+  const [hoursError, setHoursError] = useState(''); // Estado para mostrar errores de validación
+  const [hourLimits, setHourLimits] = useState({ min: 0, max: 200 }); // Almacena los límites de horas
+
+  // Obtener account_id de localStorage y llamar a get_Check_Products
+  // Decode JWT once at the start and get the user ID
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        try {
+            const decodedToken = jwtDecode(token);
+            setUserId(decodedToken.user_id);
+        } catch (error) {
+            console.error('Invalid token:', error);
+        }
+    } else {
+        setLoading(false); // Stop loading if no token is found
+    }
+
+  }, []);
+
+
+  useEffect(() => {
+
+    const fetchCheckProducts = async (userId) => {
+      try {
+        setLoading(true);
+        const response = await get_Check_Products(userId); // Llamada a la API
+        setCheckProductData(response.data); // Almacenar los datos recibidos
+        console.log('Datos recibidos:', response.data);
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+        setError('No se pudo cargar la información.'); // Mostrar mensaje de error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      fetchCheckProducts(userId);
+    }
+  }, [userId]);
+
+  // Obtener la categoría y las condiciones del localStorage al cargar el componente
+  useEffect(() => {
+    const storedAccountDetails = localStorage.getItem('accountDetails');
+    const storedConditions = localStorage.getItem('conditions');
+
+    if (storedAccountDetails && storedConditions) {
+      const accountDetails = JSON.parse(storedAccountDetails);
+      const normalizedCategory = normalizeCategory(accountDetails.category);
+
+      setCategory(normalizedCategory);
+      setConditions(JSON.parse(storedConditions));
+    }
+  }, []);
+
+  // Función para normalizar la categoría del usuario
+  const normalizeCategory = (category) => {
+    const words = category.toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
+    words.pop(); // Elimina la última palabra.
+    return words.join('_'); // Une las palabras restantes con '_'.
+  };
+
+
+  // Manejar el cambio del tiempo de trabajo
+  const handleWorkTimeChange = (e) => {
+    const selectedTime = e.target.value;
+    setWorkTime(selectedTime);
+  
+    if (conditions && category) {
+      const { horas } = conditions.carga_academica[category]?.[selectedTime] || {};
+      if (horas) {
+        setHourLimits({ min: horas.min, max: horas.max }); // Establece los límites
+      } else {
+        setHourLimits({ min: 0, max: 0 });
+      }
+    }
+  };
+
+  const handleHoursChange = (e) => {
+    const enteredHours = parseInt(e.target.value, 10); // Convertir a número
+    setHours(enteredHours);
+  
+    const { min, max } = hourLimits;
+  
+    if (enteredHours < min || enteredHours > max) {
+      setHoursError(`Las horas deben estar entre ${min} y ${max}.`);
+      setCalculatedUnits('');
+      return;
+    } else {
+      setHoursError('');
+  
+      // Si es "Carga académica", calculamos las U.P.
+      if (activity === "Carga académica") {
+        const units = enteredHours * 4;
+        setCalculatedUnits(units);
+          // Verificar si supera el límite máximo de U.P.
+        if (conditions && category) {
+          const workConfig = conditions.carga_academica[category]?.[workTime];
+          const maxUP = workConfig?.up?.max || 0; // Obtener el máximo permitido
+        
+          if (units > maxUP) {
+            setHoursError(`Las U.P. calculadas superan el máximo permitido (${maxUP} U.P.). 
+              Se colocara el máximo permitido, de acuerdo a tú categoria.`);
+            setCalculatedUnits(maxUP);
+          }
+        }
+      }
+    }
+  };
 
   // Definición de la función para obtener el color según la prioridad
   const getColorForPriority = (priority) => {
@@ -62,6 +185,18 @@ function UnidadesPromocion() {
     'Actividades de extensión, integración y difusión de la ciencia y de la cultura': 'extension',
   };
 
+  const activitiesWithHours = new Set([
+    "Carga académica",
+    "Elaboración e Impartición de acciones de formación",
+    "Programa de inducción",
+    "Tutorías",
+    "Cursos de actualización, seminarios y talleres",
+    "Cursos de propósito específico",
+    "Diplomados",
+    "Servicio externo por obra puntual, sin compensación económica",
+    "Impartición de disciplinas deportivas y/o talleres culturales",
+  ]);
+
   // Opciones de actividades por función con documentos requeridos y U.P
   const actividadesPorFuncion = {
     docencia: [ //OKKKKK
@@ -85,15 +220,16 @@ function UnidadesPromocion() {
       { actividad: "Certificación de laboratorios y validación de pruebas de laboratorio", documento: "Certificado emitido por una entidad reconocida y constancia del titular del centro de trabajo.", up: ['20.00 U.P. para certificación de laboratorios.', '5.00 U.P. para validación de pruebas de laboratorio'] },
     ],
     investigacion: [ // TODO BIEN
-      { actividad: "Proyectos de investigación con financiamiento interno", documento: "Constancia emitida por la SIP.", up: ['5.00 U.P. con el 20% de avance inicial como director.', '3.00 U.P. con el 20% de avance inicial como participante.', '25.00 U.P. por proyecto terminado como director.', '15.00 U.P. por proyecto terminado como participante.', 'Máximo 2 proyectos como director y 3 proyectos como participante.'], rol: "Director o Participante"}, // OK //'Máximo 2 proyectos como director y 3 proyectos como participante por periodo de promoción.'
-      { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio, carta de aceptación del informe final o carta de finiquito, informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante"}, //OK
+      { actividad: "Proyectos de investigación con financiamiento interno", documento: "Constancia emitida por la SIP.", up: ['5.00 U.P. con el 20% de avance inicial como director.', '3.00 U.P. con el 20% de avance inicial como participante.', '25.00 U.P. por proyecto terminado como director.', '15.00 U.P. por proyecto terminado como participante.', 'Máximo 2 proyectos como director y 3 proyectos como participante.'], rol: "Director o Participante", alcance: "Nacional" }, // OK //'Máximo 2 proyectos como director y 3 proyectos como participante por periodo de promoción.'
+      { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio\n Carta de aceptación del informe final o carta de finiquito\n Informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante", alcance: "Nacional" }, //OK
+
       { actividad: "Publicación de artículos científicos y técnicos", documento: "Constancia de validación emitida por la SIP.", up:['3.00 U.P. por artículo de circulación institucional.', '5.00 U.P. por artículo de circulación nacional.', '10.00 U.P. por artículo de circulación nacional con jurado.', '20.00 U.P. por artículo de circulación internacional.', 'Máximo 5 publicaciones por periodo de promoción.'], rol: "Autor", alcance: "Nacional o Internacional"  },//OK  //'Máximo 5 publicaciones por periodo de promoción.'
-      { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia, dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica, carta de terminación expedida por la institución donde se realizó la estancia.", up: "15.00 U.P. por año" }, //OK
-      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro, resultado del examen de forma, título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante", alcance: "Nacional o Internacional" } //OK
+      { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia\n Dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica\n Carta de terminación expedida por la institución donde se realizó la estancia.", up: "15.00 U.P. por año" }, //OK
+      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro\n Resultado del examen de forma\n Título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante o ", alcance: "Nacional o Internacional" } //OK
     ],
     superacion: [ //TODAS BIEN
       { actividad: "Otra licenciatura", documento: "Constancia de validación emitida por la DES.", up: ['60.00 U.P. por licenciatura.'] }, //OK
-      { actividad: "Cursos de actualización, seminarios y talleres", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE para impartidos por el IPN, Constancia de validación emitida por la DEMS, DES o SIP para impartidos en institución distinta al IPN.", up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'] }, //OK
+      { actividad: "Cursos de actualización, seminarios y talleres", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE para impartidos por el IPN\n Constancia de validación emitida por la DEMS, DES o SIP para impartidos en institución distinta al IPN.", up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'] }, //OK
       { actividad: "Estudios de especialidad, maestría y doctorado", documento: "Constancia de validación emitida por la SIP.", up: ['75.50 U.P. por especialidad.', '88.50 U.P. por maestría.', '108.50 U.P. por doctorado.'] }, //OK
       { actividad: "Cursos de propósito específico", documento: "Constancia emitida por la SIP.", up: ['6.00 U.P. por cada 30 horas de curso.' , 'Máximo: 30.00 U.P. por periodo de promoción.'] }, //OK
       { actividad: "Diplomados", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", up: ['40.00 U.P. por diplomado de 180 horas.'] }, //OK
@@ -118,7 +254,7 @@ function UnidadesPromocion() {
     ],
     extension: [ //TODAS BIEN 
       { actividad: "Participación en la expo-profesiográfica", documento: "Constancia emitida por la Secretaría Académica o por la DEMS o DES.", up: ['2.00 U.P. por expositor.', '3.00 por atención de talleres o concursos', '3.00 por profesor coordinador'], rol: "Expositor o Atención o Profesor", alcance: "Nacional" }, //OK
-      { actividad: "Encuentros Académicos Interpolitécnicos", documento: "Constancia de participación emitida por el Titular de la unidad académica.", up: ['2.00 U.P. por evento como asistente.', 'Máximo: 8.00 U.P. por periodo de promoción.'], rol: "Asistente", alcance: "Nacional"  }, //OK
+      { actividad: "Encuentros Académicos Interpolitécnicos", documento: "Constancia de participación emitida por el Titular de la unidad académica.", up: ['2.00 U.P. por evento como asistente', 'Máximo: 8.00 U.P. por periodo de promoción.'], rol: "Asistente", alcance: "Nacional"  }, //OK
       { actividad: "Brigadas multidisciplinarias de servicio social", documento: "Constancia de participación emitida por la Dirección de Egresados y Servicio Social.", up: ['8.00 U.P. por coordinador de brigada.', '4.00 U.P. por profesor de brigada.', '4.00 U.P. por responsable del programa.'], rol: "Profesor o Coordinador o Responsable", alcance: "Nacional" }, //OK
       { actividad: "Impartición de disciplinas deportivas y/o talleres culturales", documento: "Constancia de participación emitida por la autoridad competente.", up: ['0.50 U.P. por cada hora.'], rol: "Instructor" }, //OK
     ],
@@ -133,7 +269,6 @@ function UnidadesPromocion() {
       const { projection_id } = JSON.parse(storedAccountData);
       setProjectionId(projection_id);
       setDocumentUploaded(documents_uploaded);
-      console.log('Account details loaded from localStorage' + storedAccountData);
     } else {
         const token = localStorage.getItem('token');
         if (token) {
@@ -188,6 +323,20 @@ function UnidadesPromocion() {
     if (activityInfo) {
       setDocumentsRequired(activityInfo.documento);
 
+    // Si la actividad es "Carga académica", mostramos tiempo de trabajo y horas
+    if (selectedActivity === "Carga académica") {
+      setShowWorkTime(true); // Mostrar tiempo de trabajo
+    } else if (activitiesWithHours.has(selectedActivity)) {
+      // Mostrar solo horas para otras actividades específicas
+      setShowWorkTime(false); 
+    } else {
+      // Ocultar horas y tiempo de trabajo si no es relevante
+      setShowWorkTime(false);
+      setHours('');
+      setCalculatedUnits('');
+      setHoursError('');
+    }
+
       // Si `up` es un array, lo usamos como opciones; si es un string, lo convertimos en array
       let upsArray = Array.isArray(activityInfo.up) ? activityInfo.up : [activityInfo.up];
       
@@ -195,35 +344,34 @@ function UnidadesPromocion() {
       const filteredUpsArray = upsArray.filter((up) => !up.toLowerCase().includes('máximo'));
       setUnitsOptions(filteredUpsArray);
 
-      // Aseguramos que solo se almacena un "Máximo" si existe
+      // Asegurar que "Máximo" solo se muestra como texto si existe
       const maxOption = upsArray.find((up) => up.toLowerCase().includes('máximo'));
-      if (maxOption) {
-        setMaxText(maxOption); // Guardamos el texto máximo si existe
+      setMaxText(maxOption || ''); // Establecer el máximo o limpiar
+  
+      // **Selecciona automáticamente la única opción de U.P. si existe**
+      if (filteredUpsArray.length === 1) {
+        setUnits(filteredUpsArray[0]); // Asignar automáticamente
+        console.log('Unidades seleccionadas:', filteredUpsArray[0]);
       } else {
-        setMaxText(''); // Limpiamos si no hay "Máximo"
-      }
-
-      // Si hay solo una opción de U.P., la seleccionamos automáticamente
-      if (upsArray.length === 1) {
-        setUnits(upsArray[0]);
-      } else {
-        setUnits(''); // Limpiamos si hay múltiples opciones
+        setUnits(''); // Limpiar si hay múltiples opciones
       }
 
       // Si hay roles disponibles, los establecemos; si no, dejamos vacío
+      // Configurar y asignar rol automáticamente si hay una opción
       if (activityInfo.rol) {
         const rolesArray = activityInfo.rol.split(" o ");
         setRoleOptions(rolesArray);
+        if (rolesArray.length === 1) setRole(rolesArray[0]); // Asignar automáticamente
       } else {
         setRoleOptions([]);
+        setRole('');
       }
 
-      // Si hay alcances disponibles, los establecemos; si no, dejamos vacío
+      // Configurar y asignar alcance automáticamente si hay una opción
       if (activityInfo.alcance) {
         const scopeArray = activityInfo.alcance.split(" o ");
         setScopeOptions(scopeArray);
-        if (scopeArray.length === 1) setScope(scopeArray[0]);
-        else setScope(''); // Limpiamos si hay múltiples opciones
+        if (scopeArray.length === 1) setScope(scopeArray[0]); // Asignar automáticamente
       } else {
         setScopeOptions([]);
         setScope('');
@@ -238,6 +386,7 @@ function UnidadesPromocion() {
       setScopeOptions([]);
       setScope('');
       setMaxText('');
+      setCalculatedUnits('');
     }
   };
 
@@ -356,6 +505,21 @@ function UnidadesPromocion() {
       setActivityError(true);
       isValid = false;
     }
+
+    if (showWorkTime && (hours < hourLimits.min || hours > hourLimits.max)) {
+      setHoursError(`Las horas deben estar entre ${hourLimits.min} y ${hourLimits.max}.`);
+      isValid = false;
+    }
+
+    // Verificar si supera el límite máximo de U.P.
+    if (conditions && category) {
+      const workConfig = conditions.carga_academica[category]?.[workTime];
+      const maxUP = workConfig?.up?.max || 0; // Obtener el máximo permitido
+
+      if (units > maxUP) {
+        setHoursError(`Las U.P. calculadas (${units}) superan el máximo permitido (${maxUP} U.P.).`);
+      }
+    }
   
     // Validar rol solo si hay opciones de rol
     if (roleOptions.length > 0 && role === '') {
@@ -383,42 +547,66 @@ function UnidadesPromocion() {
     
     if (!validateForm()) {
       return; // Si el formulario no es válido, no se envía
+    }  
+    // Si `units` está vacío y hay un máximo, lo usamos como valor por defecto
+    const parts = units.split(' '); // Divide la cadena en partes
+    let result = ''; // Resultado final
+    
+    // Función para encontrar la primera parte que sea un número
+    for (let i = 0; i < parts.length; i++) {
+      if (!isNaN(Number(parts[i])) && parts[i].trim() !== '') {
+        result = parts[i]; // Si es un número, se guarda
+        break; // Termina el bucle si encuentra un número
+      }
     }
     
-    // Prepara los datos para la proyección con los nombres correctos
+    // Si no encontró un número, guarda la siguiente parte disponible
+    if (result === '' && parts.length > 1) {
+      result = parts[1]; // Guarda la segunda parte si no encontró ningún número
+    }
+    
+    console.log(result);
+
+    // Calcular la longitud de los documentos requeridos
+    const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);
+    const documentsCount = documentsList.length;
+  
+    // Preparar los datos para la proyección
     const projectionData = {
       function: functionField,
       activity,
       role,
       scope,
       documents_required,
+      documents_number: documentsCount,
       priority,
-      units,
+      units: calculatedUnits || result,
       tasks,
       projection_id,
-      documents_uploaded
+      documents_uploaded,
     };
-
+  
     try {
       setLoading(true);
       setError(null);
 
+
+      // Llama al método createProjection con los datos del formulario
+  
       // Llama al método createProjection con los datos del formulario
       const response = await createProduct(projectionData);
       console.log('Proyección creada:', response.data);
-      toast.success('Proyección creada con éxito');  // Mostrar toast de éxito
-      navigate('/KanbanBoard'); // Redirect to login or another page
+      toast.success('Proyección creada con éxito');
+      navigate('/KanbanBoard');
     } catch (error) {
-      const apiErrors = error.response.data || {};
-      if (error.response.status === 400) {
-          const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
-          toast.error(errorMessage);
-      }else {
-          console.error('Error creando proyeccion:', error);
-          // Mostrar un toast si ocurre un error
-          toast.error('Error creando la proyeccion. Verifica los datos.');
+      const apiErrors = error.response?.data || {};
+      if (error.response?.status === 400) {
+        const errorMessage = apiErrors.non_field_errors[0] || "Error en la solicitud. Verifica los datos.";
+        toast.error(errorMessage);
+      } else {
+        console.error('Error creando proyección:', error);
+        toast.error('Error creando la proyección. Verifica los datos.');
       }
-
     } finally {
       setLoading(false);
     }
@@ -524,9 +712,64 @@ function UnidadesPromocion() {
 
             {documents_required && (
               <div className="mb-4">
-                <label className="block text-white text-sm font-semibold mb-2">Documento requerido</label>
-                <p className="bg-white p-2 rounded-lg border border-gray-400">{documents_required}</p>
+                <label className="block text-white text-sm font-semibold mb-2">Documento(s) requeridos</label>
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-lg shadow-lg">
+                  <ul className="list-disc pl-6 text-gray-800">
+                    {documents_required.split('\n').map((doc, index) => (
+                      <li key={index} className="mb-2">
+                        {doc.trim()}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
+            )}
+
+            {activitiesWithHours.has(activity) && (
+              <>
+                {activity === "Carga académica" && (
+                  <div className="mb-4">
+                    <label className="block text-white text-sm font-semibold mb-2">
+                      Tiempo de trabajo
+                    </label>
+                    <select
+                      value={workTime}
+                      onChange={(e) => handleWorkTimeChange(e)}
+                      className="w-full p-2 rounded-lg border border-gray-400"
+                    >
+                      <option value="" disabled>Selecciona una opción</option>
+                      <option value="medio_tiempo">Medio tiempo</option>
+                      <option value="tres_cuartos_tiempo">Tres cuartos</option>
+                      <option value="tiempo_completo">Tiempo completo</option>
+                    </select>
+                  </div>
+                )}
+
+                <div className="mb-4">
+                  <label className="block text-white text-sm font-semibold mb-2">
+                    Horas de trabajo
+                  </label>
+                  <input
+                    type="number"
+                    value={hours}
+                    onChange={handleHoursChange}
+                    className="w-full p-2 rounded-lg border border-gray-400"
+                    placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
+                  />
+                  {hoursError && <span className="text-red-500">{hoursError}</span>}
+                </div>
+
+                {activity === "Carga académica" && (
+                  <div className="mb-4">
+                    <label className="block text-white text-sm font-semibold mb-2">
+                      U.P. Calculadas
+                    </label>
+                    <p className="bg-white p-2 rounded-lg border border-gray-400">
+                      {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
 
             {unitsOptions.length > 1 ? (
