@@ -7,9 +7,13 @@ import { Link } from 'react-router-dom';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { createProduct } from '../../../api/products.api';
+import { get_Check_Products } from '../../../api/check_products.api';
 
 function UnidadesPromocion() {
   const navigate = useNavigate();
+
+  const [checkProductData, setCheckProductData] = useState(null); // Datos recibidos
+  const [userId, setUserId] = useState(null);
 
   // Estados para los campos del formulario
   const [priority, setPriority] = useState('');
@@ -48,6 +52,45 @@ function UnidadesPromocion() {
   const [hours, setHours] = useState(''); // Estado para almacenar las horas
   const [hoursError, setHoursError] = useState(''); // Estado para mostrar errores de validación
   const [hourLimits, setHourLimits] = useState({ min: 0, max: 200 }); // Almacena los límites de horas
+
+  // Obtener account_id de localStorage y llamar a get_Check_Products
+  // Decode JWT once at the start and get the user ID
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        try {
+            const decodedToken = jwtDecode(token);
+            setUserId(decodedToken.user_id);
+        } catch (error) {
+            console.error('Invalid token:', error);
+        }
+    } else {
+        setLoading(false); // Stop loading if no token is found
+    }
+
+  }, []);
+
+
+  useEffect(() => {
+
+    const fetchCheckProducts = async (userId) => {
+      try {
+        setLoading(true);
+        const response = await get_Check_Products(userId); // Llamada a la API
+        setCheckProductData(response.data); // Almacenar los datos recibidos
+        console.log('Datos recibidos:', response.data);
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+        setError('No se pudo cargar la información.'); // Mostrar mensaje de error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      fetchCheckProducts(userId);
+    }
+  }, [userId]);
 
   // Obtener la categoría y las condiciones del localStorage al cargar el componente
   useEffect(() => {
