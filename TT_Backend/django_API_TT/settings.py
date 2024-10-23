@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'products',
     'default_Projection_Dates',
     'documents',
-    'conditions_categories'
+    'conditions_categories',
+    'check_products',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
