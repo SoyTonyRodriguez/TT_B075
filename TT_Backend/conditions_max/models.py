@@ -1,4 +1,5 @@
-from djongo import models
+from django.db import models
+from djongo.models.fields import JSONField
 
 class Conditions_Max(models.Model):
     configuracion = models.JSONField()
