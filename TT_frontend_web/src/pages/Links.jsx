@@ -25,6 +25,8 @@ function Links() {
         return "El cronograma de la promoción docente 2024 establece las fechas clave para la recepción de solicitudes, revisión de documentos, publicación de resultados y plazos para solicitar reconsideraciones. La Dirección de Capital Humano se encarga de coordinar el cumplimiento de estos plazos a lo largo del proceso anual.";
       case 'valoracionactividades':
         return "El proceso de Promoción por acumulación de 100 Unidades de Promoción (U.P.) en el Instituto Politécnico Nacional (IPN) está diseñado para valorar una amplia variedad de actividades que el personal docente realiza en su labor académica. Estas actividades se dividen en varias áreas clave, cada una con una puntuación específica que contribuye a la acumulación de las 100 U.P. necesarias para la promoción.";
+      case 'gaceta':
+        return "Acuerdo: Mediante los cuales se reforman, adicionan y derogan diversos artículos y anexos del Reglamento de Promoción Docente, Anexo III del Reglamento de las Condiciones Interiores de Trabajo del Personal Académico del IPN.";
       default:
         return "";
     }
@@ -45,7 +47,7 @@ function Links() {
             transition={{ type: 'spring', stiffness: 300 }}
           >
             <Link
-              to="/new-projection"
+              to="#"
               onMouseEnter={() => handleMouseEnter('convocatoria')}
               onMouseLeave={handleMouseLeave}
               className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
@@ -97,6 +99,21 @@ function Links() {
             >
               <IoLinkOutline className="mb-4 w-20 h-20" />
               <p className="text-center text-lg font-semibold">Valoración de actividades 100 U.P.</p>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }} 
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <Link
+              to="#"
+              onMouseEnter={() => handleMouseEnter('gaceta')}
+              onMouseLeave={handleMouseLeave}
+              className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
+            >
+              <IoLinkOutline className="mb-4 w-20 h-20" />
+              <p className="text-center text-lg font-semibold">Gaceta Politécnica 1511</p>
             </Link>
           </motion.div>
         </div>
