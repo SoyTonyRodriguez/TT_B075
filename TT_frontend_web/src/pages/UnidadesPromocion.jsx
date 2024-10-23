@@ -47,7 +47,7 @@ function UnidadesPromocion() {
 
   const [hours, setHours] = useState(''); // Estado para almacenar las horas
   const [hoursError, setHoursError] = useState(''); // Estado para mostrar errores de validación
-  const [hourLimits, setHourLimits] = useState({ min: 0, max: 0 }); // Almacena los límites de horas
+  const [hourLimits, setHourLimits] = useState({ min: 0, max: 200 }); // Almacena los límites de horas
 
   // Obtener la categoría y las condiciones del localStorage al cargar el componente
   useEffect(() => {
