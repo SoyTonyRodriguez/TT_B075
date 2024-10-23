@@ -37,6 +37,86 @@ function UnidadesPromocion() {
   const [roleOptions, setRoleOptions] = useState([]);
   const [scopeOptions, setScopeOptions] = useState([]);
 
+  // Nuevos estados
+  const [showWorkTime, setShowWorkTime] = useState(false); // Controla la visibilidad del campo
+
+  const [workTime, setWorkTime] = useState(''); // Almacena el tiempo seleccionado
+  const [category, setCategory] = useState(''); // Categoría del usuario
+  const [conditions, setConditions] = useState(null); // Condiciones desde localStorage
+  const [calculatedUnits, setCalculatedUnits] = useState(''); // U.P. calculadas
+
+  const [hours, setHours] = useState(''); // Estado para almacenar las horas
+  const [hoursError, setHoursError] = useState(''); // Estado para mostrar errores de validación
+  const [hourLimits, setHourLimits] = useState({ min: 0, max: 0 }); // Almacena los límites de horas
+
+  // Obtener la categoría y las condiciones del localStorage al cargar el componente
+  useEffect(() => {
+    const storedAccountDetails = localStorage.getItem('accountDetails');
+    const storedConditions = localStorage.getItem('conditions');
+
+    if (storedAccountDetails && storedConditions) {
+      const accountDetails = JSON.parse(storedAccountDetails);
+      const normalizedCategory = normalizeCategory(accountDetails.category);
+
+      setCategory(normalizedCategory);
+      setConditions(JSON.parse(storedConditions));
+    }
+  }, []);
+
+  // Función para normalizar la categoría del usuario
+  const normalizeCategory = (category) => {
+    const words = category.toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
+    words.pop(); // Elimina la última palabra.
+    return words.join('_'); // Une las palabras restantes con '_'.
+  };
+
+
+  // Manejar el cambio del tiempo de trabajo
+  const handleWorkTimeChange = (e) => {
+    const selectedTime = e.target.value;
+    setWorkTime(selectedTime);
+  
+    if (conditions && category) {
+      const { horas } = conditions.carga_academica[category]?.[selectedTime] || {};
+      if (horas) {
+        setHourLimits({ min: horas.min, max: horas.max }); // Establece los límites
+      } else {
+        setHourLimits({ min: 0, max: 0 });
+      }
+    }
+  };
+
+  const handleHoursChange = (e) => {
+    const enteredHours = parseInt(e.target.value, 10); // Convertir a número
+    setHours(enteredHours);
+  
+    const { min, max } = hourLimits;
+  
+    if (enteredHours < min || enteredHours > max) {
+      setHoursError(`Las horas deben estar entre ${min} y ${max}.`);
+      setCalculatedUnits('');
+      return;
+    } else {
+      setHoursError('');
+  
+      // Si es "Carga académica", calculamos las U.P.
+      if (activity === "Carga académica") {
+        const units = enteredHours * 4;
+        setCalculatedUnits(units);
+          // Verificar si supera el límite máximo de U.P.
+        if (conditions && category) {
+          const workConfig = conditions.carga_academica[category]?.[workTime];
+          const maxUP = workConfig?.up?.max || 0; // Obtener el máximo permitido
+        
+          if (units > maxUP) {
+            setHoursError(`Las U.P. calculadas superan el máximo permitido (${maxUP} U.P.). 
+              Se colocara el máximo permitido, de acuerdo a tú categoria.`);
+            setCalculatedUnits(maxUP);
+          }
+        }
+      }
+    }
+  };
 
   // Definición de la función para obtener el color según la prioridad
   const getColorForPriority = (priority) => {
@@ -61,6 +141,18 @@ function UnidadesPromocion() {
     'Actividades complementarias de apoyo a la docencia y a la investigación': 'complementarias',
     'Actividades de extensión, integración y difusión de la ciencia y de la cultura': 'extension',
   };
+
+  const activitiesWithHours = new Set([
+    "Carga académica",
+    "Elaboración e Impartición de acciones de formación",
+    "Programa de inducción",
+    "Tutorías",
+    "Cursos de actualización, seminarios y talleres",
+    "Cursos de propósito específico",
+    "Diplomados",
+    "Servicio externo por obra puntual, sin compensación económica",
+    "Impartición de disciplinas deportivas y/o talleres culturales",
+  ]);
 
   // Opciones de actividades por función con documentos requeridos y U.P
   const actividadesPorFuncion = {
@@ -133,7 +225,6 @@ function UnidadesPromocion() {
       const { projection_id } = JSON.parse(storedAccountData);
       setProjectionId(projection_id);
       setDocumentUploaded(documents_uploaded);
-      console.log('Account details loaded from localStorage' + storedAccountData);
     } else {
         const token = localStorage.getItem('token');
         if (token) {
@@ -188,6 +279,20 @@ function UnidadesPromocion() {
     if (activityInfo) {
       setDocumentsRequired(activityInfo.documento);
 
+    // Si la actividad es "Carga académica", mostramos tiempo de trabajo y horas
+    if (selectedActivity === "Carga académica") {
+      setShowWorkTime(true); // Mostrar tiempo de trabajo
+    } else if (activitiesWithHours.has(selectedActivity)) {
+      // Mostrar solo horas para otras actividades específicas
+      setShowWorkTime(false); 
+    } else {
+      // Ocultar horas y tiempo de trabajo si no es relevante
+      setShowWorkTime(false);
+      setHours('');
+      setCalculatedUnits('');
+      setHoursError('');
+    }
+
       // Si `up` es un array, lo usamos como opciones; si es un string, lo convertimos en array
       let upsArray = Array.isArray(activityInfo.up) ? activityInfo.up : [activityInfo.up];
       
@@ -205,14 +310,7 @@ function UnidadesPromocion() {
         console.log('Unidades seleccionadas:', filteredUpsArray[0]);
       } else {
         setUnits(''); // Limpiar si hay múltiples opciones
-      }  
-
-      // Si hay solo una opción de U.P., la seleccionamos automáticamente
-      // if (upsArray.length === 1) {
-      //   setUnits(upsArray[0]);
-      // } else {
-      //   setUnits(''); // Limpiamos si hay múltiples opciones
-      // }
+      }
 
       // Si hay roles disponibles, los establecemos; si no, dejamos vacío
       // Configurar y asignar rol automáticamente si hay una opción
@@ -244,6 +342,7 @@ function UnidadesPromocion() {
       setScopeOptions([]);
       setScope('');
       setMaxText('');
+      setCalculatedUnits('');
     }
   };
 
@@ -362,6 +461,21 @@ function UnidadesPromocion() {
       setActivityError(true);
       isValid = false;
     }
+
+    if (showWorkTime && (hours < hourLimits.min || hours > hourLimits.max)) {
+      setHoursError(`Las horas deben estar entre ${hourLimits.min} y ${hourLimits.max}.`);
+      isValid = false;
+    }
+
+    // Verificar si supera el límite máximo de U.P.
+    if (conditions && category) {
+      const workConfig = conditions.carga_academica[category]?.[workTime];
+      const maxUP = workConfig?.up?.max || 0; // Obtener el máximo permitido
+
+      if (units > maxUP) {
+        setHoursError(`Las U.P. calculadas (${units}) superan el máximo permitido (${maxUP} U.P.).`);
+      }
+    }
   
     // Validar rol solo si hay opciones de rol
     if (roleOptions.length > 0 && role === '') {
@@ -422,7 +536,7 @@ function UnidadesPromocion() {
       documents_required,
       documents_number: documentsCount,
       priority,
-      units: result,
+      units: calculatedUnits || result,
       tasks,
       projection_id,
       documents_uploaded,
@@ -566,6 +680,54 @@ function UnidadesPromocion() {
                 </div>
               </div>
             )}
+
+            {activitiesWithHours.has(activity) && (
+              <>
+                {activity === "Carga académica" && (
+                  <div className="mb-4">
+                    <label className="block text-white text-sm font-semibold mb-2">
+                      Tiempo de trabajo
+                    </label>
+                    <select
+                      value={workTime}
+                      onChange={(e) => handleWorkTimeChange(e)}
+                      className="w-full p-2 rounded-lg border border-gray-400"
+                    >
+                      <option value="" disabled>Selecciona una opción</option>
+                      <option value="medio_tiempo">Medio tiempo</option>
+                      <option value="tres_cuartos_tiempo">Tres cuartos</option>
+                      <option value="tiempo_completo">Tiempo completo</option>
+                    </select>
+                  </div>
+                )}
+
+                <div className="mb-4">
+                  <label className="block text-white text-sm font-semibold mb-2">
+                    Horas de trabajo
+                  </label>
+                  <input
+                    type="number"
+                    value={hours}
+                    onChange={handleHoursChange}
+                    className="w-full p-2 rounded-lg border border-gray-400"
+                    placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
+                  />
+                  {hoursError && <span className="text-red-500">{hoursError}</span>}
+                </div>
+
+                {activity === "Carga académica" && (
+                  <div className="mb-4">
+                    <label className="block text-white text-sm font-semibold mb-2">
+                      U.P. Calculadas
+                    </label>
+                    <p className="bg-white p-2 rounded-lg border border-gray-400">
+                      {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+
             {unitsOptions.length > 1 ? (
               <div className="mb-4">
                 <label className="block text-white text-sm font-semibold mb-2">U.P. aproximadas</label>
