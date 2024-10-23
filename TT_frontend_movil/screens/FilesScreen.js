@@ -135,6 +135,10 @@ const Documents = () => {
     setShowDateDropdown(false);
   };
 
+  const toggleProjectionDropdown = () => {
+    setIsProjectionDropdownOpen(!isProjectionDropdownOpen);
+  };
+
   // Mostrar/ocultar dropdown de tipo de archivo
   const toggleFileTypeDropdown = () => {
     setShowFileTypeDropdown(!showFileTypeDropdown);
@@ -420,20 +424,29 @@ const Documents = () => {
         </View>
 
         {/* Filtros */}
-        <View style={tw`flex-row justify-around mb-6 relative`}>
+        <View style={tw`flex-row justify-around mb-6 relative z-20`}>
           {/* Filtro por Tipo */}
-          <View>
-            <TouchableOpacity onPress={toggleFileTypeDropdown} style={tw`bg-gray-200 p-3 rounded-lg flex-row items-center`}>
+          <View style={{ position: 'relative', zIndex: 10 }}>
+            <TouchableOpacity 
+              onPress={toggleFileTypeDropdown} 
+              style={tw`bg-gray-200 p-3 rounded-lg flex-row items-center`}
+            >
               <Ionicons name="document" size={20} color="black" />
               <Text style={tw`ml-2`}>Tipo</Text>
             </TouchableOpacity>
 
             {showFileTypeDropdown && (
-              <View style={[tw`absolute top-16 left-0 z-10 bg-white shadow-lg p-4 rounded-lg`]}>
-                <TouchableOpacity onPress={() => handleFileTypeFilter('pdf')} style={tw`p-2`}>
+              <View style={[tw`absolute top-16 left-0 z-50 bg-white shadow-lg p-4 rounded-lg`]}>
+                <TouchableOpacity 
+                  onPress={() => handleFileTypeFilter('pdf')} 
+                  style={tw`p-2`}
+                >
                   <Text>PDF</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleFileTypeFilter('image')} style={tw`p-2`}>
+                <TouchableOpacity 
+                  onPress={() => handleFileTypeFilter('image')} 
+                  style={tw`p-2`}
+                >
                   <Text>JPG/JPEG</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={closeDropdowns} style={tw`p-2 text-red-500`}>
@@ -444,24 +457,39 @@ const Documents = () => {
           </View>
 
           {/* Filtro por Fecha */}
-          <View>
-            <TouchableOpacity onPress={toggleDateDropdown} style={tw`bg-gray-200 p-3 rounded-lg flex-row items-center`}>
+          <View style={{ position: 'relative', zIndex: 10 }}>
+            <TouchableOpacity 
+              onPress={toggleDateDropdown} 
+              style={tw`bg-gray-200 p-3 rounded-lg flex-row items-center`}
+            >
               <Ionicons name="calendar" size={20} color="black" />
               <Text style={tw`ml-2`}>Modificado</Text>
             </TouchableOpacity>
 
             {showDateDropdown && (
-              <View style={[tw`absolute top-16 left-0 z-10 bg-white shadow-lg p-4 rounded-lg`]}>
-                <TouchableOpacity onPress={() => handleDateFilter('today')} style={tw`p-2`}>
+              <View style={[tw`absolute top-16 left-0 z-50 bg-white shadow-lg p-4 rounded-lg`]}>
+                <TouchableOpacity 
+                  onPress={() => handleDateFilter('today')} 
+                  style={tw`p-2`}
+                >
                   <Text>Hoy</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDateFilter('this-week')} style={tw`p-2`}>
+                <TouchableOpacity 
+                  onPress={() => handleDateFilter('this-week')} 
+                  style={tw`p-2`}
+                >
                   <Text>Últimos 7 días</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDateFilter('this-month')} style={tw`p-2`}>
+                <TouchableOpacity 
+                  onPress={() => handleDateFilter('this-month')} 
+                  style={tw`p-2`}
+                >
                   <Text>Último mes</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDateFilter('this-year')} style={tw`p-2`}>
+                <TouchableOpacity 
+                  onPress={() => handleDateFilter('this-year')} 
+                  style={tw`p-2`}
+                >
                   <Text>Este año</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={closeDropdowns} style={tw`p-2 text-red-500`}>
@@ -472,14 +500,17 @@ const Documents = () => {
           </View>
 
           {/* Botón para resetear filtros */}
-          <TouchableOpacity onPress={resetFilters} style={tw`bg-gray-200 p-3 rounded-lg flex-row items-center`}>
+          <TouchableOpacity 
+            onPress={resetFilters} 
+            style={tw`bg-gray-200 p-3 rounded-lg flex-row items-center`}
+          >
             <Ionicons name="refresh" size={20} color="black" />
             <Text style={tw`ml-2`}>Reset</Text>
           </TouchableOpacity>
         </View>
 
         {/* Botón para abrir el modal de proyecciones */}
-        <Text style={tw`block text-gray-700 font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
+        <Text style={tw`text-gray-700 font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
         <TouchableOpacity
           onPress={openProjectionModal}
           style={tw`bg-white p-4 rounded-lg mb-4 border border-gray-300 flex-row justify-between items-center`}
