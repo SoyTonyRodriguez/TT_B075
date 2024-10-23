@@ -8,6 +8,7 @@ import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { getAccount } from "../../../api/accounts.api";
 import { getConditions } from '../../../api/conditions.api';
+import { getConditionsMax } from '../../../api/conditions_max.api';
 
 
 function MainContent() {
@@ -28,12 +29,15 @@ function MainContent() {
 
     // State for conditions
     const [conditions, setConditions] = useState(null);
+    const [conditions_max, setConditionsMax] = useState(null);
 
     useEffect(() => {
       // Verify if the userName is stored in the localStorage
       const storedAccountData = localStorage.getItem('accountDetails');
 
       const storedConditions = localStorage.getItem('conditions');
+
+      const storedConditionsMax = localStorage.getItem('conditions_max');
       
       // If the account is stored, set data and skip loading animation
       if (storedAccountData) {
@@ -62,9 +66,16 @@ function MainContent() {
       // Load conditions from localStorage if available
       if (storedConditions) {
         setConditions(JSON.parse(storedConditions));
-        console.log('conditions from localStorage: ' + storedConditions);
       } else {
           fetchConditions();
+      }
+
+      // Load conditions_max from localStorage if available
+      if (storedConditionsMax) {
+        setConditionsMax(storedConditionsMax);
+        console.log('Conditions_max loaded from localStorage' + storedConditionsMax);
+      } else {
+          fetchConditionsMax();
       }
     }, []);
 
@@ -77,6 +88,24 @@ function MainContent() {
           localStorage.setItem('conditions', JSON.stringify(response.data[0]));
       } catch (error) {
           console.error('Error fetching conditions:', error);
+      }
+    };
+
+    const fetchConditionsMax = async () => {
+      try {
+        const response = await getConditionsMax();
+    
+        // Verificamos si la respuesta es válida
+        if (response && response.data) {
+          setConditionsMax(response.data);
+    
+          // Guardamos solo si 'response.data' es válido
+          localStorage.setItem('conditions_max', JSON.stringify(response.data));
+        } else {
+          console.warn('No se encontraron datos para conditions_max.');
+        }
+      } catch (error) {
+        console.error('Error fetching conditions_max:', error);
       }
     };
 

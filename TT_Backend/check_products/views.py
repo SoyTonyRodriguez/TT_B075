@@ -49,7 +49,5 @@ class GetProductCheckView(APIView):
                 "activities": product_check.activities
             }, status=status.HTTP_200_OK)
         except ProductCheck.DoesNotExist:
-            return Response(
-                {"detail": "Product Check not found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            # Retornar un objeto vacío si no se encuentra el ProductCheck
+            return Response({}, status=status.HTTP_200_OK)
