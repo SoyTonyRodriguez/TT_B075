@@ -5,19 +5,6 @@ class RangoUPSerializer(serializers.Serializer):
     min = serializers.FloatField()
     max = serializers.FloatField()
 
-class ActividadSimpleItemSerializer(serializers.Serializer):
-    up = RangoUPSerializer()
-
-class ActividadSimpleSerializer(serializers.Serializer):
-    tecnico_docente_auxiliar = ActividadSimpleItemSerializer()
-    tecnico_docente_asociado = ActividadSimpleItemSerializer()
-    tecnico_docente_titular = ActividadSimpleItemSerializer()
-    profesor_asistente = ActividadSimpleItemSerializer()
-    profesor_asociado = ActividadSimpleItemSerializer()
-    profesor_titular = ActividadSimpleItemSerializer()
-    profesor_asignatura = ActividadSimpleItemSerializer()
-    tecnico_docente_asignatura = ActividadSimpleItemSerializer()
-
 class RangoHorasSerializer(serializers.Serializer):
     min = serializers.FloatField()
     max = serializers.FloatField()
@@ -30,6 +17,19 @@ class NivelDocenteSerializer(serializers.Serializer):
     medio_tiempo = TipoTiempoSerializer()
     tres_cuartos_tiempo = TipoTiempoSerializer()
     tiempo_completo = TipoTiempoSerializer()
+
+class ActividadSimpleItemSerializer(serializers.Serializer):
+    up = RangoUPSerializer()
+
+class ActividadSimpleSerializer(serializers.Serializer):
+    tecnico_docente_auxiliar = ActividadSimpleItemSerializer()
+    tecnico_docente_asociado = ActividadSimpleItemSerializer()
+    tecnico_docente_titular = ActividadSimpleItemSerializer()
+    profesor_asistente = ActividadSimpleItemSerializer()
+    profesor_asociado = ActividadSimpleItemSerializer()
+    profesor_titular = ActividadSimpleItemSerializer()
+    profesor_asignatura = ActividadSimpleItemSerializer()
+    tecnico_docente_asignatura = ActividadSimpleItemSerializer()
 
 class CargaAcademicaSerializer(serializers.Serializer):
     tecnico_docente_auxiliar = NivelDocenteSerializer()

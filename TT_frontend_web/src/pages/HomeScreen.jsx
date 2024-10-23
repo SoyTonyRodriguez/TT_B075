@@ -7,6 +7,7 @@ import LoadingAnimation from "../components/LoadingAnimation";
 
 import { jwtDecode } from "jwt-decode";
 import { getAccount } from "../../../api/accounts.api";
+import { getConditions } from '../../../api/conditions.api';
 
 
 function MainContent() {
@@ -25,10 +26,15 @@ function MainContent() {
     // Loading state
     const [loading, setLoading] = useState(true); 
 
+    // State for conditions
+    const [conditions, setConditions] = useState(null);
+
     useEffect(() => {
       // Verify if the userName is stored in the localStorage
       const storedAccountData = localStorage.getItem('accountDetails');
 
+      const storedConditions = localStorage.getItem('conditions');
+      
       // If the account is stored, set data and skip loading animation
       if (storedAccountData) {
         const { userName, fullName, email, category, phone, units_projection, projection_id } = JSON.parse(storedAccountData);
@@ -52,7 +58,27 @@ function MainContent() {
               }
           }
       }
+
+      // Load conditions from localStorage if available
+      if (storedConditions) {
+        setConditions(JSON.parse(storedConditions));
+        console.log('conditions from localStorage: ' + storedConditions);
+      } else {
+          fetchConditions();
+      }
     }, []);
+
+    const fetchConditions = async () => {
+      try {
+          const response = await getConditions();
+          setConditions(response.data[0]);
+
+          // Save conditions to localStorage
+          localStorage.setItem('conditions', JSON.stringify(response.data[0]));
+      } catch (error) {
+          console.error('Error fetching conditions:', error);
+      }
+    };
 
     useEffect(() => {
       if (userId && !userName) {
