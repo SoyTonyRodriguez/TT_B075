@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'documents',
     'conditions_categories',
     'check_products',
+    'conditions_max',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
