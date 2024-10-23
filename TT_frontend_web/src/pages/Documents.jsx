@@ -29,6 +29,8 @@ function Documents() {
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState(''); // segun gpt es para buscar
+
   const [loading, setLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState("Guardando los cambios...");
   const [isDocumentLoading, setIsDocumentLoading] = useState(false);
@@ -89,6 +91,10 @@ function Documents() {
 
   // Función para eliminar un documento
   const handleDeleteDocument = async (documentId) => {
+    const confirmDelete = window.confirm("¿Estás seguro que quieres eliminar este documento?");
+    if (!confirmDelete) return; 
+    
+
     try {
       setLoadingMessage("Eliminando archivo...");
       setIsDocumentLoading(true); // Mostrar loading al eliminar
@@ -231,16 +237,54 @@ function Documents() {
     setDateFilter('');
   };
 
-  // filtros de tipo y fecha
+  const parseDate = (dateString) => {
+    const [day, month, year] = dateString.split('/').map(Number); // Extraemos día, mes y año
+    return new Date(year, month - 1, day); // JavaScript usa meses de 0 a 11
+  };
+  
+
+  // Ajuste para comparación de fechas
+  const isDateInRange = (fileDateString, filter) => {
+    const today = new Date(); // Fecha actual
+    const fileDate = parseDate(fileDateString); // Convertimos la fecha del documento usando `parseDate`
+  
+    // Aseguramos que las comparaciones no se vean afectadas por la hora
+    today.setHours(0, 0, 0, 0);
+    fileDate.setHours(0, 0, 0, 0);
+  
+    switch (filter) {
+      case 'today':
+        return fileDate.getTime() === today.getTime();
+  
+      case 'this-week':
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay()); // Inicio de la semana (domingo)
+        startOfWeek.setHours(0, 0, 0, 0);
+        return fileDate >= startOfWeek && fileDate <= today;
+  
+      case 'this-month':
+        return (
+          fileDate.getMonth() === today.getMonth() &&
+          fileDate.getFullYear() === today.getFullYear()
+        );
+  
+      case 'this-year':
+        return fileDate.getFullYear() === today.getFullYear();
+  
+      default:
+        return true; // Si no hay filtro, devolver true
+    }
+  };
+  
+
+  // Filtramos los documentos según tipo y fecha seleccionados
   const filteredFileData = fileData.filter(file => {
-    if (fileTypeFilter && file.type !== fileTypeFilter) {
-      return false;
-    }
-    if (dateFilter && file.date !== dateFilter) {
-      return false;
-    }
-    return true;
-  });
+    const matchesType = !fileTypeFilter || file.type === fileTypeFilter;
+    const matchesDate = !dateFilter || isDateInRange(file.date, dateFilter);
+    const matchesSearch = file.name.toLowerCase().includes(searchTerm.toLowerCase());
+  
+    return matchesType && matchesDate && matchesSearch;
+  });  
 
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -352,11 +396,13 @@ function Documents() {
       <div className="p-6 max-w-6xl mx-auto">
         <div className="mb-6 flex items-center">
           <div className="relative w-full">
-            <input
-              type="text"
-              placeholder="Buscar en mis documentos"
-              className="w-full pl-10 pr-4 py-2 text-gray-700 border rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+          <input
+            type="text"
+            placeholder="Buscar en mis documentos"
+            className="w-full pl-10 pr-4 py-2 text-gray-700 border rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
               <FaSearch className="w-5 h-5 text-gray-400" />
             </span>
@@ -392,7 +438,7 @@ function Documents() {
               <span>Tipo</span>
             </button>
             {showFileTypeDropdown && (
-              <div className="absolute mt-2 bg-white rounded-lg shadow-lg p-4">
+              <div className="absolute z-30 mt-2 bg-white rounded-lg shadow-lg p-4">
                 <button onClick={() => handleFileTypeFilter('pdf')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                   PDF
                 </button>
@@ -415,12 +461,22 @@ function Documents() {
               <span>Modificado</span>
             </button>
             {showDateDropdown && (
-              <div className="absolute z-20 mt-2 bg-white rounded-lg shadow-lg p-4">
-                <button onClick={() => handleDateFilter('today')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Hoy</button>
-                <button onClick={() => handleDateFilter('this-week')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Últimos 7 días</button>
-                <button onClick={() => handleDateFilter('this-month')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Último mes</button>
-                <button onClick={() => handleDateFilter('this-year')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Este año</button>
-                <button onClick={closeDropdowns} className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100">Cancelar</button>
+              <div className="absolute z-30 mt-2 bg-white rounded-lg shadow-lg p-4">
+                <button onClick={() => handleDateFilter('today')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                  Hoy
+                </button>
+                <button onClick={() => handleDateFilter('this-week')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                  Últimos 7 días
+                </button>
+                <button onClick={() => handleDateFilter('this-month')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                  Último mes
+                </button>
+                <button onClick={() => handleDateFilter('this-year')} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                  Este año
+                </button>
+                <button onClick={closeDropdowns} className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100">
+                  Cancelar
+                </button>
               </div>
             )}
           </div>
@@ -466,27 +522,31 @@ function Documents() {
             <div>Nombre</div>
             <div className="text-center">Tamaño</div>
             <div className="text-center">Subido</div>
-            <div className="text-center">Actividad</div> {/* Nueva columna para la proyección */}
-            <div className="text-center">Acciones</div> {/* Alineación de la columna de acciones */}
+            <div className="text-center">Actividad</div>
+            <div className="text-center">Acciones</div>
           </div>
 
-          {fileData.length === 0 ? (
+          {filteredFileData.length === 0 ? (
             <div className="text-center p-4 text-gray-500">No tienes documentos cargados</div>
           ) : (
-            fileData.map((file, index) => (
+            filteredFileData.map((file, index) => (
               <div
                 key={index}
-                className={`grid grid-cols-5 items-center p-3 rounded-lg shadow-sm transform transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md`}
+                className={`grid grid-cols-5 items-center p-3 rounded-lg shadow-sm bg-blue-400 hover:bg-blue-500 transition-all`}
               >
-                <div className="flex items-center space-x-2">
-                  {file.type === 'pdf' ? <FaFilePdf className="text-red-500 w-6 h-6" /> : <FaFileImage className="text-white w-6 h-6" />}
-                  <span className="truncate max-w-xs underline cursor-pointer hover:text-yellow-300" title={file.name} onClick={() => handleDocumentClick(file.id)}>
+                <div className="flex space-x-3 items-center justify-center">
+                {file.type === 'pdf' ? (
+                  <FaFilePdf className="text-red-500 w-6 h-6 flex-shrink-0 hidden lg:inline" />
+                ) : (
+                  <FaFileImage className="text-white w-6 h-6 flex-shrink-0 hidden lg:inline" />
+                )}
+                  <span className="whitespace-normal break-words text-white font-medium hover:text-yellow-300 cursor-pointer text-center" title={file.name} onClick={() => handleDocumentClick(file.id)}  style={{ textDecoration: 'none', maxWidth: '180px', wordWrap: 'break-word', }}>
                     {file.name}
                   </span>
                 </div>
-                <div className="text-center">{file.size}</div>
-                <div className="text-center">{file.date}</div>
-                <div className="text-center">{file.projection}</div> {/* Mostrar el nombre de la proyección */}
+                <div className="text-center text-white">{file.size}</div>
+                <div className="text-center text-white">{file.date}</div>
+                <div className="text-center text-white">{file.projection}</div> {/* Mostrar el nombre de la proyección */}
                 <div className="flex justify-center space-x-3"> {/* Separar los botones con espacio */}
                   <div className="flex flex-col items-center">
                     {/* Botón para eliminar */}

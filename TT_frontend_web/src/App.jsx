@@ -24,6 +24,7 @@ import Privacidad from './pages/PrivacyScreen';
 import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
 import ProjectionFirstTime from './pages/Projection_FirstTime';
+import CategoryLimits from './pages/CategoryLimits'
 import { Toaster } from "react-hot-toast";
 
 
@@ -69,6 +70,7 @@ function App() {
         <Route path="/KanbanBoard" element={<ProtectedRoute component={KanbanBoard} />} />
         <Route path="/InfoProjection" element={<ProtectedRoute component={InfoProjection} />} />
         <Route path="/Projection-first" element={<ProtectedRoute component={ProjectionFirstTime} />} />
+        <Route path="/CategoryLimits" element={<ProtectedRoute component= {CategoryLimits}/>} />
       </Routes>
       <Footer />
       <Toaster />
