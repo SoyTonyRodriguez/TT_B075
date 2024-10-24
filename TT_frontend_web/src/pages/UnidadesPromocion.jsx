@@ -55,6 +55,8 @@ function UnidadesPromocion() {
   const [category_normalized, setCategoryNormalized] = useState(''); // Categoría normalizada
   const [hoursCalculated, setHoursCalculated] = useState(1); // Estado para almacenar el segundo número (horas)
 
+  const [up_allowed, setUpAllowed] = useState(''); // Estado para almacenar las U.P. permitidas
+
   // Obtener account_id de localStorage y llamar a get_Check_Products
   // Decode JWT once at the start and get the user ID
   useEffect(() => {
@@ -174,6 +176,13 @@ function UnidadesPromocion() {
             setCalculatedUnits(maxUP);
           }
         }
+      } else if (activity === "Programa de inducción") {
+        const units = enteredHours * 4;
+        setCalculatedUnits(units);
+      } else {
+        const units = Math.floor(enteredHours / hoursCalculated) * up_allowed;
+        //console.log(enteredHours, hoursCalculated, up_allowed, units);
+        setCalculatedUnits(units);
       }
     }
   };
@@ -301,6 +310,7 @@ function UnidadesPromocion() {
     setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
     setHours('');
     setIsUnitsSelected(false);
+    setCalculatedUnits('')
   };
 
   const getActividades = () => {
@@ -329,6 +339,21 @@ function UnidadesPromocion() {
     if (activityInfo) {
       setDocumentsRequired(activityInfo.documento);
 
+    // Mostrar "Horas de trabajo" y "U.P. Calculadas" solo para las dos primeras opciones de tutorías
+    const tutoriasValidas = [
+      '1.00 U.P. por cada hora de tutoría individual a la semana.',
+      '1.00 U.P. en tutoría grupal por cada hora a la semana en el semestre.'
+    ];
+
+    // Controlar la visibilidad y habilitación según la actividad seleccionada
+    if (tutoriasValidas.includes(activityInfo.up[0])) {
+      setShowWorkTime(true);  // Mostrar campos
+    } else {
+      setShowWorkTime(false); // Ocultar o deshabilitar campos
+      setHours(''); // Limpiar el campo de horas
+      setCalculatedUnits(''); // Limpiar el campo de U.P.
+    }
+
     // Si la actividad es "Carga académica", mostramos tiempo de trabajo y horas
     if (selectedActivity === "Carga académica") {
       setShowWorkTime(true); // Mostrar tiempo de trabajo
@@ -343,6 +368,8 @@ function UnidadesPromocion() {
       setHoursError('');
       setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
       setIsUnitsSelected(false);
+      setHoursCalculated(1)
+      setUpAllowed('')
     }
 
       // Si `up` es un array, lo usamos como opciones; si es un string, lo convertimos en array
@@ -383,14 +410,17 @@ function UnidadesPromocion() {
         console.log('Unidades seleccionadas:', firstNumber); // Mostrar U.P. en consola
         console.log('Horas calculadas:', secondNumber); // Mostrar horas en consola
 
+        setUpAllowed(firstNumber); // Guardar el primer número
+        setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
+
         // Asignar los valores procesados al estado
         setUnits(selectedUnit);
-        setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
         setIsUnitsSelected(true); // Habilitar los campos
       } else {
         setUnits(''); // Limpiar si hay múltiples opciones
         setHoursCalculated(1); // Limpiar horas calculadas si hay múltiples opciones
         setIsUnitsSelected(false); // Deshabilitar los campos
+        setUpAllowed(''); // Limpiar el máximo permitido
       }
 
       // Si hay roles disponibles, los establecemos; si no, dejamos vacío
@@ -427,6 +457,8 @@ function UnidadesPromocion() {
       setHours('');
       setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
       setIsUnitsSelected(false);
+      setHoursCalculated(1);
+      setUpAllowed('');
     }
   };
 
@@ -696,7 +728,9 @@ function UnidadesPromocion() {
     console.log('Primer número (U.P.):', firstNumber);
     console.log('Segundo número (Horas calculadas):', secondNumber);
   
+    setUpAllowed(firstNumber); // Guardar el primer número
     setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
+    console.log(hoursCalculated);
     setIsUnitsSelected(true); // Deshabilitar los campos
   };
 
@@ -869,7 +903,6 @@ function UnidadesPromocion() {
                   {hoursError && <span className="text-red-500">{hoursError}</span>}
                 </div>
 
-                {/* {activity === "Carga académica" && ( */}
                   <div className="mb-4">
                     <label className="block text-white text-sm font-semibold mb-2">
                       U.P. Calculadas
@@ -878,7 +911,6 @@ function UnidadesPromocion() {
                     {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
                     </p>
                   </div>
-                {/* )} */}
               </>
             )}
 
