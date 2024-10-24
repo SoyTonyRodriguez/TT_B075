@@ -29,6 +29,7 @@ function UnidadesPromocion() {
   const [documents_uploaded, setDocumentUploaded] = useState('');
   const [error, setError] = useState(null);
   const [maxText, setMaxText] = useState('');
+  const [isUnitsSelected, setIsUnitsSelected] = useState(false); // si las unidades están seleccionadas
 
   // Estados de validación para los errores
   const [functionError, setFunctionError] = useState(false);
@@ -52,6 +53,7 @@ function UnidadesPromocion() {
   const [hourLimits, setHourLimits] = useState({ min: 0, max: 200 }); // Almacena los límites de horas
 
   const [category_normalized, setCategoryNormalized] = useState(''); // Categoría normalizada
+  const [hoursCalculated, setHoursCalculated] = useState(1); // Estado para almacenar el segundo número (horas)
 
   // Obtener account_id de localStorage y llamar a get_Check_Products
   // Decode JWT once at the start and get the user ID
@@ -298,6 +300,7 @@ function UnidadesPromocion() {
     setUnitsOptions([]);
     setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
     setHours('');
+    setIsUnitsSelected(false);
   };
 
   const getActividades = () => {
@@ -339,6 +342,7 @@ function UnidadesPromocion() {
       setCalculatedUnits('');
       setHoursError('');
       setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
+      setIsUnitsSelected(false);
     }
 
       // Si `up` es un array, lo usamos como opciones; si es un string, lo convertimos en array
@@ -358,27 +362,35 @@ function UnidadesPromocion() {
 
         // Lógica para procesar la unidad seleccionada
         const parts = selectedUnit.split(' ');
-        let result = '';
+        let firstNumber = '';
+        let secondNumber = '';
 
-        // Busca la primera parte que sea un número
+        // Iterar sobre las partes para encontrar el primer y segundo número
+        let foundFirst = false;
         for (let i = 0; i < parts.length; i++) {
-          if (!isNaN(Number(parts[i])) && parts[i].trim() !== '') {
-            result = parts[i];
-            break;
+          const num = Number(parts[i].trim());
+          if (!isNaN(num)) {
+            if (!foundFirst) {
+              firstNumber = num;  // Primer número encontrado (U.P.)
+              foundFirst = true;
+            } else {
+              secondNumber = num; // Segundo número encontrado (Horas calculadas)
+              break;
+            }
           }
         }
 
-        // Si no encuentra un número, usa la siguiente parte disponible
-        if (result === '' && parts.length > 1) {
-          result = parts[1];
-        }
+        console.log('Unidades seleccionadas:', firstNumber); // Mostrar U.P. en consola
+        console.log('Horas calculadas:', secondNumber); // Mostrar horas en consola
 
-        console.log('Unidades seleccionadas:', result); // Mostrar en consola
-
-        // Asignar el valor procesado al estado
+        // Asignar los valores procesados al estado
         setUnits(selectedUnit);
+        setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
+        setIsUnitsSelected(true); // Habilitar los campos
       } else {
         setUnits(''); // Limpiar si hay múltiples opciones
+        setHoursCalculated(1); // Limpiar horas calculadas si hay múltiples opciones
+        setIsUnitsSelected(false); // Deshabilitar los campos
       }
 
       // Si hay roles disponibles, los establecemos; si no, dejamos vacío
@@ -414,6 +426,7 @@ function UnidadesPromocion() {
       setCalculatedUnits('');
       setHours('');
       setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
+      setIsUnitsSelected(false);
     }
   };
 
@@ -659,26 +672,32 @@ function UnidadesPromocion() {
 
   const handleUnitsChange = (e) => {
     const selectedUnit = e.target.value;
+    setUnits(selectedUnit);
   
-    // Divide la cadena seleccionada en partes
     const parts = selectedUnit.split(' ');
-    let result = '';
+    let firstNumber = '';
+    let secondNumber = '';
   
-    // Busca la primera parte que sea un número
+    // Iterar sobre las partes para encontrar el primer y segundo número
+    let foundFirst = false;
     for (let i = 0; i < parts.length; i++) {
-      if (!isNaN(Number(parts[i])) && parts[i].trim() !== '') {
-        result = parts[i];
-        break;
+      const num = Number(parts[i].trim());
+      if (!isNaN(num)) {
+        if (!foundFirst) {
+          firstNumber = num;
+          foundFirst = true;
+        } else {
+          secondNumber = num;
+          break;
+        }
       }
     }
   
-    // Si no encuentra un número, usa la siguiente parte disponible
-    if (result === '' && parts.length > 1) {
-      result = parts[1];
-    }
+    console.log('Primer número (U.P.):', firstNumber);
+    console.log('Segundo número (Horas calculadas):', secondNumber);
   
-    console.log('Valor seleccionado:', result); // Mostrar el valor en consola
-    setUnits(selectedUnit); // Actualiza la opción seleccionada
+    setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
+    setIsUnitsSelected(true); // Deshabilitar los campos
   };
 
   if (loading) {
@@ -796,7 +815,7 @@ function UnidadesPromocion() {
 
             {unitsOptions.length > 1 ? (
               <div className="mb-4">
-                <label className="block text-white text-sm font-semibold mb-2">U.P. aproximadas</label>
+                <label className="block text-white text-sm font-semibold mb-2">U.P. diponibles</label>
                 <select
                   value={units} // Asegúrate de que el valor sea controlado por el estado
                   onChange={handleUnitsChange} // Manejador para actualizar el estado
@@ -845,6 +864,7 @@ function UnidadesPromocion() {
                     onChange={handleHoursChange}
                     className="w-full p-2 rounded-lg border border-gray-400"
                     placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
+                    disabled={!isUnitsSelected}
                   />
                   {hoursError && <span className="text-red-500">{hoursError}</span>}
                 </div>
@@ -854,8 +874,8 @@ function UnidadesPromocion() {
                     <label className="block text-white text-sm font-semibold mb-2">
                       U.P. Calculadas
                     </label>
-                    <p className="bg-white p-2 rounded-lg border border-gray-400">
-                      {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
+                    <p className={`bg-white p-2 rounded-lg border border-gray-400 ${!isUnitsSelected ? 'opacity-50' : ''}`}>
+                    {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
                     </p>
                   </div>
                 {/* )} */}
