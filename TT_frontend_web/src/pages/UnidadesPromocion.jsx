@@ -597,6 +597,7 @@ function UnidadesPromocion() {
     return isValid;
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -621,35 +622,47 @@ function UnidadesPromocion() {
     }
     
     // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+    // Crea una variable temporal para almacenar la actividad ajustada según el rol
+    let activityToSend = activity;
 
+    if (activity === 'Proyectos de investigación con financiamiento interno' && role === 'Director') {
+      activityToSend = 'Proyectos de investigación con financiamiento interno (Director)';
+    }
+    if (activity === 'Proyectos de investigación con financiamiento interno' && role === 'Participante') {
+      activityToSend = 'Proyectos de investigación con financiamiento interno (Participante)';
+    }
+    
+    // obtener la función normalizada
+    const normalized_function = normalizeFuction(functionField);
+
+    // Acceder a max_UP_allowed de forma segura
+    const max_UP_allowed = 
+      conditions?.[normalized_function]?.[category_normalized]?.[workTime]?.up?.max || 
+      conditions?.[normalized_function]?.[category_normalized]?.up?.max;
+    if (max_UP_allowed === 0) {
+      toast.error('Tú categoría esta excenta de realizar está actividad.');
+      return;
+    }
 
      // verifica si el objeto checkProductData tiene datos
     if (Object.keys(checkProductData).length > 0) {
-      // obtener la función normalizada
-      const normalized_function = normalizeFuction(functionField);
+
       // Verificar si la actividad está en el objeto checkProductData
-      if (checkProductData.activities[activity]) {
-        const currentActivityData = checkProductData.activities[activity];
+      if (checkProductData.activities[activityToSend]) {
+        const currentActivityData = checkProductData.activities[activityToSend];
         const accumulatedUP = currentActivityData.up; // UP acumuladas para la actividad seleccionada
         const accumulatedLength = currentActivityData.length; // Número de veces registrada
-
-        // Acceder a max_UP_allowed de forma segura
-        const max_UP_allowed = 
-          conditions?.[normalized_function]?.[category_normalized]?.[workTime]?.up?.max || 
-          conditions?.[normalized_function]?.[category_normalized]?.up?.max;
         
-        const max_UP_Conditions = max_conditions.configuracion[activity]?.max_up || 
-            max_conditions.configuracion?.[activity]?.rol?.[role]?.max_up || 0;
-        const max_Length_Conditions = max_conditions.configuracion[activity]?.max_length || 
-            max_conditions.configuracion?.[activity]?.rol?.[role]?.max_length || 0;
+        const max_UP_Conditions = max_conditions.configuracion[activityToSend]?.max_up || 0;
+        const max_Length_Conditions = max_conditions.configuracion[activityToSend]?.max_length || 0;
 
         const sum_UP = accumulatedUP + Number(calculatedUnits || result);
         const sum_Length = accumulatedLength + 1;
     
-        // console.log('max_UP_Conditions:', max_UP_Conditions);
+        console.log('max_UP_Conditions:', max_UP_Conditions);
         // console.log('sum_UP:', sum_UP);
         // console.log(sum_UP > max_UP_Conditions);
-        //console.log('max_Length_Conditions:', max_Length_Conditions);
+        console.log('max_Length_Conditions:', max_Length_Conditions);
         if (sum_UP > max_UP_Conditions) {
             toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_Conditions}) de acuerdo a la actividad.`);
             return;
@@ -667,15 +680,17 @@ function UnidadesPromocion() {
       }
 
     }
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_ FIN DE VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
         
     // Calcular la longitud de los documentos requeridos
     const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);
     const documentsCount = documentsList.length;
+
   
     // Preparar los datos para la proyección
     const projectionData = {
       function: functionField,
-      activity,
+      activity: activityToSend,
       role,
       scope,
       documents_required,
