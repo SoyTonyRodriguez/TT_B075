@@ -46,6 +46,7 @@ function UnidadesPromocion() {
   const [workTime, setWorkTime] = useState(''); // Almacena el tiempo seleccionado
   const [category, setCategory] = useState(''); // Categoría del usuario
   const [conditions, setConditions] = useState(null); // Condiciones desde localStorage
+  const [max_conditions, setMaxConditions] = useState(null) // Condiciones de maximos desde el localstorage
   const [calculatedUnits, setCalculatedUnits] = useState(''); // U.P. calculadas
 
   const [hours, setHours] = useState(''); // Estado para almacenar las horas
@@ -100,14 +101,16 @@ function UnidadesPromocion() {
   useEffect(() => {
     const storedAccountDetails = localStorage.getItem('accountDetails');
     const storedConditions = localStorage.getItem('conditions');
+    const storedMaxConditions = localStorage.getItem('conditions_max');
 
-    if (storedAccountDetails && storedConditions) {
+    if (storedAccountDetails && storedConditions && storedMaxConditions) {
       const accountDetails = JSON.parse(storedAccountDetails);
       const normalizedCategory = normalizeCategory(accountDetails.category);
       setCategoryNormalized(normalizeCategory(accountDetails.category));
 
       setCategory(normalizedCategory);
       setConditions(JSON.parse(storedConditions));
+      setMaxConditions(JSON.parse(storedMaxConditions));
     }
   }, []);
 
@@ -339,21 +342,6 @@ function UnidadesPromocion() {
     if (activityInfo) {
       setDocumentsRequired(activityInfo.documento);
 
-    // Mostrar "Horas de trabajo" y "U.P. Calculadas" solo para las dos primeras opciones de tutorías
-    const tutoriasValidas = [
-      '1.00 U.P. por cada hora de tutoría individual a la semana.',
-      '1.00 U.P. en tutoría grupal por cada hora a la semana en el semestre.'
-    ];
-
-    // Controlar la visibilidad y habilitación según la actividad seleccionada
-    if (tutoriasValidas.includes(activityInfo.up[0])) {
-      setShowWorkTime(true);  // Mostrar campos
-    } else {
-      setShowWorkTime(false); // Ocultar o deshabilitar campos
-      setHours(''); // Limpiar el campo de horas
-      setCalculatedUnits(''); // Limpiar el campo de U.P.
-    }
-
     // Si la actividad es "Carga académica", mostramos tiempo de trabajo y horas
     if (selectedActivity === "Carga académica") {
       setShowWorkTime(true); // Mostrar tiempo de trabajo
@@ -370,6 +358,7 @@ function UnidadesPromocion() {
       setIsUnitsSelected(false);
       setHoursCalculated(1)
       setUpAllowed('')
+      setHoursError('');
     }
 
       // Si `up` es un array, lo usamos como opciones; si es un string, lo convertimos en array
@@ -649,18 +638,36 @@ function UnidadesPromocion() {
           conditions?.[normalized_function]?.[category_normalized]?.[workTime]?.up?.max || 
           conditions?.[normalized_function]?.[category_normalized]?.up?.max;
         
-        console.log('normlaized_activity:', normalized_function);
-        console.log('max_UP_allowed:', max_UP_allowed);
+        const max_UP_Conditions = max_conditions.configuracion[activity]?.max_up || 
+            max_conditions.configuracion?.[activity]?.rol?.[role]?.max_up || 0;
+        const max_Length_Conditions = max_conditions.configuracion[activity]?.max_length || 
+            max_conditions.configuracion?.[activity]?.rol?.[role]?.max_length || 0;
 
         const sum_UP = accumulatedUP + Number(calculatedUnits || result);
+        const sum_Length = accumulatedLength + 1;
+    
+        // console.log('max_UP_Conditions:', max_UP_Conditions);
+        // console.log('sum_UP:', sum_UP);
+        // console.log(sum_UP > max_UP_Conditions);
+        //console.log('max_Length_Conditions:', max_Length_Conditions);
+        if (sum_UP > max_UP_Conditions) {
+            toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_Conditions}) de acuerdo a la actividad.`);
+            return;
+        }
+        
+        if (sum_Length > max_Length_Conditions) {
+          toast.error(`El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a la actividad.`);
+          return;
+        }
 
         if (sum_UP > max_UP_allowed) {
           toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`);
           return;
         }
       }
+
     }
-    
+        
     // Calcular la longitud de los documentos requeridos
     const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);
     const documentsCount = documentsList.length;
@@ -702,9 +709,18 @@ function UnidadesPromocion() {
     }
   };
 
+  const tutoringOptions = new Set([
+    '3.00 U.P. en tutoría de regularización por unidad de aprendizaje al semestre.',
+    '5.00 U.P. en tutoría de recuperación académica por unidad de aprendizaje al semestre.',
+    '3.00 U.P. en tutoría a distancia por grupo atendido al semestre.',
+  ]);
+
   const handleUnitsChange = (e) => {
     const selectedUnit = e.target.value;
     setUnits(selectedUnit);
+    setHours(''); 
+    setCalculatedUnits(''); 
+    setHoursError(''); 
   
     const parts = selectedUnit.split(' ');
     let firstNumber = '';
@@ -730,8 +746,21 @@ function UnidadesPromocion() {
   
     setUpAllowed(firstNumber); // Guardar el primer número
     setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
-    console.log(hoursCalculated);
-    setIsUnitsSelected(true); // Deshabilitar los campos
+  
+    // Verificar si la opción seleccionada está en el conjunto de opciones específicas
+    const shouldDisableFields = tutoringOptions.has(selectedUnit);
+  
+    if (shouldDisableFields) {
+      // Limpiar los campos si la opción seleccionada requiere deshabilitarlos
+      setHours(''); 
+      setCalculatedUnits(''); 
+      setHoursError(''); 
+      setHourLimits({ min: 0, max: 200 }); 
+    }
+  
+    setIsUnitsSelected(!shouldDisableFields); // Deshabilitar campos si es necesario
+  
+    console.log('Campos deshabilitados:', shouldDisableFields);
   };
 
   if (loading) {
@@ -907,7 +936,7 @@ function UnidadesPromocion() {
                     <label className="block text-white text-sm font-semibold mb-2">
                       U.P. Calculadas
                     </label>
-                    <p className={`bg-white p-2 rounded-lg border border-gray-400 ${!isUnitsSelected ? 'opacity-50' : ''}`}>
+                    <p className={`bg-white p-2 rounded-lg border border-gray-400 ${!isUnitsSelected || !isUnitsSelected ? 'opacity-50' : ''}`}>
                     {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
                     </p>
                   </div>
