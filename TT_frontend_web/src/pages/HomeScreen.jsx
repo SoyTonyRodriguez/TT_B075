@@ -109,54 +109,6 @@ function MainContent() {
       }
     };
 
-    useEffect(() => {
-      if (userId && !userName) {
-          const fetchAccountDetails = async () => {
-              try {
-                  const response = await getAccount(userId);
-                  const fullName = response.data.name;
-                  const firstName = fullName.split(' ')[0];
-                  const email = response.data.email;
-                  const category = response.data.category;
-                  const phone = response.data.phone;
-                  const units_projection = response.data.units_projection;
-                  const projection_id = response.data.projection_id;
-
-                  // Store the account details in the state
-                  setUserName(firstName);
-                  setFullName(fullName);
-                  setEmail(email);
-                  setCategory(category);
-                  setPhone(phone);
-                  setUnitsProjection(units_projection);
-                  setProjectionId(projection_id);
-
-                  // Create an object with the account details
-                  const accountDetails = {
-                      userName: firstName,
-                      fullName,
-                      email,
-                      category,
-                      phone,
-                      units_projection,
-                      projection_id,
-                  };
-
-                  // Save the account details in the localStorage
-                  localStorage.setItem('accountDetails', JSON.stringify(accountDetails));
-              } catch (error) {
-                  console.error('Error fetching account details:', error);
-                  if (error.response && error.response.status === 401) {
-                      console.error('Unauthorized: Invalid or expired token');
-                  }
-              } finally {
-                  setLoading(false);
-              }
-          };
-          fetchAccountDetails();
-      }
-  }, [userId, userName]);
-
     // Show loading animation while fetching the account details
     if (loading) {
         return <LoadingAnimation />;
