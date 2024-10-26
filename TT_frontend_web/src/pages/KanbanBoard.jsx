@@ -219,43 +219,72 @@ function KanbanBoard() {
 
     // Función para calcular el progreso basado en las tareas completadas
     const calculateProgress = (tasks, projectionId) => {
-        // Obtener todas las tareas asociadas a la proyección
         const projectionTasks = tasks.filter(task => task.projection_id === projectionId);
-
-        // Filtrar solo las tareas que están en estado "done"
         const doneTasks = projectionTasks.filter(task => task.status === 'done');
-        
-        // Si no hay tareas asociadas a la proyección, el progreso es 0
+    
         if (projectionTasks.length === 0) return 0;
-
-        // Calcular el porcentaje de tareas completadas
-        const progress = (doneTasks.length / projectionTasks.length) * 100;
-        return Math.round(progress); // Redondear al número entero más cercano
+    
+        let progress = (doneTasks.length / projectionTasks.length) * 100;
+    
+        // Obtener la proyección correspondiente
+        const projection = projections.find(proj => proj.id === projectionId);
+    
+        // Usar la función `safeParseJSON` para manejar documentos subidos
+        const projectionDocuments = Array.isArray(projection.documents_uploaded)
+            ? projection.documents_uploaded  // Si ya es un array, usarlo directamente
+            : safeParseJSON(projection.documents_uploaded || '[]');
+    
+        const documentsUploadedCount = projectionDocuments.length;
+        const documentsRequiredCount = projection.documents_number || 0;
+    
+        // Limitar el progreso al 99% si faltan documentos
+        if (documentsUploadedCount < documentsRequiredCount) {
+            progress = Math.min(progress, 99);
+        }
+    
+        return Math.round(progress);
     };
 
     // Actualizar el progreso de la proyección cuando cambie el estado de una tarea
     const updateProjectionProgress = async (projectionId, tasks) => {
         const progress = calculateProgress(tasks, projectionId);
-        
+    
+        // Buscar la proyección correspondiente
+        const projection = projections.find(proj => proj.id === projectionId);
+    
+        // Verificar si los documentos están ya en array o intentar parsearlos
+        const projectionDocuments = Array.isArray(projection.documents_uploaded)
+            ? projection.documents_uploaded  // Si ya es array, úsalo directamente
+            : safeParseJSON(projection.documents_uploaded || '[]');  // Intentar parseo
+    
+        const documentsUploadedCount = projectionDocuments.length;
+        const documentsRequiredCount = projection.documents_number || 0;
+    
+        console.log(`Documentos subidos: ${documentsUploadedCount}/${documentsRequiredCount}`);
+    
+        // Validar que no se pueda marcar como 100% si faltan documentos
+        if (progress === 100 && documentsUploadedCount < documentsRequiredCount) {
+            toast.error('No puedes completar esta proyección sin subir todos los documentos requeridos.');
+            return;  // Evitar que continúe si faltan documentos
+        }
+    
         try {
             // Actualizar la proyección con el nuevo progreso
             await updateProduct(projectionId, { progress });
-            
-            // Verificar el progreso actualizado
-            const response = await getProduct(userId); // Obtén las proyecciones desde la API de nuevo
+    
+            // Refrescar las proyecciones desde la API
+            const response = await getProduct(userId);
             const updatedProjections = response.data;
     
             console.log(`Progreso actualizado para la proyección ${projectionId}:`, progress);
     
             // Actualizar el estado local de las proyecciones
             setProjections(updatedProjections);
-    
         } catch (error) {
-            console.error('Error updating projection progress:', error);
-            toast.error('Error actualizando el progreso de la proyección');
+            console.error('Error updating task status:', error);
+            toast.error('Error actualizando el progreso de la proyección.');
         }
     };
-
     // Barra de progreso para cada proyección
     const ProgressBar = ({ progress }) => (
         <div className="w-full bg-gray-200 rounded-full h-2 relative mt-1">
@@ -267,47 +296,71 @@ function KanbanBoard() {
         </div>
       );
 
+    const safeParseJSON = (str) => {
+        try {
+            // Reemplazar comillas simples y limpiar la cadena
+            const cleanedStr = str.replace(/'/g, '"').trim();
+            return JSON.parse(cleanedStr);  // Intentar parsear el JSON limpio
+        } catch (error) {
+            console.error('Error al parsear JSON:', error);
+            return [];  // Retornar un array vacío en caso de error
+        }
+    };
+    
+
     // Update task status when dropped in a different column
     const handleDrop = async (id, newStatus) => {
+        const taskBeforeUpdate = tasks.find(task => task.id === id);
         const updatedTasks = tasks.map(task =>
             task.id === id ? { ...task, status: newStatus } : task
         );
     
-        // Actualizar el estado local de tareas inmediatamente
-        setTasks(updatedTasks);
+        setTasks(updatedTasks); // Actualiza temporalmente el estado
     
-        // Obtener la tarea actualizada
         const updatedTask = updatedTasks.find(task => task.id === id);
     
-        // Calcular el progreso localmente para la proyección
         if (updatedTask.projection_id) {
+            const projection = projections.find(proj => proj.id === updatedTask.projection_id);
+    
+            // Usamos safeParseJSON para evitar errores de parseo
+            const projectionDocuments = Array.isArray(projection.documents_uploaded)
+                ? projection.documents_uploaded
+                : safeParseJSON(projection.documents_uploaded || '[]');
+    
+            const documentsUploadedCount = projectionDocuments.length;
+            const documentsRequiredCount = projection.documents_number || 0;
+    
+            if (newStatus === 'done' && documentsUploadedCount < documentsRequiredCount) {
+                toast.error('No puedes marcar esta tarea como completada sin subir todos los documentos requeridos.');
+                setTasks(tasks); // Revertimos el estado si no cumple
+                return;
+            }
+    
             const localProgress = calculateProgress(updatedTasks, updatedTask.projection_id);
-            
-            // Actualizar la proyección localmente antes de hacer la llamada a la API
-            setProjections(prevProjections => prevProjections.map(projection =>
-                projection.id === updatedTask.projection_id
-                    ? { ...projection, progress: localProgress }
-                    : projection
-            ));
+    
+            setProjections(prevProjections =>
+                prevProjections.map(projection =>
+                    projection.id === updatedTask.projection_id
+                        ? { ...projection, progress: localProgress }
+                        : projection
+                )
+            );
         }
     
-        // Luego, hacer la llamada a la API
         try {
             await updateTask(id, { status: newStatus });
             toast.success('Tarea actualizada con éxito');
     
-            // Si la tarea pertenece a una proyección, actualizar el progreso en la API
             if (updatedTask.projection_id) {
                 await updateProjectionProgress(updatedTask.projection_id, updatedTasks);
             }
         } catch (error) {
             console.error('Error updating task status:', error);
             setError('Error actualizando el estado de la tarea.');
-            
-            // Revertir al estado original si falla la API
-            setTasks(tasks);
+            setTasks(tasks); // Revertir el estado si hay un error
         }
     };
+    
 
     // TaskCard component that displays the task details
     const TaskCard = ({ task, onDelete, projections }) => {
@@ -499,7 +552,6 @@ function KanbanBoard() {
                         <h2 className="text-2xl font-bold mb-2">Progresos de Actividades</h2>
                         <div className="space-y-4">
                             {projections.map(projection => {
-                                console.log("Projection object:", projection); // Depuración
 
                                 // Filtrar las tareas asociadas a la proyección actual
                                 const projectionTasks = tasks.filter(task => task.projection_id === projection.id);
@@ -515,34 +567,41 @@ function KanbanBoard() {
                                 const documentsRequiredCount = projection.documents_number || 0; // Número total de documentos requeridos
 
                                 return (
-                                    <div key={projection.id} className="bg-white shadow-lg p-6 rounded-xl hover:shadow-2xl transition-all duration-300">
-                                        <h3 className="font-bold text-md mb-1 text-gray-800 truncate z-10">{projection.activity}</h3>
-                                        <ProgressBar progress={projection.progress || 0} />
-                                        <p className="mt-2 text-sm text-gray-600">
-                                            <strong>Tareas Completadas: </strong> {doneTasks}/{totalTasks}
-                                        </p>
-                                        <hr className="my-2 border-t-2 border-gray-300" />
-                                        <p className="text-sm text-gray-500">
-                                            <strong>Documentos Requeridos: </strong> {documentsUploadedCount}/{documentsRequiredCount}
-                                            {/* Mostrar documentos requeridos como lista */}
-                                            <ul className="list-disc list-inside text-sm text-gray-500 mt-2">
-                                                {projection.documents_required.split('\n').map((doc, index) => (
-                                                    <li key={index}>{doc.trim()}</li>
-                                                ))}
-                                            </ul>
-                                        </p>
+                                    <div 
+                                        key={projection.id} 
+                                        className="shadow-md p-4 hover:shadow-lg transition-all duration-300 border mb-4 flex flex-col gap-2" 
+                                        style={{ 
+                                            borderColor: projection.color || '#cccccc',
+                                            borderWidth: '2px',
+                                            borderRadius: '8px',
+                                            boxShadow: `0 2px 6px ${projection.color}22`, // Sombra suave y menos intensa
+                                        }}
+                                    >
+                                            {/* Título de la actividad */}
+                                        <h3 className="text-sm font-semibold text-gray-800 truncate">{projection.activity}</h3>
 
-                                        {documentsUploadedCount >= documentsRequiredCount ? (
-                                            <div className="flex items-center text-green-500">
-                                                <AiOutlinePaperClip className="mr-2" size={18} />
-                                                <span>Todos los documentos han sido subidos</span>
-                                            </div>
-                                        ) : (
-                                            <Link to="/documents" className="text-sm text-gray-500 flex items-center">
-                                                <AiOutlinePaperClip className="mr-2 text-blue-500" size={18} />
-                                                <span className="text-blue-500 hover:underline cursor-pointer">
-                                                    Clic aquí para subir documento
-                                                </span>
+                                        {/* Contador de tareas debajo del título */}
+                                        <span className="text-xs text-gray-500 mb-2">
+                                            {doneTasks}/{totalTasks} Tareas completadas
+                                        </span>
+
+                                        {/* Barra de progreso más compacta */}
+                                        <ProgressBar progress={projection.progress || 0} />
+
+                                        {/* Información de documentos en una línea */}
+                                        <div className="text-xs text-gray-600 flex items-center gap-2">
+                                            <AiOutlinePaperClip className="text-blue-400" size={16} />
+                                            <span>{documentsUploadedCount}/{documentsRequiredCount} documentos</span>
+                                        </div>
+
+                                        {/* Link para subir documentos si faltan */}
+                                        {documentsUploadedCount < documentsRequiredCount && (
+                                            <Link 
+                                                to="/documents" 
+                                                className="text-xs text-blue-500 hover:underline flex items-center gap-1"
+                                            >
+                                                <AiOutlinePaperClip size={16} />
+                                                Subir documento
                                             </Link>
                                         )}
                                     </div>
