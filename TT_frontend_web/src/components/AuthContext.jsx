@@ -10,9 +10,9 @@ export const AuthProvider = ({ children }) => {
         // Cargar datos de autenticación desde localStorage
         const accountData = localStorage.getItem("accountDetails");
         if (accountData) {
-        const { email } = JSON.parse(accountData);
-        setEmail(email);
-        setIsAuthenticated(true);
+            const { email } = JSON.parse(accountData);
+            setEmail(email);
+            setIsAuthenticated(true);
         }
     }, []);
 

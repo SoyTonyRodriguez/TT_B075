@@ -664,12 +664,12 @@ function UnidadesPromocion() {
         // console.log(sum_UP > max_UP_Conditions);
         console.log('max_Length_Conditions:', max_Length_Conditions);
         if (sum_UP > max_UP_Conditions) {
-            toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_Conditions}) de acuerdo a la actividad.`);
+            toast.error(`Agregar esta activdad superará el máximo permitido (${max_UP_Conditions} U.P) de acuerdo al reglamento de promocion docente.`);
             return;
         }
         
         if (sum_Length > max_Length_Conditions) {
-          toast.error(`El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a la actividad.`);
+          toast.error(`El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a al reglamento de promocion docente.`);
           return;
         }
 
