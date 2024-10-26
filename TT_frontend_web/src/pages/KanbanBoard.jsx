@@ -44,6 +44,9 @@ function KanbanBoard() {
     const [taskToEdit, setTaskToEdit] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+    const [showDocuments, setShowDocuments] = useState(false);
+    const [expandedProjectionId, setExpandedProjectionId] = useState(null);  // Estado para saber qué proyección está expandida
+
     // Decode JWT once at the start and get the user ID
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -311,18 +314,24 @@ function KanbanBoard() {
     // Update task status when dropped in a different column
     const handleDrop = async (id, newStatus) => {
         const taskBeforeUpdate = tasks.find(task => task.id === id);
+    
+        // Actualizamos las tareas en el estado temporalmente
         const updatedTasks = tasks.map(task =>
             task.id === id ? { ...task, status: newStatus } : task
         );
     
-        setTasks(updatedTasks); // Actualiza temporalmente el estado
+        setTasks(updatedTasks); // Actualiza el estado con el cambio temporal
     
         const updatedTask = updatedTasks.find(task => task.id === id);
     
         if (updatedTask.projection_id) {
             const projection = projections.find(proj => proj.id === updatedTask.projection_id);
     
-            // Usamos safeParseJSON para evitar errores de parseo
+            // Filtramos todas las tareas asociadas a esta proyección
+            const projectionTasks = updatedTasks.filter(task => task.projection_id === updatedTask.projection_id);
+            const remainingTasks = projectionTasks.filter(task => task.status !== 'done'); // Tareas restantes
+    
+            // Usamos safeParseJSON para evitar errores al parsear documentos
             const projectionDocuments = Array.isArray(projection.documents_uploaded)
                 ? projection.documents_uploaded
                 : safeParseJSON(projection.documents_uploaded || '[]');
@@ -330,14 +339,19 @@ function KanbanBoard() {
             const documentsUploadedCount = projectionDocuments.length;
             const documentsRequiredCount = projection.documents_number || 0;
     
-            if (newStatus === 'done' && documentsUploadedCount < documentsRequiredCount) {
-                toast.error('No puedes marcar esta tarea como completada sin subir todos los documentos requeridos.');
+            console.log(`Restan ${remainingTasks.length} tareas. Documentos: ${documentsUploadedCount}/${documentsRequiredCount}`);
+    
+            // **Nueva validación**: Solo si NO hay más tareas restantes y faltan documentos
+            if (newStatus === 'done' && remainingTasks.length === 0 && documentsUploadedCount < documentsRequiredCount) {
+                toast.error('No puedes completar esta actividad sin subir todos los documentos requeridos.');
                 setTasks(tasks); // Revertimos el estado si no cumple
                 return;
             }
     
+            // Calculamos el progreso localmente
             const localProgress = calculateProgress(updatedTasks, updatedTask.projection_id);
     
+            // Actualizamos el progreso en el estado local
             setProjections(prevProjections =>
                 prevProjections.map(projection =>
                     projection.id === updatedTask.projection_id
@@ -357,9 +371,10 @@ function KanbanBoard() {
         } catch (error) {
             console.error('Error updating task status:', error);
             setError('Error actualizando el estado de la tarea.');
-            setTasks(tasks); // Revertir el estado si hay un error
+            setTasks(tasks); // Revertimos el estado si hay error
         }
     };
+    
     
 
     // TaskCard component that displays the task details
@@ -551,20 +566,19 @@ function KanbanBoard() {
                     <div className="w-1/3 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px', overflowY: 'auto' }}>
                         <h2 className="text-2xl font-bold mb-2">Progresos de Actividades</h2>
                         <div className="space-y-4">
-                            {projections.map(projection => {
-
-                                // Filtrar las tareas asociadas a la proyección actual
+                            {projections.map((projection) => {
                                 const projectionTasks = tasks.filter(task => task.projection_id === projection.id);
                                 const doneTasks = projectionTasks.filter(task => task.status === 'done').length;
                                 const totalTasks = projectionTasks.length;
 
-                                // Aquí convertimos los documentos subidos en un array válido
                                 const projectionDocuments = Array.isArray(projection.documents_uploaded) 
                                     ? projection.documents_uploaded 
                                     : JSON.parse(projection.documents_uploaded.replace(/'/g, '"') || '[]');
 
                                 const documentsUploadedCount = projectionDocuments.length;
-                                const documentsRequiredCount = projection.documents_number || 0; // Número total de documentos requeridos
+                                const documentsRequiredCount = projection.documents_number || 0;
+
+                                const isExpanded = expandedProjectionId === projection.id;  // Saber si esta proyección está expandida
 
                                 return (
                                     <div 
@@ -574,27 +588,41 @@ function KanbanBoard() {
                                             borderColor: projection.color || '#cccccc',
                                             borderWidth: '2px',
                                             borderRadius: '8px',
-                                            boxShadow: `0 2px 6px ${projection.color}22`, // Sombra suave y menos intensa
+                                            boxShadow: `0 2px 6px ${projection.color}22`, 
                                         }}
                                     >
-                                            {/* Título de la actividad */}
-                                        <h3 className="text-sm font-semibold text-gray-800 truncate">{projection.activity}</h3>
+                                        <h3 className="text-sm font-semibold text-gray-800 truncate">
+                                            {projection.activity}
+                                        </h3>
 
-                                        {/* Contador de tareas debajo del título */}
                                         <span className="text-xs text-gray-500 mb-2">
                                             {doneTasks}/{totalTasks} Tareas completadas
                                         </span>
 
-                                        {/* Barra de progreso más compacta */}
                                         <ProgressBar progress={projection.progress || 0} />
 
-                                        {/* Información de documentos en una línea */}
+                                        {/* Botón de toggle para mostrar/ocultar documentos */}
+                                        <button 
+                                            onClick={() => setExpandedProjectionId(isExpanded ? null : projection.id)}
+                                            className="text-blue-500 text-xs mt-2 hover:underline"
+                                        >
+                                            {isExpanded ? 'Ocultar documentos' : 'Mostrar documentos'}
+                                        </button>
+
+                                        {/* Lista de documentos */}
+                                        {isExpanded && (
+                                            <ul className="list-disc list-inside text-sm text-gray-700 mt-2">
+                                                {projection.documents_required.split('\n').map((doc, index) => (
+                                                    <li key={index}>{doc.trim()}</li>
+                                                ))}
+                                            </ul>
+                                        )}
+
                                         <div className="text-xs text-gray-600 flex items-center gap-2">
                                             <AiOutlinePaperClip className="text-blue-400" size={16} />
                                             <span>{documentsUploadedCount}/{documentsRequiredCount} documentos</span>
                                         </div>
 
-                                        {/* Link para subir documentos si faltan */}
                                         {documentsUploadedCount < documentsRequiredCount && (
                                             <Link 
                                                 to="/documents" 
