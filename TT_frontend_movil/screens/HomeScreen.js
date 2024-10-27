@@ -3,6 +3,8 @@ import { View, Text, TextInput, Image, ImageBackground, TouchableOpacity, Scroll
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import { getAccount } from "../api/accounts.api"; // Importa tu función de API
+import { getConditions } from '../api/conditions.api'; // Importa tu función de API
+import { getConditionsMax } from '../api/conditions_max.api'; // Importa tu función de API
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 import { jwtDecode } from "jwt-decode";
@@ -24,12 +26,20 @@ const HomeScreen = () => {
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
   const [loading, setLoading] = useState(true); // Estado de carga
 
+  // State for conditions
+  const [conditions, setConditions] = useState(null);
+  const [conditions_max, setConditionsMax] = useState(null);
+
   useEffect(() => {
     const loadAccountData = async () => {
       try {
         Toast.show({ type: 'success', text1: 'Bienvenido!', visibilityTime: 1000 });
         // Verifica si los datos de la cuenta están almacenados
         const storedAccountData = await AsyncStorage.getItem('accountDetails');
+
+        const storedConditions = await AsyncStorage.getItem('conditions');
+
+        const storedConditionsMax = await AsyncStorage.getItem('conditions_max');
         
         if (storedAccountData) {
           const { userName, fullName, email, category, phone } = JSON.parse(storedAccountData);
@@ -51,6 +61,20 @@ const HomeScreen = () => {
               console.error('Token inválido:', error);
             }
           }
+        }
+
+        if (storedConditions) {
+          setConditions(JSON.parse(storedConditions));
+          console.log('Conditions cargadas desde AsyncStorage.');
+        } else {
+          fetchConditions();
+        }
+  
+        if (storedConditionsMax) {
+          setConditionsMax(JSON.parse(storedConditionsMax));
+          console.log('Conditions_max cargadas desde AsyncStorage.');
+        } else {
+          fetchConditionsMax();
         }
       } catch (error) {
         console.error('Error al cargar los datos de la cuenta:', error);
@@ -101,7 +125,40 @@ const HomeScreen = () => {
 
       fetchAccountDetails();
     }
-  }, [userId, userName]);
+  }, [userId, userName]);    
+  
+  const fetchConditions = async () => {
+    try {
+      const response = await getConditions();
+      setConditions(response.data[0]);
+  
+      // Verificar que los datos sean válidos antes de guardar
+      if (response.data[0]) {
+        await AsyncStorage.setItem('conditions', JSON.stringify(response.data[0]));
+        console.log('Conditions guardadas en AsyncStorage.');
+      }
+    } catch (error) {
+      console.error('Error fetching conditions:', error);
+    }
+  };
+  
+  const fetchConditionsMax = async () => {
+    try {
+      const response = await getConditionsMax();
+  
+      // Verificar que los datos sean válidos
+      if (response && response.data) {
+        setConditionsMax(response.data);
+  
+        await AsyncStorage.setItem('conditions_max', JSON.stringify(response.data));
+        console.log('Conditions_max guardadas en AsyncStorage.');
+      } else {
+        console.warn('No se encontraron datos para conditions_max.');
+      }
+    } catch (error) {
+      console.error('Error fetching conditions_max:', error);
+    }
+  };
 
   return (
     <ImageBackground 
