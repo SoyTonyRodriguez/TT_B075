@@ -3,7 +3,7 @@ import { format, startOfMonth, startOfWeek, addDays, setMonth, setYear, addMonth
 import { es } from 'date-fns/locale';
 import Navigation from './Navigation/Navigation';  
 import { getAllDates } from '../../../api/calendar_dates.api';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingAnimation from '../components/LoadingAnimation';
 
 const CalendarWithDetails = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
