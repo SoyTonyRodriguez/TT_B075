@@ -24,4 +24,7 @@ urlpatterns = [
     path('', include('projections.urls')),
     path('', include('products.urls')),
     path('', include('documents.urls')),
+    path('', include('conditions_categories.urls')),
+    path('', include('check_products.urls')),
+    path('', include('conditions_max.urls')),
 ]
