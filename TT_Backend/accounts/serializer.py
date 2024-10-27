@@ -67,27 +67,28 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         email = attrs.get('email')
         password = attrs.get('password')
 
-        # Connect to MongoDB and find the account by email
+        # Conectar a MongoDB y encontrar la cuenta por email
         client = MongoClient(settings.MONGO_CONNECTION_STRING)
         db = client[settings.DB_CLIENT]
         account = db.accounts.find_one({"email": email})
 
-        # Check if the account exists
+        # Validar si la cuenta existe
         if account is None:
             raise serializers.ValidationError('Correo y/o contraseña inválidos\nIntente nuevamente')
 
-        # Authenticate the user
+        # Autenticar al usuario
         user = authenticate(id=account['id'], password=password)
-
         if user is None:
             raise serializers.ValidationError('Correo y/o contraseña inválidos\nIntente nuevamente')
-        
-        # Manually generate tokens
+
+        # Generar los tokens y validar que el JTI no sea nulo
         refresh = RefreshToken.for_user(user)
+        assert refresh.get("jti") is not None, "El token generado tiene un JTI nulo"
+
+        # Preparar los datos de respuesta con los tokens
         data = {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
-            #'email': user.email,
         }
         return data
 

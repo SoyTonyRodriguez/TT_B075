@@ -2,6 +2,7 @@ from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from .models import Products
 from projections.models import Projection
+from check_products.models import ProductCheck
 
 # Variable global para almacenar el projection_id anterior
 old_product_id = None
@@ -62,3 +63,24 @@ def update_product_projection(sender, instance, created, **kwargs):
     
     # Resetear el valor global old_projection_id después de usarlo
     old_product_id = None
+
+@receiver(post_save, sender=Products)
+def update_product_check(sender, instance, **kwargs):
+    account_id = instance.account_id
+    activity_name = instance.activity
+    units = instance.units
+
+    # Buscar o crear un ProductCheck para la cuenta
+    product_check, created = ProductCheck.objects.get_or_create(account_id=account_id)
+
+    # Actualizar las actividades en ProductCheck
+    if activity_name in product_check.activities:
+        product_check.activities[activity_name]['length'] += 1
+        product_check.activities[activity_name]['up'] += units
+    else:
+        product_check.activities[activity_name] = {
+            'length': 1,
+            'up': units
+        }
+
+    product_check.save()  # Guardar los cambios

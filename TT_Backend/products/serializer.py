@@ -7,7 +7,7 @@ class RegisterProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products
         fields = ['id', 'account_id', 'function', 'activity', 'role', 'scope', 
-                  'tasks', 'documents_required', 'documents_uploaded', 'units', 'priority', 'color', 'progress', 'projection_id']
+                  'tasks', 'documents_required', 'documents_number', 'documents_uploaded', 'units', 'priority', 'color', 'progress', 'projection_id']
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True},

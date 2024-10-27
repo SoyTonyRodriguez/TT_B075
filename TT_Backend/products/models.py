@@ -40,6 +40,7 @@ class Products(models.Model):
         null=True,
         default=list
     )
+    documents_number = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     units_str = models.CharField(max_length=255, blank=True, null=True)
