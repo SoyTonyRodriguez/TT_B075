@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, ImageBackground, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker'; 
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { get_Check_Products } from '../api/check_products.api'; 
+import { AuthContext } from '../components/AuthContext';
+
 import tw from 'twrnc';
 
   // Opciones de actividades por función con documentos requeridos y U.P
@@ -66,8 +69,6 @@ import tw from 'twrnc';
     ],
   };
 
-  const prioridades = ['Baja', 'Media', 'Alta'];
-
   const CrearProyeccion = () => {
     const [funcion, setFuncion] = useState('');
     const [actividad, setActividad] = useState('');
@@ -83,21 +84,39 @@ import tw from 'twrnc';
     const [modalVisible, setModalVisible] = useState(false); 
     const [modalType, setModalType] = useState('');
     const [showCalendar, setShowCalendar] = useState(false); 
-    const [priority, setPriority] = useState(''); 
     const [rolesDisponibles, setRolesDisponibles] = useState([]); 
     const [mostrarRol, setMostrarRol] = useState(false);
     const [mostrarAlcance, setMostrarAlcance] = useState(false);
     const [mostrarUp, setMostrarUp] = useState(false); 
     const [mostrarDocumento, setMostrarDocumento] = useState(false);
     const [maximoUps, setMaximoUps] = useState([]); // Estado para U.P. con máximo permitido
+
+    const [checkProductData, setCheckProductData] = useState(null); // Datos recibidos
+    const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
+    const [loading, setLoading] = useState(true); // Estado de carga inicial
+    
+    useEffect(() => {
+  
+      const fetchCheckProducts = async (userId) => {
+        try {
+          setLoading(true);
+          const response = await get_Check_Products(userId); // Llamada a la API
+          setCheckProductData(response.data); // Almacenar los datos recibidos
+          console.log('Datos recibidos:', response.data);
+        } catch (error) {
+          console.error('Error al obtener datos:', error);
+          setError('No se pudo cargar la información.'); // Mostrar mensaje de error
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      if (userId) {
+        fetchCheckProducts(userId);
+      }
+    }, [userId]);
   
     const funciones = Object.keys(actividadesPorFuncion);
-  
-    const priorityColors = {
-      Baja: 'bg-blue-500',
-      Media: 'bg-yellow-500',
-      Alta: 'bg-red-500',
-    };
   
     const filtrarUPs = (rolSeleccionado, alcanceSeleccionado) => {
       if (!actividad) return; // No hacer nada si no hay actividad seleccionada
@@ -171,7 +190,6 @@ import tw from 'twrnc';
         setMostrarAlcance(false);
         setAlcancesDisponibles([]);
         setFecha('');
-        setPriority('');
       } else if (modalType === 'actividad') {
         setActividad(item);
         const actividadEncontrada = actividadesDisponibles.find(
@@ -214,8 +232,6 @@ import tw from 'twrnc';
         filtrarUPs(rol, item); // Volver a filtrar con el nuevo alcance seleccionado
       } else if (modalType === 'up') {
         setUpSeleccionada(item);
-      } else if (modalType === 'prioridad') {
-        setPriority(item);
       }
       setModalVisible(false);
     };  
@@ -364,14 +380,6 @@ import tw from 'twrnc';
   
           {/* Selector de Prioridad */}
           <View style={tw`mb-4 flex-row items-center`}>
-            {/* Selector de prioridad */}
-            <TouchableOpacity
-              onPress={() => { setModalType('prioridad'); setModalVisible(true); }}
-              style={tw`flex-1 p-4 border border-gray-700 rounded-lg flex-row justify-between items-center bg-white text-black ${priorityColors[priority]} mr-2`}
-            >
-              <Text style={tw`text-black`}>{priority || "Selecciona prioridad"}</Text>
-              <Ionicons name="chevron-down" size={24} color="black" />
-            </TouchableOpacity>
   
             {/* Botón Agregar */}
             <TouchableOpacity
@@ -398,8 +406,7 @@ import tw from 'twrnc';
                   modalType === 'actividad' ? actividadesDisponibles.map(a => a.actividad) :
                   modalType === 'rol' ? rolesDisponibles :
                   modalType === 'alcance' ? alcancesDisponibles :
-                  modalType === 'up' ? upsDisponibles : // Asegúrate de mostrar las U.P.
-                  modalType === 'prioridad' ? prioridades : []
+                  modalType === 'up' ? upsDisponibles : []
                 }
                 keyExtractor={(item, index) => `${item}-${index}`} // Evita conflictos en las keys
                 renderItem={({ item }) => (
