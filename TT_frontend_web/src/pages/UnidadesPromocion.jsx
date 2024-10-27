@@ -16,7 +16,6 @@ function UnidadesPromocion() {
   const [userId, setUserId] = useState(null);
 
   // Estados para los campos del formulario
-  const [priority, setPriority] = useState('');
   const [functionField, setFunctionField] = useState('');
   const [role, setRole] = useState('');
   const [scope, setScope] = useState('');
@@ -30,13 +29,13 @@ function UnidadesPromocion() {
   const [documents_uploaded, setDocumentUploaded] = useState('');
   const [error, setError] = useState(null);
   const [maxText, setMaxText] = useState('');
+  const [isUnitsSelected, setIsUnitsSelected] = useState(false); // si las unidades están seleccionadas
 
   // Estados de validación para los errores
   const [functionError, setFunctionError] = useState(false);
   const [activityError, setActivityError] = useState(false);
   const [roleError, setRoleError] = useState(false);
   const [scopeError, setScopeError] = useState(false);
-  const [priorityError, setPriorityError] = useState(false);
 //este pedo es para que funcione el rol y el alcance 
   const [roleOptions, setRoleOptions] = useState([]);
   const [scopeOptions, setScopeOptions] = useState([]);
@@ -47,11 +46,17 @@ function UnidadesPromocion() {
   const [workTime, setWorkTime] = useState(''); // Almacena el tiempo seleccionado
   const [category, setCategory] = useState(''); // Categoría del usuario
   const [conditions, setConditions] = useState(null); // Condiciones desde localStorage
+  const [max_conditions, setMaxConditions] = useState(null) // Condiciones de maximos desde el localstorage
   const [calculatedUnits, setCalculatedUnits] = useState(''); // U.P. calculadas
 
   const [hours, setHours] = useState(''); // Estado para almacenar las horas
   const [hoursError, setHoursError] = useState(''); // Estado para mostrar errores de validación
   const [hourLimits, setHourLimits] = useState({ min: 0, max: 200 }); // Almacena los límites de horas
+
+  const [category_normalized, setCategoryNormalized] = useState(''); // Categoría normalizada
+  const [hoursCalculated, setHoursCalculated] = useState(1); // Estado para almacenar el segundo número (horas)
+
+  const [up_allowed, setUpAllowed] = useState(''); // Estado para almacenar las U.P. permitidas
 
   // Obtener account_id de localStorage y llamar a get_Check_Products
   // Decode JWT once at the start and get the user ID
@@ -96,13 +101,16 @@ function UnidadesPromocion() {
   useEffect(() => {
     const storedAccountDetails = localStorage.getItem('accountDetails');
     const storedConditions = localStorage.getItem('conditions');
+    const storedMaxConditions = localStorage.getItem('conditions_max');
 
-    if (storedAccountDetails && storedConditions) {
+    if (storedAccountDetails && storedConditions && storedMaxConditions) {
       const accountDetails = JSON.parse(storedAccountDetails);
       const normalizedCategory = normalizeCategory(accountDetails.category);
+      setCategoryNormalized(normalizeCategory(accountDetails.category));
 
       setCategory(normalizedCategory);
       setConditions(JSON.parse(storedConditions));
+      setMaxConditions(JSON.parse(storedMaxConditions));
     }
   }, []);
 
@@ -112,6 +120,20 @@ function UnidadesPromocion() {
     words.pop(); // Elimina la última palabra.
     return words.join('_'); // Une las palabras restantes con '_'.
   };
+
+
+  const normalizeFuction = (functionField) => {
+    const mappings = {
+      "Docencia": "carga_academica",
+      "Otras actividades en docencia": "otras_actividades",
+      "Investigación": "investigacion",
+      "Superación académica": "superacion_academica",
+      "Actividades complementarias de apoyo a la docencia y a la investigación": "actividades_complementarias",
+      "Actividades de extensión, integración y difusión de la ciencia y de la cultura": "actividades_extension"
+    };
+
+    return mappings[functionField];
+  }
 
 
   // Manejar el cambio del tiempo de trabajo
@@ -157,21 +179,14 @@ function UnidadesPromocion() {
             setCalculatedUnits(maxUP);
           }
         }
+      } else if (activity === "Programa de inducción") {
+        const units = enteredHours * 4;
+        setCalculatedUnits(units);
+      } else {
+        const units = Math.floor(enteredHours / hoursCalculated) * up_allowed;
+        //console.log(enteredHours, hoursCalculated, up_allowed, units);
+        setCalculatedUnits(units);
       }
-    }
-  };
-
-  // Definición de la función para obtener el color según la prioridad
-  const getColorForPriority = (priority) => {
-    switch (priority) {
-      case 'Baja':
-        return 'bg-blue-500';
-      case 'Media':
-        return 'bg-yellow-500';
-      case 'Alta':
-        return 'bg-red-500';
-      default:
-        return 'bg-white-500';
     }
   };
 
@@ -256,7 +271,7 @@ function UnidadesPromocion() {
       { actividad: "Participación en la expo-profesiográfica", documento: "Constancia emitida por la Secretaría Académica o por la DEMS o DES.", up: ['2.00 U.P. por expositor.', '3.00 por atención de talleres o concursos', '3.00 por profesor coordinador'], rol: "Expositor o Atención o Profesor", alcance: "Nacional" }, //OK
       { actividad: "Encuentros Académicos Interpolitécnicos", documento: "Constancia de participación emitida por el Titular de la unidad académica.", up: ['2.00 U.P. por evento como asistente', 'Máximo: 8.00 U.P. por periodo de promoción.'], rol: "Asistente", alcance: "Nacional"  }, //OK
       { actividad: "Brigadas multidisciplinarias de servicio social", documento: "Constancia de participación emitida por la Dirección de Egresados y Servicio Social.", up: ['8.00 U.P. por coordinador de brigada.', '4.00 U.P. por profesor de brigada.', '4.00 U.P. por responsable del programa.'], rol: "Profesor o Coordinador o Responsable", alcance: "Nacional" }, //OK
-      { actividad: "Impartición de disciplinas deportivas y/o talleres culturales", documento: "Constancia de participación emitida por la autoridad competente.", up: ['0.50 U.P. por cada hora.'], rol: "Instructor" }, //OK
+      { actividad: "Impartición de disciplinas deportivas y/o talleres culturales", documento: "Constancia de participación emitida por la autoridad competente.", up: ['0.50 U.P. por 1 hora.'], rol: "Instructor" }, //OK
     ],
   };
 
@@ -295,6 +310,10 @@ function UnidadesPromocion() {
     setRoleOptions([]);
     setScopeOptions([]);
     setUnitsOptions([]);
+    setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
+    setHours('');
+    setIsUnitsSelected(false);
+    setCalculatedUnits('')
   };
 
   const getActividades = () => {
@@ -335,6 +354,11 @@ function UnidadesPromocion() {
       setHours('');
       setCalculatedUnits('');
       setHoursError('');
+      setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
+      setIsUnitsSelected(false);
+      setHoursCalculated(1)
+      setUpAllowed('')
+      setHoursError('');
     }
 
       // Si `up` es un array, lo usamos como opciones; si es un string, lo convertimos en array
@@ -348,12 +372,44 @@ function UnidadesPromocion() {
       const maxOption = upsArray.find((up) => up.toLowerCase().includes('máximo'));
       setMaxText(maxOption || ''); // Establecer el máximo o limpiar
   
-      // **Selecciona automáticamente la única opción de U.P. si existe**
+      // Selecciona automáticamente la única opción de U.P. si existe
       if (filteredUpsArray.length === 1) {
-        setUnits(filteredUpsArray[0]); // Asignar automáticamente
-        console.log('Unidades seleccionadas:', filteredUpsArray[0]);
+        const selectedUnit = filteredUpsArray[0];
+
+        // Lógica para procesar la unidad seleccionada
+        const parts = selectedUnit.split(' ');
+        let firstNumber = '';
+        let secondNumber = '';
+
+        // Iterar sobre las partes para encontrar el primer y segundo número
+        let foundFirst = false;
+        for (let i = 0; i < parts.length; i++) {
+          const num = Number(parts[i].trim());
+          if (!isNaN(num)) {
+            if (!foundFirst) {
+              firstNumber = num;  // Primer número encontrado (U.P.)
+              foundFirst = true;
+            } else {
+              secondNumber = num; // Segundo número encontrado (Horas calculadas)
+              break;
+            }
+          }
+        }
+
+        console.log('Unidades seleccionadas:', firstNumber); // Mostrar U.P. en consola
+        console.log('Horas calculadas:', secondNumber); // Mostrar horas en consola
+
+        setUpAllowed(firstNumber); // Guardar el primer número
+        setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
+
+        // Asignar los valores procesados al estado
+        setUnits(selectedUnit);
+        setIsUnitsSelected(true); // Habilitar los campos
       } else {
         setUnits(''); // Limpiar si hay múltiples opciones
+        setHoursCalculated(1); // Limpiar horas calculadas si hay múltiples opciones
+        setIsUnitsSelected(false); // Deshabilitar los campos
+        setUpAllowed(''); // Limpiar el máximo permitido
       }
 
       // Si hay roles disponibles, los establecemos; si no, dejamos vacío
@@ -387,6 +443,11 @@ function UnidadesPromocion() {
       setScope('');
       setMaxText('');
       setCalculatedUnits('');
+      setHours('');
+      setHourLimits({ min: 0, max: 200 }); // Restablecer los límites de horas
+      setIsUnitsSelected(false);
+      setHoursCalculated(1);
+      setUpAllowed('');
     }
   };
 
@@ -533,14 +594,9 @@ function UnidadesPromocion() {
       isValid = false;
     }
   
-    // Validar prioridad solo si el campo es visible
-    if (priority === '') {
-      setPriorityError(true);
-      isValid = false;
-    }
-  
     return isValid;
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -565,21 +621,80 @@ function UnidadesPromocion() {
       result = parts[1]; // Guarda la segunda parte si no encontró ningún número
     }
     
-    console.log(result);
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+    // Crea una variable temporal para almacenar la actividad ajustada según el rol
+    let activityToSend = activity;
 
+    if (activity === 'Proyectos de investigación con financiamiento interno' && role === 'Director') {
+      activityToSend = 'Proyectos de investigación con financiamiento interno (Director)';
+    }
+    if (activity === 'Proyectos de investigación con financiamiento interno' && role === 'Participante') {
+      activityToSend = 'Proyectos de investigación con financiamiento interno (Participante)';
+    }
+    
+    // obtener la función normalizada
+    const normalized_function = normalizeFuction(functionField);
+
+    // Acceder a max_UP_allowed de forma segura
+    const max_UP_allowed = 
+      conditions?.[normalized_function]?.[category_normalized]?.[workTime]?.up?.max || 
+      conditions?.[normalized_function]?.[category_normalized]?.up?.max;
+    if (max_UP_allowed === 0) {
+      toast.error('Tú categoría esta excenta de realizar está actividad.');
+      return;
+    }
+
+     // verifica si el objeto checkProductData tiene datos
+    if (Object.keys(checkProductData).length > 0) {
+
+      // Verificar si la actividad está en el objeto checkProductData
+      if (checkProductData.activities[activityToSend]) {
+        const currentActivityData = checkProductData.activities[activityToSend];
+        const accumulatedUP = currentActivityData.up; // UP acumuladas para la actividad seleccionada
+        const accumulatedLength = currentActivityData.length; // Número de veces registrada
+        
+        const max_UP_Conditions = max_conditions.configuracion[activityToSend]?.max_up || 0;
+        const max_Length_Conditions = max_conditions.configuracion[activityToSend]?.max_length || 0;
+
+        const sum_UP = accumulatedUP + Number(calculatedUnits || result);
+        const sum_Length = accumulatedLength + 1;
+    
+        console.log('max_UP_Conditions:', max_UP_Conditions);
+        // console.log('sum_UP:', sum_UP);
+        // console.log(sum_UP > max_UP_Conditions);
+        console.log('max_Length_Conditions:', max_Length_Conditions);
+        if (sum_UP > max_UP_Conditions) {
+            toast.error(`Agregar esta activdad superará el máximo permitido (${max_UP_Conditions} U.P) de acuerdo al reglamento de promocion docente.`);
+            return;
+        }
+        
+        if (sum_Length > max_Length_Conditions) {
+          toast.error(`El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a al reglamento de promocion docente.`);
+          return;
+        }
+
+        if (sum_UP > max_UP_allowed) {
+          toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`);
+          return;
+        }
+      }
+
+    }
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_ FIN DE VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
+        
     // Calcular la longitud de los documentos requeridos
     const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);
     const documentsCount = documentsList.length;
+
   
     // Preparar los datos para la proyección
     const projectionData = {
       function: functionField,
-      activity,
+      activity: activityToSend,
       role,
       scope,
       documents_required,
       documents_number: documentsCount,
-      priority,
       units: calculatedUnits || result,
       tasks,
       projection_id,
@@ -589,9 +704,6 @@ function UnidadesPromocion() {
     try {
       setLoading(true);
       setError(null);
-
-
-      // Llama al método createProjection con los datos del formulario
   
       // Llama al método createProjection con los datos del formulario
       const response = await createProduct(projectionData);
@@ -610,6 +722,60 @@ function UnidadesPromocion() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const tutoringOptions = new Set([
+    '3.00 U.P. en tutoría de regularización por unidad de aprendizaje al semestre.',
+    '5.00 U.P. en tutoría de recuperación académica por unidad de aprendizaje al semestre.',
+    '3.00 U.P. en tutoría a distancia por grupo atendido al semestre.',
+  ]);
+
+  const handleUnitsChange = (e) => {
+    const selectedUnit = e.target.value;
+    setUnits(selectedUnit);
+    setHours(''); 
+    setCalculatedUnits(''); 
+    setHoursError(''); 
+  
+    const parts = selectedUnit.split(' ');
+    let firstNumber = '';
+    let secondNumber = '';
+  
+    // Iterar sobre las partes para encontrar el primer y segundo número
+    let foundFirst = false;
+    for (let i = 0; i < parts.length; i++) {
+      const num = Number(parts[i].trim());
+      if (!isNaN(num)) {
+        if (!foundFirst) {
+          firstNumber = num;
+          foundFirst = true;
+        } else {
+          secondNumber = num;
+          break;
+        }
+      }
+    }
+  
+    console.log('Primer número (U.P.):', firstNumber);
+    console.log('Segundo número (Horas calculadas):', secondNumber);
+  
+    setUpAllowed(firstNumber); // Guardar el primer número
+    setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
+  
+    // Verificar si la opción seleccionada está en el conjunto de opciones específicas
+    const shouldDisableFields = tutoringOptions.has(selectedUnit);
+  
+    if (shouldDisableFields) {
+      // Limpiar los campos si la opción seleccionada requiere deshabilitarlos
+      setHours(''); 
+      setCalculatedUnits(''); 
+      setHoursError(''); 
+      setHourLimits({ min: 0, max: 200 }); 
+    }
+  
+    setIsUnitsSelected(!shouldDisableFields); // Deshabilitar campos si es necesario
+  
+    console.log('Campos deshabilitados:', shouldDisableFields);
   };
 
   if (loading) {
@@ -725,6 +891,27 @@ function UnidadesPromocion() {
               </div>
             )}
 
+            {unitsOptions.length > 1 ? (
+              <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">U.P. diponibles</label>
+                <select
+                  value={units} // Asegúrate de que el valor sea controlado por el estado
+                  onChange={handleUnitsChange} // Manejador para actualizar el estado
+                  className="w-full p-2 rounded-lg border border-gray-400"
+                >
+                  <option value="" disabled>Selecciona una opción</option>
+                  {unitsOptions.map((up, index) => (
+                    <option key={index} value={up}>{up}</option>
+                  ))}
+                </select>
+              </div>
+            ) : unitsOptions.length === 1 && (
+              <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">U.P. aproximadas</label>
+                <p className="bg-white p-2 rounded-lg border border-gray-400">{unitsOptions[0]}</p>
+              </div>
+            )}
+
             {activitiesWithHours.has(activity) && (
               <>
                 {activity === "Carga académica" && (
@@ -755,43 +942,22 @@ function UnidadesPromocion() {
                     onChange={handleHoursChange}
                     className="w-full p-2 rounded-lg border border-gray-400"
                     placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
+                    disabled={!isUnitsSelected}
                   />
                   {hoursError && <span className="text-red-500">{hoursError}</span>}
                 </div>
 
-                {activity === "Carga académica" && (
                   <div className="mb-4">
                     <label className="block text-white text-sm font-semibold mb-2">
                       U.P. Calculadas
                     </label>
-                    <p className="bg-white p-2 rounded-lg border border-gray-400">
-                      {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
+                    <p className={`bg-white p-2 rounded-lg border border-gray-400 ${!isUnitsSelected || !isUnitsSelected ? 'opacity-50' : ''}`}>
+                    {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
                     </p>
                   </div>
-                )}
               </>
             )}
 
-            {unitsOptions.length > 1 ? (
-              <div className="mb-4">
-                <label className="block text-white text-sm font-semibold mb-2">U.P. aproximadas</label>
-                <select
-                  value={units}
-                  onChange={(e) => setUnits(e.target.value)}
-                  className="w-full p-2 rounded-lg border border-gray-400"
-                >
-                  <option value="" disabled>Selecciona una opción</option>
-                  {unitsOptions.map((up, index) => (
-                    <option key={index} value={up}>{up}</option>
-                  ))}
-                </select>
-              </div>
-            ) : unitsOptions.length === 1 && (
-              <div className="mb-4">
-                <label className="block text-white text-sm font-semibold mb-2">U.P. aproximadas</label>
-                <p className="bg-white p-2 rounded-lg border border-gray-400">{unitsOptions[0]}</p>
-              </div>
-            )}
 
             {maxText && (
               <div className="mb-4">
@@ -801,25 +967,7 @@ function UnidadesPromocion() {
             )}
 
             <div className="flex items-center justify-between">
-              <div className="w-1/2 mr-2">
-                <label className="block text-white text-sm font-semibold mb-2">Prioridad</label>
-                <select
-                  className={`w-full p-2 rounded-lg border border-gray-400 ${getColorForPriority(priority)}`}
-                  value={priority}
-                  onChange={(e) => {
-                    setPriority(e.target.value);
-                    setPriorityError(false); // Elimina el error al seleccionar una prioridad
-                  }}
-                >
-                  <option value="" disabled>Selecciona una prioridad</option>
-                  <option value="Baja">Baja</option>
-                  <option value="Media">Media</option>
-                  <option value="Alta">Alta</option>
-                </select>
-                {priorityError && <span className="text-red-500">Por favor, selecciona una prioridad.</span>}
-              </div>
-
-              <div className="w-1/2 ml-2">
+              <div className="w-full ml-2">
                 <button 
                   type="submit" 
                   className="bg-blue-800 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 w-full mt-6"
