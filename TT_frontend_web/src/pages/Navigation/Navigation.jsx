@@ -64,6 +64,14 @@ function Navigation() {
         setTitle('¿Qué puedes proyectar?');
         setIcon(<IoSchoolOutline size={60} />); 
         break;
+      case '/CategoryLimits':  
+        setTitle('Mínimos y máximos de Unidades de Promoción ');
+        setIcon(<IoSchoolOutline size={60} />); 
+        break;
+      case '/Convocatoria':  
+        setTitle('¿En qué consiste la convocatoria?');
+        setIcon(<IoSchoolOutline size={60} />); 
+        break;  
       default:
         setTitle('');
         setIcon(null); 
