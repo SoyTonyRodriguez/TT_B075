@@ -14,7 +14,7 @@ const ConocerMas = () => {
           href="https://www.ipn.mx/imageninstitucional/comunicados/ver-comunicado.html?y=2023&n=12&t=6" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="inline-block px-6 py-2 mt-4 text-white bg-green-600 hover:bg-green-700 font-semibold rounded-lg shadow-md transition-all duration-300"
+          className="inline-block px-6 py-2 mt-4 text-white bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg shadow-md transition-all duration-300"
         >
           Leer más
         </a>

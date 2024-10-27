@@ -39,7 +39,7 @@ const data = [
     },
     otrasActividades: { min: 10, max: 70 },
     investigacion: '25 -------------------------- 88.5',
-    superacionAcademica: { min: 0, max: 88.5 },
+    superacionAcademica: { min: 25, max: 88.5 },
     actividadesComplementarias: { min: 0, max: 60 },
     actividadesExtension: { min: 0, max: 10 },
     totalRequerido: 100
@@ -67,7 +67,7 @@ const data = [
     },
     otrasActividades: { min: 10, max: 70 },
     investigacion: '25 -------------------------- 88.5',
-    superacionAcademica: { min: 0, max: 88.5 },
+    superacionAcademica: { min: 25, max: 88.5 },
     actividadesComplementarias: { min: 0, max: 60 },
     actividadesExtension: { min: 0, max: 10 },
     totalRequerido: 100
@@ -81,7 +81,7 @@ const data = [
     },
     otrasActividades: { min: 10, max: 70 },
     investigacion: '25 -------------------------- 88.5',
-    superacionAcademica: { min: 0, max: 88.5 },
+    superacionAcademica: { min: 25, max: 88.5 },
     actividadesComplementarias: { min: 0, max: 60 },
     actividadesExtension: { min: 0, max: 10 },
     totalRequerido: 100
@@ -129,9 +129,12 @@ const Categorias = () => {
       {/* Incluye la navegación */}
       <Navigation />
 
+      {/* Línea de separación */}
+      <hr className="border-t-2 border-black my-4" />
+
       {/* Contenido principal */}
       <div className="container mx-auto mt-8 mb-8">
-        <label className="block text-gray-700 text-lg font-bold mb-2">Selecciona una categoría:</label>
+        <label className="block  text-black text-lg font-bold mb-2">Selecciona una categoría:</label>
         <select
           onChange={handleCategoriaChange}
           className="w-full p-2 border rounded-lg"
@@ -145,7 +148,7 @@ const Categorias = () => {
         </select>
 
         {/* Mostrar información según la categoría seleccionada */}
-        <div className="mt-8 bg-white shadow-lg rounded-lg p-6">
+        <div className="mt-8 bg-gray-800 bg-opacity-40 shadow-lg rounded-lg p-6 text-white">
           <h2 className="text-2xl font-bold mb-4">{categoriaSeleccionada.categoria}</h2>
 
           <div className="grid grid-cols-2 gap-4">
