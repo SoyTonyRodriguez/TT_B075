@@ -477,17 +477,17 @@ function KanbanBoard() {
                     
                     {/* Columna de Tareas */}
                     <div className="flex-1 flex gap-x-6">
-                    <Column status="todo">
+                    <Column status="por hacer">
                         {tasks.filter(task => task.status === 'todo').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}
                     </Column>
-                    <Column status="in-progress">
+                    <Column status="en progreso">
                         {tasks.filter(task => task.status === 'in-progress').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}
                     </Column>
-                    <Column status="done">
+                    <Column status="terminado">
                         {tasks.filter(task => task.status === 'done').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}

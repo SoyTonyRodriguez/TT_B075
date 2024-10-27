@@ -18,9 +18,6 @@ function Convocatoria() {
       <div className='flex flex-wrap justify-center'>
         <div className='w-full md:w-2/3 mb-8'>
           {/* Título de la Convocatoria */}
-          <div className=' text-black-500 text-6xl mt-4 mx-4 w-2/3'>
-            ¿En qué consiste la convocatoria?
-          </div>
 
           {/* Descripción General */}
           <div className="flex items-center">
