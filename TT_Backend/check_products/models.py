@@ -14,7 +14,7 @@ class ProductCheck(models.Model):
         editable=False
     )
     account_id = models.CharField(max_length=255, unique=True)  # Un solo registro por cuenta.
-    activities = models.JSONField(default=dict)  # Contendrá las actividades como objetos JSON.
+    categories = models.JSONField(default=dict)  # JSON con categorías y actividades anidadas.
 
     def __str__(self):
         return f"ProductCheck for {self.account_id}"

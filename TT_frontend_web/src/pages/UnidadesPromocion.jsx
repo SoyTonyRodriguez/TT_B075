@@ -646,42 +646,66 @@ function UnidadesPromocion() {
 
      // verifica si el objeto checkProductData tiene datos
     if (Object.keys(checkProductData).length > 0) {
+      console.log( checkProductData?.[functionField]?.[activityToSend])
 
-      // Verificar si la actividad está en el objeto checkProductData
-      if (checkProductData.activities[activityToSend]) {
-        const currentActivityData = checkProductData.activities[activityToSend];
-        const accumulatedUP = currentActivityData.up; // UP acumuladas para la actividad seleccionada
-        const accumulatedLength = currentActivityData.length; // Número de veces registrada
-        
-        const max_UP_Conditions = max_conditions.configuracion[activityToSend]?.max_up || 0;
-        const max_Length_Conditions = max_conditions.configuracion[activityToSend]?.max_length || 0;
+      // Verificar si tiene datos para la función seleccionada
+      if (checkProductData?.[functionField]) {
+        console.log("Estoy aqui")
+        // Calcular el total de U.P. de la función
+        const total_UP_check_product = checkProductData?.[functionField].total;
+        console.log(total_UP_check_product)
 
-        const sum_UP = accumulatedUP + Number(calculatedUnits || result);
-        const sum_Length = accumulatedLength + 1;
-    
-        console.log('max_UP_Conditions:', max_UP_Conditions);
-        // console.log('sum_UP:', sum_UP);
-        // console.log(sum_UP > max_UP_Conditions);
-        console.log('max_Length_Conditions:', max_Length_Conditions);
-        if (sum_UP > max_UP_Conditions) {
-            toast.error(`Agregar esta activdad superará el máximo permitido (${max_UP_Conditions} U.P) de acuerdo al reglamento de promocion docente.`);
-            return;
-        }
-        
-        if (sum_Length > max_Length_Conditions) {
-          toast.error(`El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a al reglamento de promocion docente.`);
+        // Calcular el total de U.P. con la actividad actual
+        const sum_total_funcition = total_UP_check_product + Number(calculatedUnits || result);
+
+        console.log('sum_total_funcition:', sum_total_funcition);
+        console.log('max_UP_allowed:', max_UP_allowed);
+        console.log("total_UP_check_product:", total_UP_check_product);
+
+        // Verificar si supera el límite máximo de U.P. de acuerdo a la categoría
+        if (sum_total_funcition > max_UP_allowed) {
+          toast.error(`La cantidad de U.P. con está actividad será (${sum_total_funcition}), lo que supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`);
           return;
         }
 
-        if (sum_UP > max_UP_allowed) {
-          toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`);
-          return;
+        // Verificar si tiene datos para la actividad seleccionada
+        if (checkProductData?.[functionField]?.[activityToSend]) {
+
+          const currentActivityData = checkProductData?.[functionField]?.[activityToSend];
+          const accumulatedUP = currentActivityData.up; // UP acumuladas para la actividad seleccionada
+          const accumulatedLength = currentActivityData.length; // Número de veces registrada
+          
+            const max_UP_Conditions = max_conditions.configuracion[activityToSend]?.max_up || 100;
+            const max_Length_Conditions = max_conditions.configuracion[activityToSend]?.max_length || 100;
+
+            const sum_UP = accumulatedUP + Number(calculatedUnits || result);
+            const sum_Length = accumulatedLength + 1;
+        
+            //console.log('max_UP_Conditions:', max_UP_Conditions);
+            // console.log('sum_UP:', sum_UP);
+            // console.log(sum_UP > max_UP_Conditions);
+            console.log('max_Length_Conditions:', max_Length_Conditions);
+            if (sum_UP > max_UP_Conditions) {
+                toast.error(`Agregar esta activdad superará el máximo permitido (${max_UP_Conditions} U.P) de acuerdo al reglamento de promocion docente.`);
+                return;
+            }
+            
+            if (sum_Length > max_Length_Conditions) {
+              toast.error(`El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a al reglamento de promocion docente.`);
+              return;
+            }
+
+            if (sum_UP > max_UP_allowed) {
+              toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`);
+              return;
+            }
         }
       }
 
     }
     // -_-_-_-_-_-_-_-_-_-_-_-_-_-_ FIN DE VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
         
+    // return;
     // Calcular la longitud de los documentos requeridos
     const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);
     const documentsCount = documentsList.length;
