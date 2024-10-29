@@ -30,6 +30,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+HUNTER_API_KEY = os.getenv('HUNTER_API_KEY')  # Asegúrate de que esté correctamente cargada
+print(f"HUNTER_API_KEY: {HUNTER_API_KEY}")  # Imprime la clave para verificar si se está cargando bien
+
 
 # Application definition
 

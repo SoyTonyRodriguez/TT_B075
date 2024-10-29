@@ -6,6 +6,7 @@ from django.conf import settings
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.auth import authenticate
+import re, requests
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -18,24 +19,34 @@ class RegisterSerializer(serializers.ModelSerializer):
             'projection_id': {'required': False}
         }
 
-    # # Use validate_<field_name> methods to add custom validation logic.
     def validate_email(self, value):
-        print(f"self.instance --> {self.instance}")
+        # Validar el formato del correo electrónico
+        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        if not re.match(email_regex, value):
+            raise serializers.ValidationError("Ingrese un correo electrónico válido.")
 
-        # Do the validation only when an account is created and the email is updated
-        if self.instance is None or self.instance.email != value:
-            client = MongoClient(settings.MONGO_CONNECTION_STRING)
-            db = client[settings.DB_CLIENT]
+        # Llamada a Hunter.io para validar si es entregable
+        try:
+            response = requests.get(
+                f"https://api.hunter.io/v2/email-verifier?email={value}&api_key={settings.HUNTER_API_KEY}"
+            )
+            data = response.json()
+            print("Respuesta de Hunter.io:", data)  # Para depurar
 
-            # Check manually if email is already in use
-            if db.accounts.find_one({"email": value}):
-                raise serializers.ValidationError("El email ya ha sido registrado")
-            return value
+            if response.status_code != 200 or 'data' not in data or 'result' not in data['data']:
+                raise serializers.ValidationError("Error al verificar el correo.")
 
-    # Create in django it's the same POST method
+            if data['data']['result'] != 'deliverable':
+                raise serializers.ValidationError("El correo ingresado no es válido o no se puede entregar.")
+        except requests.exceptions.RequestException as e:
+            raise serializers.ValidationError(f"Error al conectar con Hunter.io: {str(e)}")
+
+        return value
+
     def create(self, validated_data):
-        # Hash the password before saving
-        validated_data['password'] = make_password(validated_data.get('password'))
+        # Encriptar la contraseña antes de guardar
+        if 'password' in validated_data:
+            validated_data['password'] = make_password(validated_data['password'])
         return super().create(validated_data)
     
     # Update in django it's the same PUT or PATCH methods

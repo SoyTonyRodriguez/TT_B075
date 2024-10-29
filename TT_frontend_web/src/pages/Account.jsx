@@ -14,7 +14,6 @@ function Account() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('');
-  const [phone, setPhone] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
   const navigate = useNavigate();
@@ -24,12 +23,11 @@ function Account() {
     try {
       const storedAccountData = localStorage.getItem('accountDetails');
       if (storedAccountData) {
-        const { userName, fullName, email, category, phone } = JSON.parse(storedAccountData);
+        const { userName, fullName, email, category } = JSON.parse(storedAccountData);
         setUserName(userName);
         setFullName(fullName);
         setEmail(email);
         setCategory(category);
-        setPhone(phone);
       }
     } catch (error) {
       console.error("Error accessing or parsing account details from localStorage:", error);
@@ -83,14 +81,29 @@ function Account() {
   
       const response = await updateAccount(userId, token, updatedData);  // Llamada a la API para actualizar la cuenta
       console.log('Respuesta del servidor:', response);
-      
+  
+      // Actualizar el localStorage con los datos actualizados
+      const updatedAccountDetails = {
+        userName: userName,  // Puedes ajustar esto si es necesario
+        fullName: fullName,
+        email: email,
+        category: category,
+      };
+      localStorage.setItem('accountDetails', JSON.stringify(updatedAccountDetails));
+  
+      // Actualizar los estados del componente
+      setUserName(userName);
+      setFullName(fullName);
+      setEmail(email);
+      setCategory(category);
+  
       setIsEditing(false);  // Desactivar modo edición
-      navigate('/home');  // Redirigir a otra página existente, como la pantalla de inicio
+      // Si deseas mantenerte en la misma página para ver los cambios inmediatamente, puedes comentar la siguiente línea
+      // navigate('/home');  // Redirigir a otra página existente, como la pantalla de inicio
     } catch (error) {
       console.error("Error actualizando la cuenta:", error.response ? error.response.data : error.message);
     }
   };
-  
   
 
   const handleImageChange = (event) => {
@@ -167,23 +180,32 @@ function Account() {
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-2">Categoría</label>
-              <input
-                type="text"
+              <select
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 disabled={!isEditing}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm mb-2">Teléfono</label>
-              <input
-                type="text"
-                className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                disabled={!isEditing}
-              />
+              >
+                <option value="">Selecciona una categoría</option>
+                <option value="Técnico Docente de Asignatura A">Técnico Docente de Asignatura A</option>
+                <option value="Técnico Docente de Asignatura B">Técnico Docente de Asignatura B</option>
+                <option value="Técnico Docente Auxiliar A">Técnico Docente Auxiliar A</option>
+                <option value="Técnico Docente Auxiliar B">Técnico Docente Auxiliar B</option>
+                <option value="Técnico Docente Auxiliar C">Técnico Docente Auxiliar C</option>
+                <option value="Técnico Docente Asociado A">Técnico Docente Asociado A</option>
+                <option value="Técnico Docente Asociado B">Técnico Docente Asociado B</option>
+                <option value="Técnico Docente Asociado C">Técnico Docente Asociado C</option>
+                <option value="Técnico Docente Titular A">Técnico Docente Titular A</option>
+                <option value="Profesor de Asignatura A">Profesor de Asignatura A</option>
+                <option value="Profesor Asistente A">Profesor Asistente A</option>
+                <option value="Profesor Asistente B">Profesor Asistente B</option>
+                <option value="Profesor Asistente C">Profesor Asistente C</option>
+                <option value="Profesor Asociado A">Profesor Asociado A</option>
+                <option value="Profesor Asociado B">Profesor Asociado B</option>
+                <option value="Profesor Asociado C">Profesor Asociado C</option>
+                <option value="Profesor Titular A">Profesor Titular A</option>
+                <option value="Profesor Titular B">Profesor Titular B</option>
+              </select>
             </div>
             <div className="flex justify-end mt-8">
               {!isEditing ? (

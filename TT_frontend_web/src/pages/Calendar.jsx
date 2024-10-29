@@ -7,10 +7,12 @@ import LoadingSpinner from '../components/LoadingSpinner';
 
 const CalendarWithDetails = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [activities, setActivities] = useState([]);
   const [activityDetails, setActivityDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+
+
 
   const currentYear = new Date().getFullYear();
   const minYear = currentYear - 2;
@@ -39,7 +41,7 @@ const CalendarWithDetails = () => {
 
   // Show loading (Mostrar pantalla de carga)
   if (loading) {
-      return <LoadingAnimation />;
+      return <LoadingSpinner />;
   }
 
 
@@ -106,6 +108,7 @@ const CalendarWithDetails = () => {
       return minYear + i;
     });
 
+
     return (
       <div className="flex justify-between items-center py-2 mb-4">
         <div className="flex items-center">
@@ -159,53 +162,44 @@ const CalendarWithDetails = () => {
   const renderCells = () => {
     const monthStart = startOfMonth(currentMonth);
     const startDate = startOfWeek(monthStart, { locale: es });
-    const endDate = addDays(startDate, 41);
+    const endDate = addDays(startDate, 41); // 6 semanas en vista
     const dateFormat = "d";
     const rows = [];
     let days = [];
     let day = startDate;
-  
-    // Función para verificar si un día está dentro del rango de una actividad
-    const isWithinActivityRange = (day, activity) => {
-      const start = adjustToLocaleDate(activity.start_date);
-      const end = adjustToLocaleDate(activity.end_date);
-      return day >= start && day <= end;
-    };
-  
-    // Función para verificar si es el día de inicio de la actividad
-    const isActivityStartDay = (day, activity) => {
-      const start = adjustToLocaleDate(activity.start_date);
-      return isSameDay(day, start); // Verifica si el día es el inicio de la actividad
-    };
   
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         const formattedDate = format(day, dateFormat);
         const cloneDay = day;
         const isSelected = isSameDay(day, selectedDate);
+        const isToday = isSameDay(day, new Date()); // Nuevo: verificar si es hoy
   
-        // Verificar si es sábado o domingo
         const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-  
-        // Verificar si el día está dentro del rango de alguna actividad
         const activityOnDay = !isWeekend && activities.find(activity =>
           isWithinActivityRange(day, activity)
         );
   
-        // Verificar si es el día de inicio de la actividad
-        const isStartDay = activityOnDay && isActivityStartDay(day, activityOnDay);
+        // Clases aplicadas sin alterar el diseño original
+        let cellClass = "p-2 text-center border ";
+        if (!isSameMonth(day, monthStart)) {
+          cellClass += "text-gray-400 "; // Días de otros meses
+        } else if (isSelected) {
+          cellClass += "bg-orange-500 text-white "; // Día seleccionado
+        } else if (activityOnDay) {
+          cellClass += "bg-green-200 "; // Día con actividad
+        } else {
+          cellClass += "text-black "; // Días normales
+        }
+  
+        // Nuevo: Añadir borde solo si es el día actual
+        if (isToday) {
+          cellClass += "border-blue-500 ";
+        }
   
         days.push(
           <div
-            className={`p-2 text-center border ${!isSameMonth(day, monthStart)
-              ? "text-gray-400"
-              : isSelected
-                ? "bg-orange-500 text-white"
-                : isStartDay
-                  ? "bg-green-500 text-white" // Resaltar el inicio de la actividad
-                  : activityOnDay
-                    ? "bg-green-200" // Sombreado para los días de duración
-                    : "text-black"}`}
+            className={cellClass}
             key={day}
             onClick={() => onDateClick(cloneDay)}
           >
@@ -224,6 +218,7 @@ const CalendarWithDetails = () => {
   
     return <div>{rows}</div>;
   };
+  
 
   const renderSelectedDateDetails = () => {
     if (!selectedDate) return <p className="text-center">Haz clic sobre alguna fecha en específico para más detalles</p>;
