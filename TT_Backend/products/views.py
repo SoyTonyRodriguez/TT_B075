@@ -29,8 +29,8 @@ class GetProductsView(ListAPIView):
 
     def get_queryset(self):
         account_id = self.kwargs['account_id']
-        if self.request.method == 'GET':
-            post_save.disconnect(update_product_check, sender=Products)
+        # if self.request.method == 'GET':
+        #     post_save.disconnect(update_product_check, sender=Products)
         return Products.objects.filter(account_id=account_id)
 
 from django.db.models.signals import post_save, post_delete
@@ -73,9 +73,9 @@ class DeleteProductView(DestroyAPIView):
         if instance.account_id != self.request.user.id:
             raise PermissionDenied("You do not have permission to delete this product.")
 
-        if self.request.method == 'DELETE':
-            post_save.disconnect(update_product_check, sender=Products)
-            post_delete.disconnect(update_product_check, sender=Products)
+        # if self.request.method == 'DELETE':
+        #     post_save.disconnect(update_product_check, sender=Products)
+        #     post_delete.disconnect(update_product_check, sender=Products)
 
         # Eliminar el producto
         instance.delete()
