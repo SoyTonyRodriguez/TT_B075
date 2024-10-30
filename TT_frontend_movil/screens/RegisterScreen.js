@@ -30,7 +30,8 @@ const RegisterScreen = (route) => {
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
   const [loadingMessage, setLoadingMessage] = useState(""); // Message for LoadingScreen
-
+  const [requirementsModalVisible, setRequirementsModalVisible] = useState(false);
+  
   // -_-_-_-_-_ Form -_-_-_-_-_
   const { control, handleSubmit, setValue, formState: { errors } } = useForm({
     defaultValues: {
@@ -280,6 +281,15 @@ const RegisterScreen = (route) => {
             )}
           />
 
+          <TouchableOpacity
+            style={tw`bg-transparent mt-5`}
+            onPress={() => setRequirementsModalVisible(true)}
+          >
+            <Text style={tw`text-blue-700 text-center underline`}>
+              Conoce los requisitos para participar en el proceso de promoción docente
+            </Text>
+          </TouchableOpacity>
+
           {/* Submit Button */}
           <TouchableOpacity
             style={tw`bg-[#003366] p-4 rounded-lg items-center mt-8 mb-10`}
@@ -290,6 +300,41 @@ const RegisterScreen = (route) => {
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
+
+      <Modal visible={requirementsModalVisible} transparent={true} animationType="fade">
+        <View style={tw`flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]`}>
+          <View style={tw`w-4/5 bg-white rounded-xl p-6 shadow-2xl`}>
+            <Text style={tw`text-xl font-bold text-center mb-4 text-black`}>
+              Requisitos para la Promoción Docente
+            </Text>
+
+            <ScrollView style={{ maxHeight: height * 0.4 }}>
+              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                • Poseer plaza en propiedad (en carácter de alta definitiva) de medio, tres cuartos, tiempo completo o con máximo 19 horas de asignatura.
+              </Text>
+              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                • Tener categoría académica dictaminada con carácter definitivo.
+              </Text>
+              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                • Haber laborado en la categoría actual cuando menos dos años.
+              </Text>
+              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                • Cumplir con la carga académica frente a grupo establecida en los artículos 49, 50 y 51 del RCITPAIPN en cada uno de los semestres considerados en el periodo de promoción o contar con excepción parcial o total, según sea el caso, desde la fecha de efectos del último Comunicado Oficial a diciembre de 2023.
+              </Text>
+              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                • La carga académica y/o sus excepciones, los méritos y actividades contemplados en el RPDIPN y Puntos de Acuerdo de la CCMPPD, corresponderán exclusivamente a los semestres declarados en la solicitud, de acuerdo con la opción de promoción seleccionada.
+              </Text>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={tw`mt-5 bg-blue-700 py-3 rounded-lg`}
+              onPress={() => setRequirementsModalVisible(false)}
+            >
+              <Text style={tw`text-white text-center text-lg`}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal de categorías */}
       <Modal visible={categoryModalVisible} transparent={true} animationType="slide">

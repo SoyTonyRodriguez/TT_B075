@@ -4,7 +4,7 @@ import { useSpring, animated } from 'react-spring';
 import Navigation from './Navigation/Navigation';
 
 const actividadesPorFuncion = {
-  docencia: [
+  docencia: [ //ok
     {
       actividad: "Carga académica", 
       documento: "Registro Único de Actividades Académicas (RUAA) o constancia de carga académica suscrita por las autoridades competentes.", 
@@ -24,7 +24,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Programa de inducción", 
       documento: "Constancia de validación emitida por la DEMS, DES o SIP.", 
-      up: ['5.00 U.P. por programa de inducción al año en nivel medio superior.', '1.00 U.P. por hora/semana/mes en nivel superior.', '1.25 U.P. por hora/semana/mes en posgrado.'], 
+      up: ['1.00 U.P. por hora/semana/mes en nivel superior.'], 
       condiciones: [
         'El programa debe estar validado por las autoridades académicas correspondientes.'
       ]
@@ -32,7 +32,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Tutorías", 
       documento: "Constancia emitida por la Coordinación Institucional de Tutoría Politécnica (CITP).", 
-      up: ['1.00 U.P. por cada hora de tutoría individual a la semana.', 'Máximo: 5.00 U.P. por semestre.'], 
+      up: ['1.00 U.P. por cada hora de tutoría individual a la semana.  Máximo 5.00.', '1.00 U.P. en tutoría grupal por cada hora a la semana en el semestre. Máximo 5.00.', '3.00 U.P. en tutoría de regularización por unidad de aprendizaje al semestre.', '5.00 U.P. en tutoría de recuperación académica por unidad de aprendizaje al semestre.', '3.00 U.P. en tutoría a distancia por grupo atendido al semestre.'], 
       condiciones: [
         'Las tutorías deben estar registradas oficialmente y validadas por el CITP.'
       ]
@@ -48,7 +48,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Elaboración de material didáctico para la impartición de cátedra", 
       documento: "Constancia emitida por el presidente de la academia o equivalente, con el aval de los integrantes de la misma y el visto bueno del Subdirector Académico.", 
-      up: ['5.00 U.P. por transparencias, rotafolios.', '10.00 U.P. por problemario.', '20.00 U.P. por prototipos.', 'Máximo: 25.00 U.P. por periodo de promoción.'], 
+      up: ['5.00 U.P. por transparencias, rotafolios.', '8.00 U.P. por antología de la asignatura', '10.00 U.P. por problemario.', '20.00 U.P. por prototipos.', 'Máximo: 25.00 U.P. por periodo de promoción.'], 
       condiciones: [
         'El material debe ser aprobado por la academia correspondiente.'
       ]
@@ -56,7 +56,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Elaboración de material didáctico digital", 
       documento: "Constancia emitida por la DEMS, DES o SIP.", 
-      up: ['Máximo U.P. definido según el impacto del material elaborado.'], 
+      up: ['Tratamiento educativo: Curso completo 60.00 U.P.', 'Apoyo educativo: Curso completo 40.00 U.P.', 'Informativos: Curso completo 20.00 U.P.', 'Tratamiento educativo: Unidad o Módulo 40.00 U.P.', 'Apoyo educativo: Unidad o Módulo 20.00 U.P.', 'Indormativos: Unidad o Módulo 5.00 U.P.'], 
       condiciones: [
         'El material digital debe estar validado por las instancias correspondientes.'
       ]
@@ -88,7 +88,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Evaluación, diseño y/o rediseño de programas académicos", 
       documento: "Constancia emitida por la DEMS, DES o SIP.", 
-      up: ['15.00 U.P. por programa evaluado o rediseñado.'], 
+      up: ['Coordinador "Evaluación o Rediseño": Plan de Estudio (Programa Académico) 10.00 U.P.', 'Participante "Evaluación o Rediseño": Plan de Estudio (Programa Académico) 3.00 U.P.', 'Coordinador "Diseño": Plan de Estudio (Programa Académico) 20.00 U.P.', 'Participante "Diseño": Plan de Estudio (Programa Académico) 10.00 U.P.', 'Coordinador "Evaluación o Rediseño": Programa de Estudio de una Unidad de Aprendizaje 5.00 U.P.', 'Participante "Evaluación o Rediseño": Programa de Estudio de una Unidad de Aprendizaje 3.00 U.P', 'Coordinador "Diseño": Programa de Estudio de una Unidad de Aprendizaje 8.00 U.P', 'Participante "Diseño": Programa de Estudio de una Unidad de Aprendizaje 4.00 U.P'], 
       condiciones: [
         'El programa debe estar aprobado y validado por la instancia correspondiente.'
       ]
@@ -96,7 +96,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Elaboración de software educativo", 
       documento: "Constancia emitida por la DEMS, DES o SIP.", 
-      up: ['5.00 U.P. por software validado.'], 
+      up: ['Simulador Complejo e Integrado 15.00 U.P.', 'Sistema Complejo e Integrado 15.00 U.P.', 'Tutorial Interactivo Complejo e Integrado 10.00 U.P.', 'Simulador Modular 10.00 U.P.', 'Sistema Modular 10.00 U.P.', 'Tutorial Interactivo Modular 5.00 U.P.'], 
       condiciones: [
         'El software debe estar aprobado y validado por la institución correspondiente.'
       ]
@@ -104,7 +104,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Elaboración de hardware", 
       documento: "Constancia emitida por la DEMS, DES o SIP.", 
-      up: ['Máximo U.P. a definir según el impacto del hardware elaborado.'], 
+      up: ['75.00 U.P. excelente calidad.', '55.00 U.P. buena calidad.', '35.00 U.P. regular calidad.'], 
       condiciones: [
         'El hardware debe ser aprobado por las instancias correspondientes.'
       ]
@@ -112,7 +112,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Producción de Unidades de Aprendizaje en línea", 
       documento: "Constancia emitida por la UPEV con el visto bueno de la DEMS, DES o SIP.", 
-      up: ['8.00 U.P. por unidad producida.'], 
+      up: ['Profesor-autor 8.00 U.P.', 'Diseñador 8.00 U.P.', 'Comunicólo 5.00 U.P.', 'Programador web 5.00 U.P.', 'Diseñador gráfico 5.00 U.P.', 'Supervisor 3.00 U.P.'], 
       condiciones: [
         'La unidad de aprendizaje debe estar aprobada por la UPEV y las instancias académicas correspondientes.'
       ]
@@ -120,7 +120,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Proyecto Aula", 
       documento: "Constancia emitida por la DEMS.", 
-      up: ['5.00 U.P. por proyecto.'], 
+      up: ['5.00 U.P. por proyecto semestral.'], 
       condiciones: [
         'El proyecto debe estar registrado y aprobado por las instancias académicas.'
       ]
@@ -128,13 +128,13 @@ const actividadesPorFuncion = {
     {
       actividad: "Certificación de laboratorios y validación de pruebas de laboratorio", 
       documento: "Certificado emitido por una entidad reconocida y constancia del titular del centro de trabajo.", 
-      up: ['20.00 U.P. por certificación.'], 
+      up: ['20.00 U.P. para certificación de laboratorios.', '5.00 U.P. para validación de pruebas de laboratorio'], 
       condiciones: [
         'La certificación debe estar avalada por una entidad oficial.'
       ]
     }
   ],
-  investigacion: [
+  investigacion: [//OK
     {
       actividad: "Proyectos de investigación con financiamiento interno", 
       documento: "Constancia emitida por la SIP.", 
@@ -162,7 +162,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Estancias de Investigación", 
       documento: "Oficio de aceptación para realizar la estancia, dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica, carta de terminación expedida por la institución donde se realizó la estancia.", 
-      up: ['15.00 U.P. por estancia de investigación.'], 
+      up: ['15.00 U.P. por estancia de investigación. (1 por año)'], 
       condiciones: [
         'La estancia debe estar avalada por el COTEBAL y ser diferente a las realizadas para impartir clases.'
       ]
@@ -176,23 +176,135 @@ const actividadesPorFuncion = {
       ]
     }
   ],
-  complementarias: [
+  superacion: [//OK
     {
-      actividad: "Distinciones académicas", 
-      documento: "Constancia de validación emitida por la SIP.", 
-      up: ['Se otorgan según el reglamento específico de la distinción.'], 
+      actividad: "Otra licenciatura", 
+      documento: "Constancia de validación emitida por la DES.", 
+      up: ['60.00 U.P. por licenciatura.'], 
       condiciones: [
-        'La distinción debe estar validada oficialmente por el IPN.'
+        'La licenciatura debe ser distinta a la presentada en evaluaciones anteriores y estar validada por la DES.'
       ]
     },
     {
+      actividad: "Cursos de actualización, seminarios y talleres", 
+      documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE si son impartidos por el IPN; Constancia de validación emitida por la DEMS, DES o SIP si son impartidos por otra institución.", 
+      up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'], 
+      condiciones: [
+        'Los cursos deben estar relacionados con la actividad docente y contar con la validación institucional.'
+      ]
+    },
+    {
+      actividad: "Estudios de especialidad, maestría y doctorado", 
+      documento: "Constancia de validación emitida por la SIP.", 
+      up: ['75.50 U.P. por especialidad.', '88.50 U.P. por maestría.', '108.50 U.P. por doctorado.'], 
+      condiciones: [
+        'Los estudios deben estar completamente acreditados con el 100% de los créditos aprobados.'
+      ]
+    },
+    {
+      actividad: "Cursos de propósito específico", 
+      documento: "Constancia emitida por la SIP.", 
+      up: ['6.00 U.P. por cada 30 horas de curso.', 'Máximo: 30.00 U.P. por periodo de promoción.'], 
+      condiciones: [
+        'El curso debe estar orientado a un propósito específico dentro de la enseñanza o investigación.'
+      ]
+    },
+    {
+      actividad: "Diplomados", 
+      documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", 
+      up: ['40.00 U.P. por diplomado de 180 horas.'], 
+      condiciones: [
+        'Los diplomados deben tener un mínimo de 100 horas y estar validados por la institución correspondiente.'
+      ]
+    },
+    {
+      actividad: "Idiomas", 
+      documento: "Constancia emitida por la Dirección de Formación en Lenguas Extranjeras y/o certificado emitido por el CENLEX Santo Tomás o Zacatenco.", 
+      up: ['8.00 U.P. por expresión oral.', '8.00 U.P. por expresión escrita.', '5.00 U.P. por comprensión de lectura.', '5.00 U.P. por comprensión auditiva.'], 
+      condiciones: [
+        'El dominio del idioma debe estar certificado por el CENLEX o validado por la Dirección de Formación en Lenguas Extranjeras.'
+      ]
+    }
+  ],
+  complementarias: [
+    {
+      "actividad": "Distinciones académicas",
+      "documento": "Constancia de validación emitida por la SIP.",
+      "up": [
+        {
+          "nivel": "I",
+          "puntos": "31 - 40",
+          "conceptos": [
+            "Premio internacional otorgado por instituciones de prestigio en ciencia y tecnología.",
+            "Premio nacional de ciencia y artes.",
+            "Premios nacionales de academias y colegios de profesionistas (curriculares).",
+            "Premio de la Academia Mexicana en Ciencias.",
+            "Cátedra patrimonial nivel I (CONACYT)."
+          ]
+        },
+        {
+          "nivel": "II",
+          "puntos": "26 - 30",
+          "conceptos": [
+            "Premios a la investigación otorgados por otros organismos nacionales que promueven el desarrollo científico y tecnológico.",
+            "Premio Instituto Politécnico Nacional a la investigación.",
+            "Presea 'Lázaro Cárdenas' o equivalentes de otras instituciones educativas otorgadas a profesores e investigadores."
+          ]
+        },
+        {
+          "nivel": "III",
+          "puntos": "21 - 25",
+          "conceptos": [
+            "Premios otorgados a tesistas por organismos nacionales públicos o privados que promueven el desarrollo científico y tecnológico.",
+            "Premios otorgados en certámenes académicos nacionales e internacionales en áreas específicas del conocimiento."
+          ]
+        },
+        {
+          "nivel": "IV",
+          "puntos": "16 - 20",
+          "conceptos": [
+            "Menciones honoríficas en tesis de grado.",
+            "Premio Instituto Politécnico Nacional a tesis de grado.",
+            "Mención honorífica en tesis de licenciatura.",
+            "Premio Instituto Politécnico Nacional a tesis de licenciatura.",
+            "Premio a la dirección de tesis de nivel posgrado.",
+            "Reconocimiento por actividades de investigación realizadas en año sabático."
+          ]
+        },
+        {
+          "nivel": "V",
+          "puntos": "11 - 15",
+          "conceptos": [
+            "Presea 'Lázaro Cárdenas' o equivalentes de otras instituciones educativas otorgadas a estudiantes.",
+            "Premio de software Instituto Politécnico Nacional.",
+            "Premio de hardware Instituto Politécnico Nacional.",
+            "Premio al prototipo Instituto Politécnico Nacional.",
+            "Premio otorgado por organismos nacionales e internacionales a trabajos académicos que promueven el desarrollo científico y técnico."
+          ]
+        },
+        {
+          "nivel": "VI",
+          "puntos": "10",
+          "conceptos": [
+            "Premio al trabajo en congresos nacionales o internacionales (póster, cartel o presentación).",
+            "Mejor promedio de una maestría o doctorado.",
+            "Mejor promedio de un año."
+          ]
+        }
+      ],
+      "condiciones": [
+        "La distinción debe estar validada oficialmente por el IPN."
+      ]
+    },
+    
+  /*  {
       actividad: "Actividades académico-administrativas y sindicales", 
       documento: "Constancia u oficio de designación y documento que acredite el término del cargo.", 
       up: ['Se otorgan según la función desempeñada en el cargo.'], 
       condiciones: [
         'El cargo debe ser reconocido oficialmente por el IPN.'
       ]
-    },
+    },*/
     {
       actividad: "Dirección o asesoría de trabajos escritos para titulación", 
       documento: "Oficio, constancia o formato de designación suscrito por el Titular de la unidad académica o autoridad competente.", 
@@ -260,7 +372,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Servicio externo por obra puntual, sin compensación económica", 
       documento: "Solicitud del servicio externo, aceptación por el centro de trabajo y constancia de participación.", 
-      up: ['2.00 U.P. por participación.'], 
+      up: ['2.00 U.P. por cada 80 horas de servicio externo'], 
       condiciones: [
         'El servicio debe ser avalado y solicitado por el centro de trabajo.'
       ]
@@ -268,7 +380,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Ponente en conferencias, videoconferencias y expositor de carteles", 
       documento: "Constancia de participación como conferencista o expositor de carteles.", 
-      up: ['3.00 U.P. por conferencia o cartel.', 'Máximo: 24.00 U.P. por periodo de promoción.'], 
+      up: ['Nacional 3.00 por cartel o por conferencia.', 'Nacional 4.00 por videoconferencia.', 'Nacional 6.00 por conferencia magistral.', 'Internacional 6.00 por cartel o por conferencia.', 'Internacional 7.00 por videoconferencia.', 'Internacional 8.00 por conferencia magistral.', 'Máximo: 24.00 U.P. por periodo de promoción.'], 
       condiciones: [
         'Participación oficial en eventos académicos nacionales o internacionales.'
       ]
@@ -284,7 +396,7 @@ const actividadesPorFuncion = {
     {
       actividad: "Comisiones de evaluación", 
       documento: "Oficio de designación o constancia emitida por la DEMS, DES o SIP.", 
-      up: ['3.00 U.P. por participación en comisiones.', '5.00 U.P. como coordinador.', 'Máximo: 12.00 U.P. por periodo de promoción.'], 
+      up: ['3.00 U.P. por participación en comisiones.', '5.00 U.P. como coordinador.', '3.00 U.P. como analista'], 
       condiciones: [
         'Participación oficial en comisiones de evaluación académica.'
       ]
@@ -292,63 +404,13 @@ const actividadesPorFuncion = {
     {
       actividad: "Programas y proyectos institucionales en áreas centrales", 
       documento: "Constancia de participación emitida por el área correspondiente.", 
-      up: ['3.00 U.P. por participación.', 'Máximo: 9.00 U.P. por periodo de promoción.'], 
+      up: ['Programa institucional: 9.00 por coordinador.', 'Programa institucional: 7.00 por analista.', 'Proyecto institucional: 7.00 por coordinador.', 'Proyecto institucional: 5.00 por analista.', 'Proyecto de dependencia: 5.00 por coordinador.', 'Proyecto de dependencia: 3.00 por analista.'], 
       condiciones: [
         'Participación activa en programas y proyectos institucionales aprobados por el IPN.'
       ]
     }
   ],
-  superacion: [
-    {
-      actividad: "Otra licenciatura", 
-      documento: "Constancia de validación emitida por la DES.", 
-      up: ['60.00 U.P. por licenciatura.'], 
-      condiciones: [
-        'La licenciatura debe ser distinta a la presentada en evaluaciones anteriores y estar validada por la DES.'
-      ]
-    },
-    {
-      actividad: "Cursos de actualización, seminarios y talleres", 
-      documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE si son impartidos por el IPN; Constancia de validación emitida por la DEMS, DES o SIP si son impartidos por otra institución.", 
-      up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'], 
-      condiciones: [
-        'Los cursos deben estar relacionados con la actividad docente y contar con la validación institucional.'
-      ]
-    },
-    {
-      actividad: "Estudios de especialidad, maestría y doctorado", 
-      documento: "Constancia de validación emitida por la SIP.", 
-      up: ['75.50 U.P. por especialidad.', '88.50 U.P. por maestría.', '108.50 U.P. por doctorado.'], 
-      condiciones: [
-        'Los estudios deben estar completamente acreditados con el 100% de los créditos aprobados.'
-      ]
-    },
-    {
-      actividad: "Cursos de propósito específico", 
-      documento: "Constancia emitida por la SIP.", 
-      up: ['6.00 U.P. por cada 30 horas de curso.', 'Máximo: 30.00 U.P. por periodo de promoción.'], 
-      condiciones: [
-        'El curso debe estar orientado a un propósito específico dentro de la enseñanza o investigación.'
-      ]
-    },
-    {
-      actividad: "Diplomados", 
-      documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", 
-      up: ['40.00 U.P. por diplomado de 180 horas.'], 
-      condiciones: [
-        'Los diplomados deben tener un mínimo de 100 horas y estar validados por la institución correspondiente.'
-      ]
-    },
-    {
-      actividad: "Idiomas", 
-      documento: "Constancia emitida por la Dirección de Formación en Lenguas Extranjeras y/o certificado emitido por el CENLEX Santo Tomás o Zacatenco.", 
-      up: ['8.00 U.P. por expresión oral.', '8.00 U.P. por expresión escrita.', '5.00 U.P. por comprensión de lectura.', '5.00 U.P. por comprensión auditiva.'], 
-      condiciones: [
-        'El dominio del idioma debe estar certificado por el CENLEX o validado por la Dirección de Formación en Lenguas Extranjeras.'
-      ]
-    }
-  ],
-  extension: [
+  extension: [ //OK
     {
       actividad: "Participación en la expo-profesiográfica", 
       documento: "Constancia emitida por la Secretaría Académica o por la DEMS o DES.", 
@@ -381,14 +443,6 @@ const actividadesPorFuncion = {
         'La actividad debe ser avalada por el IPN y contar con la participación de los estudiantes.'
       ]
     },
-    {
-      actividad: "Eventos nacionales e internacionales de ciencia y formación integral", 
-      documento: "Constancia emitida por la Subdirección Académica y aval de la DEMS, DES o SIP.", 
-      up: ['5.00 U.P. por evento nacional.', '7.00 U.P. por evento internacional.'], 
-      condiciones: [
-        'Participación como asistente o expositor en eventos académicos nacionales o internacionales avalados por el IPN.'
-      ]
-    }
   ]
 
 };
@@ -473,25 +527,49 @@ function InfoProjection({ userName }) {
                   <FaChevronDown />
                 </span>
               </button>
+
               {openSection === actividadIndex && (
                 <div>
-                  <div ref={(el) => sectionRefs.current[actividadIndex] = el}>
+                  <div ref={(el) => (sectionRefs.current[actividadIndex] = el)}>
                     <div className="py-3 px-4 text-white rounded-b-lg">
-                      <p>
-                        <b>Valoración:</b>
-                        <ul className="list-disc ml-5">
-                          {actividadItem.up.map((valor, i) => (
-                            <li key={i}>{valor}</li>
-                          ))}
-                        </ul>
-                        <b>Documento Probatorio:</b> {actividadItem.documento}
-                      </p>
-                      <p><b>Condiciones:</b></p>
-                      <ul className="list-disc ml-5">
-                        {actividadItem.condiciones.map((condicion, i) => (
-                          <li key={i}>{condicion}</li>
-                        ))}
-                      </ul>
+                      {/* Verificamos si es la actividad con niveles */}
+                      {actividadItem.actividad === "Distinciones académicas" ? (
+                        <div>
+                          <p><b>Valoración:</b></p>
+                          <ul className="list-disc ml-5">
+                            {actividadItem.up.map((nivel, nivelIndex) => (
+                              <li key={nivelIndex}>
+                                <b>Nivel:</b> {nivel.nivel}, <b>Puntos:</b> {nivel.puntos}
+                                <ul className="list-disc ml-5">
+                                  {nivel.conceptos.map((concepto, conceptoIndex) => (
+                                    <li key={conceptoIndex}>{concepto}</li>
+                                  ))}
+                                </ul>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : (
+                        // Renderizado estándar para otras actividades
+                        <>
+                          <p><b>Valoración:</b></p>
+                            <p>
+                              {(actividadItem.up || []).join('\n').split('\n').map((linea, index) => (
+                                <span key={index}>
+                                  {linea}
+                                  <br />
+                                </span>
+                              ))}
+                            </p>
+                          <p><b>Documento Probatorio:</b> {actividadItem.documento}</p>
+                          <p><b>Condiciones:</b></p>
+                          <ul className="list-disc ml-5">
+                            {actividadItem.condiciones.map((condicion, i) => (
+                              <li key={i}>{condicion}</li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -499,7 +577,9 @@ function InfoProjection({ userName }) {
             </div>
           ))
         ) : (
-          <p className="text-center text-lg text-gray-500">No hay actividades disponibles para la categoría seleccionada.</p>
+          <p className="text-center text-lg text-gray-500">
+            No hay actividades disponibles para la categoría seleccionada.
+          </p>
         )}
       </div>
     </main>
