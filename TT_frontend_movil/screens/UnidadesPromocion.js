@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { get_Check_Products } from '../api/check_products.api'; 
 import { AuthContext } from '../components/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 
 import tw from 'twrnc';
 
@@ -69,6 +70,18 @@ import tw from 'twrnc';
     ],
   };
 
+  const activitiesWithHours = new Set([
+    "Carga académica",
+    "Elaboración e Impartición de acciones de formación",
+    "Programa de inducción",
+    "Tutorías",
+    "Cursos de actualización, seminarios y talleres",
+    "Cursos de propósito específico",
+    "Diplomados",
+    "Servicio externo por obra puntual, sin compensación económica",
+    "Impartición de disciplinas deportivas y/o talleres culturales",
+  ]);
+
   const CrearProyeccion = () => {
     const [funcion, setFuncion] = useState('');
     const [actividad, setActividad] = useState('');
@@ -94,6 +107,27 @@ import tw from 'twrnc';
     const [checkProductData, setCheckProductData] = useState(null); // Datos recibidos
     const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
     const [loading, setLoading] = useState(true); // Estado de carga inicial
+
+    // Nuevos estados
+    const [showWorkTime, setShowWorkTime] = useState(false); // Controla la visibilidad del campo
+
+    const [workTime, setWorkTime] = useState(''); // Almacena el tiempo seleccionado
+    const [category, setCategory] = useState(''); // Categoría del usuario
+    const [conditions, setConditions] = useState(null); // Condiciones desde localStorage
+    const [max_conditions, setMaxConditions] = useState(null) // Condiciones de maximos desde el localstorage
+    const [calculatedUnits, setCalculatedUnits] = useState(''); // U.P. calculadas
+
+    const [hours, setHours] = useState(''); // Estado para almacenar las horas
+    const [hoursError, setHoursError] = useState(''); // Estado para mostrar errores de validación
+    const [hourLimits, setHourLimits] = useState({ min: 0, max: 200 }); // Almacena los límites de horas
+
+    const [category_normalized, setCategoryNormalized] = useState(''); // Categoría normalizada
+    const [hoursCalculated, setHoursCalculated] = useState(1); // Estado para almacenar el segundo número (horas)
+
+    const [up_allowed, setUpAllowed] = useState(''); // Estado para almacenar las U.P. permitidas
+    const [isUnitsSelected, setIsUnitsSelected] = useState(false); 
+    const [modalWorkTimeVisible, setModalWorkTimeVisible] = useState(false); // Modal específico para tiempo de trabajo
+
     
     useEffect(() => {
   
@@ -115,7 +149,110 @@ import tw from 'twrnc';
         fetchCheckProducts(userId);
       }
     }, [userId]);
+
+      // Obtener la categoría y las condiciones del localStorage al cargar el componente
+    useEffect(() => {
+      const load_data = async () => {
+        const storedAccountDetails = await AsyncStorage.getItem('accountDetails');
+        const storedConditions = await AsyncStorage.getItem('conditions');
+        const storedMaxConditions = await AsyncStorage.getItem('conditions_max');
+
+        if (storedAccountDetails && storedConditions && storedMaxConditions) {
+          const accountDetails = JSON.parse(storedAccountDetails);
+          const normalizedCategory = normalizeCategory(accountDetails.category);
+          console.log(userId);
+          setCategoryNormalized(normalizeCategory(accountDetails.category));
+
+          setCategory(normalizedCategory);
+          setConditions(JSON.parse(storedConditions));
+          setMaxConditions(JSON.parse(storedMaxConditions));
+        }
+      };
+      load_data();
+    }, []);
+
+    // Función para normalizar la categoría del usuario
+    const normalizeCategory = (category) => {
+      const words = category.toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
+      words.pop(); // Elimina la última palabra.
+      return words.join('_'); // Une las palabras restantes con '_'.
+    };
+
+    const normalizeFuction = (functionField) => {
+      const mappings = {
+        "Docencia": "carga_academica",
+        "Otras actividades en docencia": "otras_actividades",
+        "Investigación": "investigacion",
+        "Superación académica": "superacion_academica",
+        "Actividades complementarias de apoyo a la docencia y a la investigación": "actividades_complementarias",
+        "Actividades de extensión, integración y difusión de la ciencia y de la cultura": "actividades_extension"
+      };
   
+      return mappings[functionField];
+    };
+
+
+  // **Manejo del cambio en horas ingresadas**
+  const handleHoursChange = (text) => {
+    const enteredHours = parseInt(text, 10);
+    setHours(enteredHours);
+
+    const { min, max } = hourLimits;
+
+    if (enteredHours < min || enteredHours > max) {
+      setHoursError(`Las horas deben estar entre ${min} y ${max}.`);
+      setCalculatedUnits('');
+      return;
+    }
+
+    setHoursError(''); // Limpiar errores
+
+    // Calcular U.P. si la actividad es "Carga académica"
+    if (actividad === 'Carga académica') {
+      const units = enteredHours * 4; // 4 U.P. por hora
+      setCalculatedUnits(units);
+      validateUP(units);
+    } else if (actividad === "Programa de inducción") {
+      const units = enteredHours * 4;
+      setCalculatedUnits(units);
+      //validateUP(units);
+    } else {
+      console.log(hoursCalculated);
+      const units = Math.floor(enteredHours / hoursCalculated) * up_allowed;
+      setCalculatedUnits(units);
+      //validateUP(units);
+    }
+  };
+
+  // **Validar que no se supere el límite de U.P. permitidas** (solo en carga académica)
+  const validateUP = (units) => {
+    if (conditions && category) {
+      const maxUP = conditions?.carga_academica?.[category]?.[workTime]?.up?.max || 0;
+      if (units > maxUP) {
+        setHoursError(`Las U.P. calculadas superan el máximo permitido (${maxUP} U.P.).`);
+        setCalculatedUnits(maxUP); // Establecer el máximo permitido
+      }
+    }
+  };
+
+  // **Manejo del cambio en tiempo de trabajo**
+  const handleWorkTimeChange = (selectedOption) => {
+    setWorkTime(selectedOption);
+    console.log("category", category);
+
+    if (conditions && category) {
+      const horas = conditions.carga_academica[category]?.[selectedOption]?.horas || { min: 0, max: 200 };
+      setHourLimits(horas);
+    }
+  };
+
+  const options_work_time = [
+    { value: 'medio_tiempo', label: 'Medio tiempo' },
+    { value: 'tres_cuartos_tiempo', label: 'Tres cuartos' },
+    { value: 'tiempo_completo', label: 'Tiempo completo' },
+  ];
+
+
     const funciones = Object.keys(actividadesPorFuncion);
   
     const filtrarUPs = (rolSeleccionado, alcanceSeleccionado) => {
@@ -169,6 +306,12 @@ import tw from 'twrnc';
         setUpSeleccionada(upsAMostrar.length === 1 ? upsAMostrar[0] : '');
       }
     };
+
+    const extractNumbers = (text) => {
+      const regex = /\d+(\.\d+)?/g; // Captura números enteros o decimales
+      const numbers = text.match(regex); // Extrae todos los números encontrados
+      return numbers ? numbers.slice(0, 2).map(Number) : []; // Retorna los dos primeros como números
+    };
     
     const handleModalSelect = (item) => {
       if (modalType === 'funcion') {
@@ -190,6 +333,9 @@ import tw from 'twrnc';
         setMostrarAlcance(false);
         setAlcancesDisponibles([]);
         setFecha('');
+        setHourLimits({ min: 0, max: 200 });
+        setCalculatedUnits('');
+        setWorkTime('');
       } else if (modalType === 'actividad') {
         setActividad(item);
         const actividadEncontrada = actividadesDisponibles.find(
@@ -199,13 +345,13 @@ import tw from 'twrnc';
           setDocumento(actividadEncontrada.documento || '');
           setMostrarDocumento(!!actividadEncontrada.documento);
     
-          // Manejo de roles y su visibilidad
+          // Manejo de roles y visibilidad
           const roles = actividadEncontrada.rol ? actividadEncontrada.rol.split(' o ') : [];
           setRolesDisponibles(roles);
           setRol(roles.length === 1 ? roles[0] : '');
           setMostrarRol(roles.length > 0);
     
-          // Manejo de alcances y su visibilidad
+          // Manejo de alcances y visibilidad
           const alcance = actividadEncontrada.alcance ? actividadEncontrada.alcance.split(' o ') : [];
           setAlcancesDisponibles(alcance);
           setAlcance(alcance.length === 1 ? alcance[0] : '');
@@ -213,28 +359,41 @@ import tw from 'twrnc';
     
           // Manejo de U.P.
           const ups = actividadEncontrada.up || [];
-  
           setMaximoUps(ups.filter((up) => up.toLowerCase().includes('máximo')));
-  
-        // Filtra y actualiza las U.P. normales (excluyendo las que contienen "Máximo")
           setUpsDisponibles(ups.filter((up) => !up.toLowerCase().includes('máximo')));
-  
-        // Selecciona la U.P. automáticamente si solo hay una disponible
+    
           const normales = ups.filter((up) => !up.toLowerCase().includes('máximo'));
-          setUpSeleccionada(normales.length === 1 ? normales[0] : '');
-          setMostrarUp(true); // Muestra el campo U.P.
+          const seleccionada = normales.length === 1 ? normales[0] : '';
+          setUpSeleccionada(seleccionada);
+          if (seleccionada) {
+            const [firstNumber, secondNumber] = extractNumbers(seleccionada);
+            //console.log('Números extraídos:', firstNumber, secondNumber); // Aquí tienes los dos primeros números
+            setUpAllowed(firstNumber);
+            setHoursCalculated(secondNumber);
+            console.log(up_allowed, hoursCalculated );
+          }
+          setMostrarUp(true);
         }
-      } if (modalType === 'rol') {
+      } else if (modalType === 'rol') {
         setRol(item);
-        filtrarUPs(item, alcance); // Volver a filtrar con el nuevo rol seleccionado
+        filtrarUPs(item, alcance);
       } else if (modalType === 'alcance') {
         setAlcance(item);
-        filtrarUPs(rol, item); // Volver a filtrar con el nuevo alcance seleccionado
+        filtrarUPs(rol, item);
       } else if (modalType === 'up') {
         setUpSeleccionada(item);
+        const [firstNumber, secondNumber] = extractNumbers(item);
+        console.log('Números extraídos:', firstNumber, secondNumber); // Aquí tienes los dos primeros números
+        setUpAllowed(firstNumber);
+        setHoursCalculated(secondNumber);
       }
       setModalVisible(false);
-    };  
+    };
+
+    const handleWorkTimeSelect = (option) => {
+      handleWorkTimeChange(option);
+      setModalWorkTimeVisible(false); // Cerrar el modal de tiempo de trabajo
+    };
   
     return (
       <ImageBackground
@@ -363,6 +522,80 @@ import tw from 'twrnc';
                 <Ionicons name="chevron-down" size={24} color="rgba(0, 0, 0, 0.8)" />
               </TouchableOpacity>
             </View>
+          )}
+  
+          {activitiesWithHours.has(actividad) && (
+              <>
+                {/* Si la actividad es "Carga académica", mostrar el selector de tiempo de trabajo */}
+                {actividad === "Carga académica" && (
+                  <View style={tw`mb-4`}>
+                    <Text style={tw`text-base font-bold text-black`}>
+                      Tiempo de trabajo
+                    </Text>
+                    <TouchableOpacity
+                    onPress={() => setModalWorkTimeVisible(true)} // Abrir modal de tiempo de trabajo
+                    style={tw`w-full p-4 border border-gray-700 rounded-lg bg-white flex-row justify-between items-center`}
+                  >
+                    <Text>{workTime || 'Selecciona una opción'}</Text>
+                    <Ionicons name="chevron-down" size={24} color="black" />
+                  </TouchableOpacity>
+
+                  <Modal
+                    visible={modalWorkTimeVisible}
+                    transparent={true}
+                    animationType="slide"
+                  >
+                    <View style={tw`flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]`}>
+                      <View style={tw`w-4/5 bg-white rounded-lg p-5`}>
+                        {options_work_time.map((options_work_time) => (
+                          <TouchableOpacity
+                            key={options_work_time.value}
+                            style={tw`py-3 border-b border-gray-300`}
+                            onPress={() => handleWorkTimeSelect(options_work_time.value)}
+                          >
+                            <Text style={tw`text-black`}>{options_work_time.label}</Text>
+                          </TouchableOpacity>
+                        ))}
+                        <TouchableOpacity
+                          style={tw`mt-5 items-center`}
+                          onPress={() => setModalWorkTimeVisible(false)}
+                        >
+                          <Text style={tw`text-blue-700`}>Cerrar</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </Modal>
+                </View>
+              )}
+
+              {/* Campo de horas con validación */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-base font-bold text-black`}>Horas de trabajo</Text>
+                <TextInput
+                  value={hours}
+                  onChangeText={handleHoursChange}
+                  keyboardType="numeric"
+                  placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
+                  style={tw`w-full p-4 border border-gray-700 rounded-lg bg-white text-black`}
+                  maxLength={3} // Limitar a 3 dígitos (por si acaso)
+                />
+                {hoursError ? <Text style={tw`text-red-500`}>{hoursError}</Text> : null}
+              </View>
+
+              {/* Campo de visualización de U.P. calculadas */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-base font-bold text-black`}>
+                  U.P. Calculadas
+                </Text>
+                <View
+                  style={tw`w-full p-4 border border-gray-700 rounded-lg bg-white ${!isUnitsSelected ? 'opacity-50' : ''}`}
+                >
+                  <Text style={tw`text-black`}>
+                    {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
+                  </Text>
+                </View>
+              </View>              
+            </>
           )}
   
           {maximoUps.length > 0 && (
