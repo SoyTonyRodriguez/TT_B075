@@ -24,7 +24,7 @@ const KanbanBoard = () => {
   const [showProjectionModal, setShowProjectionModal] = useState(false); // Estado del modal de proyección
   const [showStatusModal, setShowStatusModal] = useState(false); // Controla el modal de status
   const [isTaskLoading, setIsTaskLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
-
+  const [activeSection, setActiveSection] = useState(null); // para que solo una seccion este abierya 
   const [taskToEdit, setTaskToEdit] = useState(null); // Nueva tarea para editar
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Estado del modal de edición
 
@@ -181,6 +181,10 @@ const KanbanBoard = () => {
     setTaskToEdit({ ...taskToEdit, [name]: value });
   };
 
+  const toggleSection = (section) => {
+    setActiveSection((prevSection) => (prevSection === section ? null : section));
+  };
+
   const TaskCard = ({ task }) => {
     const getPriorityColor = () => {
       switch (task.priority) {
@@ -258,12 +262,12 @@ const KanbanBoard = () => {
 
       <ScrollView style={tw`p-5`}>
         {/* Sección To-Do */}
-        <TouchableOpacity onPress={() => setShowTodo(!showTodo)}>
-          <View style={tw`bg-yellow-200 p-4 rounded-xl`}>
-            <Text style={tw`text-lg font-semibold text-black`}>TO-DO</Text>
+        <TouchableOpacity onPress={() => toggleSection('todo')}>
+          <View style={tw`bg-blue-900 p-4 rounded-xl`}>
+            <Text style={tw`text-lg font-semibold text-white`}>POR HACER</Text>
           </View>
         </TouchableOpacity>
-        {showTodo && (
+        {activeSection === 'todo' && (
           <View style={tw`bg-white p-4 rounded-xl mt-2`}>
             {tasks.filter(task => task.status === 'todo').map(task => (
               <TaskCard key={task.id} task={task}  />
@@ -272,12 +276,12 @@ const KanbanBoard = () => {
         )}
 
         {/* Sección In-Progress */}
-        <TouchableOpacity onPress={() => setShowInProcess(!showInProcess)}>
-          <View style={tw`bg-blue-200 p-4 mt-5 rounded-xl`}>
-            <Text style={tw`text-lg font-semibold text-black`}>IN PROGRESS</Text>
+        <TouchableOpacity onPress={() => toggleSection('in-progress')}>
+          <View style={tw`bg-blue-900 p-4 mt-5 rounded-xl`}>
+            <Text style={tw`text-lg font-semibold text-white`}>EN PROGRESO</Text>
           </View>
         </TouchableOpacity>
-        {showInProcess && (
+        {activeSection === 'in-progress' && (
           <View style={tw`bg-white p-4 rounded-xl mt-2`}>
             {tasks.filter(task => task.status === 'in-progress').map(task => (
               <TaskCard key={task.id} task={task}  />
@@ -286,12 +290,12 @@ const KanbanBoard = () => {
         )}
 
         {/* Sección Done */}
-        <TouchableOpacity onPress={() => setShowDone(!showDone)}>
-          <View style={tw`bg-green-200 p-4 mt-5 rounded-xl`}>
-            <Text style={tw`text-lg font-semibold text-black`}>DONE</Text>
+        <TouchableOpacity onPress={() => toggleSection('done')}>
+          <View style={tw`bg-blue-900 p-4 mt-5 rounded-xl`}>
+            <Text style={tw`text-lg font-semibold text-white`}>TERMINADO</Text>
           </View>
         </TouchableOpacity>
-        {showDone && (
+        {activeSection === 'done' && (
           <View style={tw`bg-white p-4 rounded-xl mt-2`}>
             {tasks.filter(task => task.status === 'done').map(task => (
               <TaskCard key={task.id} task={task} />
