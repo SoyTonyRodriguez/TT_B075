@@ -34,32 +34,18 @@ const HomeScreen = () => {
     const loadAccountData = async () => {
       try {
         Toast.show({ type: 'success', text1: 'Bienvenido!', visibilityTime: 1000 });
-        // Verifica si los datos de la cuenta están almacenados
-        const storedAccountData = await AsyncStorage.getItem('accountDetails');
 
         const storedConditions = await AsyncStorage.getItem('conditions');
 
         const storedConditionsMax = await AsyncStorage.getItem('conditions_max');
         
-        if (storedAccountData) {
-          const { userName, fullName, email, category, phone } = JSON.parse(storedAccountData);
-          setUserName(userName);
-          setFullName(fullName);
-          setEmail(email);
-          setCategory(category);
-          setPhone(phone);
-          setLoading(false); // Datos encontrados, omitimos la animación de carga
-        } else {
-          // Si no hay datos almacenados, obtenemos el token
-          const token = await AsyncStorage.getItem('token');
-          if (token) {
-            try {
-              const decodedToken = jwtDecode(token);
-              setUserId(decodedToken.user_id);
-              console.log('Token decodificado:', decodedToken.user_id);
-            } catch (error) {
-              console.error('Token inválido:', error);
-            }
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          try {
+            const decodedToken = jwtDecode(token);
+            setUserId(decodedToken.user_id);
+          } catch (error) {
+            console.error('Token inválido:', error);
           }
         }
 
@@ -85,43 +71,39 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (userId && !userName) {
+    if (userId ) {
       const fetchAccountDetails = async () => {
         try {
-
           const response = await getAccount(userId);
-          console.log('Detalles de la cuenta:', response);
-          const fullName = response.data.name;
-          const firstName = fullName.split(' ')[0];
-          const email = response.data.email;
-          const category = response.data.category;
-          const phone = response.data.phone;
-
-          setUserName(firstName);
-          setFullName(fullName);
-          setEmail(email);
-          setCategory(category);
-          setPhone(phone);
-
-          // Guarda los detalles de la cuenta en AsyncStorage
-          const accountDetails = {
-            userName: firstName,
-            fullName,
-            email,
-            category,
-            phone,
-          };
-
-          await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+          
+          if (response && response.data) {
+            console.log('Detalles de la cuenta recibidos:', response.data);
+            const fullName = response.data.name || 'Sin nombre';
+            const firstName = fullName.split(' ')[0];
+            const email = response.data.email || 'Sin email';
+            const category = response.data.category || 'Sin categoría';
+      
+            setUserName(firstName);
+            setFullName(fullName);
+            setEmail(email);
+            setCategory(category);
+      
+            // Guarda en AsyncStorage
+            const accountDetails = { userName: firstName, fullName, email, category, phone };
+            await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+          } else {
+            console.warn('La API no devolvió datos de usuario válidos.');
+          }
         } catch (error) {
           console.error('Error al obtener los detalles de la cuenta:', error);
-          if (error.response && error.response.status === 401) {
+          if (error.response?.status === 401) {
             console.error('No autorizado: token inválido o caducado');
           }
         } finally {
           setLoading(false);
         }
       };
+      console.log('Intentando obtener detalles de la cuenta para el usuario:', userId);
 
       fetchAccountDetails();
     }

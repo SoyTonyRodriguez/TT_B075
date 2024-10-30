@@ -17,7 +17,7 @@ export const login = (credentials) => accountsAPI.post('login/', credentials)
 // getAccount method
 export const getAccount = async (id) => {
     const token = await AsyncStorage.getItem('token');
-    const cleanToken = token.trim(); // Elimina espacios en blanco adicionales
+    const cleanToken = token.replace(/["]/g, '').trim();
     return accountsAPI.get(`account/${id}/`, {
       headers: {
         Authorization: `Bearer ${cleanToken}`,
