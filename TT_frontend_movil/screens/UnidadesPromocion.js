@@ -4,7 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { get_Check_Products } from '../api/check_products.api'; 
 import { AuthContext } from '../components/AuthContext';
+import { createProduct } from '../api/products.api';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
+import LoadingScreen from './LoadingScreen'; // Pantalla de carga
+
+import CustomToast from '../components/CustomToast'; // Toast personalizado
+import Toast from 'react-native-toast-message'; 
 
 import tw from 'twrnc';
 
@@ -32,14 +37,14 @@ import tw from 'twrnc';
     ],
     "Investigación": [ //Falla la tercera y la ultima 
       { actividad: "Proyectos de investigación con financiamiento interno", documento: "Constancia emitida por la SIP.", up: ['5.00 U.P. con el 20% de avance inicial como director.', '3.00 U.P. con el 20% de avance inicial como participante.', '25.00 U.P. por proyecto terminado como director.', '15.00 U.P. por proyecto terminado como participante.', 'Máximo 2 proyectos como director y 3 proyectos como participante.'], rol: "Director o Participante" }, // OK //'Máximo 2 proyectos como director y 3 proyectos como participante por periodo de promoción.'
-      { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio, carta de aceptación del informe final o carta de finiquito, informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante"}, //OK
+      { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio\n Carta de aceptación del informe final o carta de finiquito\n Informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante", alcance: "Nacional" }, //OK
       { actividad: "Publicación de artículos científicos y técnicos", documento: "Constancia de validación emitida por la SIP.", up:['3.00 U.P. por artículo de circulación institucional.', '5.00 U.P. por artículo de circulación nacional.', '10.00 U.P. por artículo de circulación nacional con jurado.', '20.00 U.P. por artículo de circulación internacional.', 'Máximo 5 publicaciones por periodo de promoción.'], rol: "Autor", alcance: "Nacional o Internacional"  },//AQUI NO ME DEJA ELEGIR
-      { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia, dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica, carta de terminación expedida por la institución donde se realizó la estancia.", up: ['15.00 U.P. por año'] }, //OK
-      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro, resultado del examen de forma, título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante", alcance: "Nacional o Internacional" } //AQUI TAMPOCO SALE NADA 
+      { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia\n Dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica\n Carta de terminación expedida por la institución donde se realizó la estancia.", up: "15.00 U.P. por año" }, //OK
+      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro\n Resultado del examen de forma\n Título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante o ", alcance: "Nacional o Internacional" } //OK
     ],
     "Superación académica": [ //TODAS BIEN
       { actividad: "Otra licenciatura", documento: "Constancia de validación emitida por la DES.", up: ['60.00 U.P. por licenciatura.'] }, //OK
-      { actividad: "Cursos de actualización, seminarios y talleres", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE para impartidos por el IPN, Constancia de validación emitida por la DEMS, DES o SIP para impartidos en institución distinta al IPN.", up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'] }, //OK
+      { actividad: "Cursos de actualización, seminarios y talleres", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE para impartidos por el IPN\n Constancia de validación emitida por la DEMS, DES o SIP para impartidos en institución distinta al IPN.", up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'] }, //OK
       { actividad: "Estudios de especialidad, maestría y doctorado", documento: "Constancia de validación emitida por la SIP.", up: ['75.50 U.P. por especialidad.', '88.50 U.P. por maestría.', '108.50 U.P. por doctorado.'] }, //OK
       { actividad: "Cursos de propósito específico", documento: "Constancia emitida por la SIP.", up: ['6.00 U.P. por cada 30 horas de curso.' , 'Máximo: 30.00 U.P. por periodo de promoción.'] }, //OK
       { actividad: "Diplomados", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", up: ['40.00 U.P. por diplomado de 180 horas.'] }, //OK
@@ -82,12 +87,11 @@ import tw from 'twrnc';
     "Impartición de disciplinas deportivas y/o talleres culturales",
   ]);
 
-  const CrearProyeccion = () => {
+  const CrearProyeccion = ({ navigation }) => {
     const [funcion, setFuncion] = useState('');
     const [actividad, setActividad] = useState('');
     const [actividadesDisponibles, setActividadesDisponibles] = useState([]);
     const [documento, setDocumento] = useState('');
-    const [up, setUp] = useState('');
     const [upsDisponibles, setUpsDisponibles] = useState([]); // Inicia vacío
     const [upSeleccionada, setUpSeleccionada] = useState(''); 
     const [fecha, setFecha] = useState('');
@@ -96,13 +100,15 @@ import tw from 'twrnc';
     const [alcance, setAlcance] = useState('');  
     const [modalVisible, setModalVisible] = useState(false); 
     const [modalType, setModalType] = useState('');
-    const [showCalendar, setShowCalendar] = useState(false); 
     const [rolesDisponibles, setRolesDisponibles] = useState([]); 
     const [mostrarRol, setMostrarRol] = useState(false);
     const [mostrarAlcance, setMostrarAlcance] = useState(false);
     const [mostrarUp, setMostrarUp] = useState(false); 
     const [mostrarDocumento, setMostrarDocumento] = useState(false);
     const [maximoUps, setMaximoUps] = useState([]); // Estado para U.P. con máximo permitido
+    const [projection_id, setProjectionId] = useState('');
+    const [documents_uploaded, setDocumentsUploaded] = useState([]);
+    const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
 
     const [checkProductData, setCheckProductData] = useState(null); // Datos recibidos
     const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
@@ -159,6 +165,8 @@ import tw from 'twrnc';
 
         if (storedAccountDetails && storedConditions && storedMaxConditions) {
           const accountDetails = JSON.parse(storedAccountDetails);
+          const { projection_id } = JSON.parse(storedAccountDetails);
+          setProjectionId(projection_id);
           const normalizedCategory = normalizeCategory(accountDetails.category);
           console.log(userId);
           setCategoryNormalized(normalizeCategory(accountDetails.category));
@@ -215,12 +223,9 @@ import tw from 'twrnc';
     } else if (actividad === "Programa de inducción") {
       const units = enteredHours * 4;
       setCalculatedUnits(units);
-      //validateUP(units);
     } else {
-      console.log(hoursCalculated);
       const units = Math.floor(enteredHours / hoursCalculated) * up_allowed;
       setCalculatedUnits(units);
-      //validateUP(units);
     }
   };
 
@@ -238,7 +243,6 @@ import tw from 'twrnc';
   // **Manejo del cambio en tiempo de trabajo**
   const handleWorkTimeChange = (selectedOption) => {
     setWorkTime(selectedOption);
-    console.log("category", category);
 
     if (conditions && category) {
       const horas = conditions.carga_academica[category]?.[selectedOption]?.horas || { min: 0, max: 200 };
@@ -358,7 +362,7 @@ import tw from 'twrnc';
           setMostrarAlcance(alcance.length > 0);
     
           // Manejo de U.P.
-          const ups = actividadEncontrada.up || [];
+          const ups = Array.isArray(actividadEncontrada.up) ? actividadEncontrada.up : [actividadEncontrada.up];
           setMaximoUps(ups.filter((up) => up.toLowerCase().includes('máximo')));
           setUpsDisponibles(ups.filter((up) => !up.toLowerCase().includes('máximo')));
     
@@ -367,13 +371,12 @@ import tw from 'twrnc';
           setUpSeleccionada(seleccionada);
           if (seleccionada) {
             const [firstNumber, secondNumber] = extractNumbers(seleccionada);
-            //console.log('Números extraídos:', firstNumber, secondNumber); // Aquí tienes los dos primeros números
             setUpAllowed(firstNumber);
             setHoursCalculated(secondNumber);
-            console.log(up_allowed, hoursCalculated );
+            console.log(up_allowed, hoursCalculated);
           }
           setMostrarUp(true);
-        }
+        }    
       } else if (modalType === 'rol') {
         setRol(item);
         filtrarUPs(item, alcance);
@@ -394,12 +397,204 @@ import tw from 'twrnc';
       handleWorkTimeChange(option);
       setModalWorkTimeVisible(false); // Cerrar el modal de tiempo de trabajo
     };
+
+    const validateForm = () => {
+      // Verificar que todos los campos obligatorios estén completos
+      if (!funcion) {
+        alert("Por favor selecciona una función.");
+        return false;
+      }
+    
+      if (!actividad) {
+        alert("Por favor selecciona una actividad.");
+        return false;
+      }
+    
+      if (mostrarDocumento && !documento) {
+        alert("Por favor completa el campo de documento requerido.");
+        return false;
+      }
+    
+      if (mostrarRol && !rol) {
+        alert("Por favor selecciona un rol.");
+        return false;
+      }
+    
+      if (mostrarAlcance && !alcance) {
+        alert("Por favor selecciona un alcance.");
+        return false;
+      }
+    
+      if (mostrarUp && !upSeleccionada) {
+        alert("Por favor selecciona una U.P.");
+        return false;
+      }
+    
+      if (activitiesWithHours.has(actividad)) {
+        if (actividad === "Carga académica" && !workTime) {
+          alert("Por favor selecciona un tiempo de trabajo.");
+          return false;
+        }
+    
+        if (!hours || hours < hourLimits.min || hours > hourLimits.max) {
+          alert(`Por favor ingresa una cantidad de horas entre ${hourLimits.min} y ${hourLimits.max}.`);
+          return false;
+        }
+      }
+    
+      return true; // Si todo está completo, retorna true
+    };
+    
+    const handleOnPress = async () => {
+      if (!validateForm()) {
+        return; // Detener ejecución si el formulario no es válido
+      }
+    
+      // Si el formulario es válido, continuar con las siguientes operaciones
+      const result = up_allowed;
+    
+      // Calcular la longitud de los documentos requeridos
+      const documentsList = documento.split('\n').map(doc => doc.trim()).filter(doc => doc);
+      const documentsCount = documentsList.length;
+
+          // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+      // Crea una variable temporal para almacenar la actividad ajustada según el rol
+      let activityToSend = actividad;
+
+      if (actividad === 'Proyectos de investigación con financiamiento interno' && rol === 'Director') {
+        activityToSend = 'Proyectos de investigación con financiamiento interno (Director)';
+      }
+      if (actividad === 'Proyectos de investigación con financiamiento interno' && rol === 'Participante') {
+        activityToSend = 'Proyectos de investigación con financiamiento interno (Participante)';
+      }
+      
+      // obtener la función normalizada
+      const normalized_function = normalizeFuction(funcion);
+
+      // Acceder a max_UP_allowed de forma segura
+      const max_UP_allowed = 
+        conditions?.[normalized_function]?.[category_normalized]?.[workTime]?.up?.max || 
+        conditions?.[normalized_function]?.[category_normalized]?.up?.max;
+      if (max_UP_allowed === 0) {
+        console.error('Tú categoría esta excenta de realizar está actividad.');
+        return;
+      }
+
+      // verifica si el objeto checkProductData tiene datos
+      if (Object.keys(checkProductData).length > 0) {
+        console.log( checkProductData?.[funcion]?.[activityToSend])
+
+        // Verificar si tiene datos para la función seleccionada
+        if (checkProductData?.[funcion]) {
+          console.log("Estoy aqui")
+          // Calcular el total de U.P. de la función
+          const total_UP_check_product = checkProductData?.[funcion].total;
+          console.log(total_UP_check_product)
+
+          // Calcular el total de U.P. con la actividad actual
+          const sum_total_funcition = total_UP_check_product + Number(calculatedUnits || result);
+
+          console.log('sum_total_funcition:', sum_total_funcition);
+          console.log('max_UP_allowed:', max_UP_allowed);
+          console.log("total_UP_check_product:", total_UP_check_product);
+
+          // Verificar si supera el límite máximo de U.P. de acuerdo a la categoría
+          if (sum_total_funcition > max_UP_allowed) {
+            Toast.show({ type: 'error', 
+              text1: `La cantidad de U.P. con está actividad será (${sum_total_funcition}), lo que supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`, 
+              visibilityTime: 2000 });
+            return;
+          }
+
+          // Verificar si tiene datos para la actividad seleccionada
+          if (checkProductData?.[funcion]?.[activityToSend]) {
+
+            const currentActivityData = checkProductData?.[funcion]?.[activityToSend];
+            const accumulatedUP = currentActivityData.up; // UP acumuladas para la actividad seleccionada
+            const accumulatedLength = currentActivityData.length; // Número de veces registrada
+            
+              const max_UP_Conditions = max_conditions.configuracion[activityToSend]?.max_up || 100;
+              const max_Length_Conditions = max_conditions.configuracion[activityToSend]?.max_length || 100;
+
+              const sum_UP = accumulatedUP + Number(calculatedUnits || result);
+              const sum_Length = accumulatedLength + 1;
+          
+              //console.log('max_UP_Conditions:', max_UP_Conditions);
+              // console.log('sum_UP:', sum_UP);
+              // console.log(sum_UP > max_UP_Conditions);
+              console.log('max_Length_Conditions:', max_Length_Conditions);
+              if (sum_UP > max_UP_Conditions) {
+                  Toast.show({ type: 'error', 
+                    text1: `Agregar esta activdad superará el máximo permitido (${max_UP_Conditions} U.P) de acuerdo al reglamento de promocion docente.`, 
+                    visibilityTime: 2000 });
+                  return;
+              }
+              
+              if (sum_Length > max_Length_Conditions) {
+                Toast.show({ type: 'error', 
+                  text1: `El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a al reglamento de promocion docente.`, 
+                  visibilityTime: 2000 });
+                return;
+              }
+
+              if (sum_UP > max_UP_allowed) {
+                Toast.show({ type: 'error', 
+                  text1: `La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`, 
+                  visibilityTime: 2000 });
+                return;
+              }
+          }
+        }
+
+      }
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_ FIN DE VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
+        
+      // return;
+
+          // Preparar los datos para la proyección
+      const projectionData = {
+        function: funcion,
+        activity: activityToSend,
+        role: rol,
+        scope: alcance,
+        documents_required: documento,
+        documents_number: documentsCount,
+        units: calculatedUnits || result,
+        projection_id,
+        tasks: [], // Agrega tasks como una lista vacía si no tiene valores
+        documents_uploaded: [] // Asegura que sea una lista vacía si está en None
+      };
+
+      console.log('Datos de la proyección:', projectionData);
+    
+      try {
+        setLoading(true);
+        setLoadingMessage("Creando ...");
+    
+        // Llama al método createProjection con los datos del formulario
+        const response = await createProduct(projectionData);
+        console.log('Proyección creada:', response.data);
+        navigation.navigate('KanbanBoard');
+      } catch (error) {
+        const apiErrors = error.response?.data || {};
+        if (error.response?.status === 400) {
+          const errorMessage = apiErrors.non_field_errors[0] || "Error en la solicitud. Verifica los datos.";
+        } else {
+          console.error('Error creando proyección:', error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
   
     return (
       <ImageBackground
         source={require('../assets/images/fondo.jpg')}
         style={tw`flex-1`}
       >
+
+        {/* Pantalla de carga */}
+        {loading && <LoadingScreen message={loadingMessage} />}
   
         <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
           <Text style={tw`text-2xl font-bold text-black`}>Unidades de promoción</Text>
@@ -444,15 +639,16 @@ import tw from 'twrnc';
           {/* Campo de documento autocompletado */}
           {mostrarDocumento && (
             <View style={tw`mb-4`}>
-              <Text style={tw`text-base font-bold text-black`}>Tipo de documento que debes presentar</Text>
-              <TextInput
-                style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 bg-white text-black`}
-                value={documento}
-                editable={false}
-                multiline={true}  
-                scrollEnabled={true} 
-                placeholder="Documento a presentar"
-              />
+              <Text style={tw`text-base font-bold text-black`}>Documento(s) requeridos</Text>
+              <View style={tw`bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-lg shadow-lg`}>
+                {documento.split('\n').map((doc, index) => (
+                  <View key={index} style={tw`flex-row items-start mb-2`}>
+                    {/* Icono o símbolo para el marcador de lista */}
+                    <Text style={tw`text-gray-800 mr-2`}>•</Text>
+                    <Text style={tw`text-gray-800 flex-1`}>{doc.trim()}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           )}
   
@@ -617,7 +813,7 @@ import tw from 'twrnc';
             {/* Botón Agregar */}
             <TouchableOpacity
               style={tw`flex-1 p-4 bg-[#003366] rounded-lg ml-2`}
-              onPress={() => console.log("Agregar actividad")}
+              onPress={handleOnPress}
             >
               <Text style={tw`text-white text-center`}>Agregar</Text>
             </TouchableOpacity>
@@ -654,7 +850,9 @@ import tw from 'twrnc';
             </View>
           </View>
         </Modal>
-  
+        
+      {/* Toast container */}
+      <CustomToast />
       </ImageBackground>
     );
   };
