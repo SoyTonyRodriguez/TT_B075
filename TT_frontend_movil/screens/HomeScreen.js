@@ -3,6 +3,8 @@ import { View, Text, TextInput, Image, ImageBackground, TouchableOpacity, Scroll
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import { getAccount } from "../api/accounts.api"; // Importa tu función de API
+import { getConditions } from '../api/conditions.api'; // Importa tu función de API
+import { getConditionsMax } from '../api/conditions_max.api'; // Importa tu función de API
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 import { jwtDecode } from "jwt-decode";
@@ -24,33 +26,41 @@ const HomeScreen = () => {
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
   const [loading, setLoading] = useState(true); // Estado de carga
 
+  // State for conditions
+  const [conditions, setConditions] = useState(null);
+  const [conditions_max, setConditionsMax] = useState(null);
+
   useEffect(() => {
     const loadAccountData = async () => {
       try {
         Toast.show({ type: 'success', text1: 'Bienvenido!', visibilityTime: 1000 });
-        // Verifica si los datos de la cuenta están almacenados
-        const storedAccountData = await AsyncStorage.getItem('accountDetails');
+
+        const storedConditions = await AsyncStorage.getItem('conditions');
+
+        const storedConditionsMax = await AsyncStorage.getItem('conditions_max');
         
-        if (storedAccountData) {
-          const { userName, fullName, email, category, phone } = JSON.parse(storedAccountData);
-          setUserName(userName);
-          setFullName(fullName);
-          setEmail(email);
-          setCategory(category);
-          setPhone(phone);
-          setLoading(false); // Datos encontrados, omitimos la animación de carga
-        } else {
-          // Si no hay datos almacenados, obtenemos el token
-          const token = await AsyncStorage.getItem('token');
-          if (token) {
-            try {
-              const decodedToken = jwtDecode(token);
-              setUserId(decodedToken.user_id);
-              console.log('Token decodificado:', decodedToken.user_id);
-            } catch (error) {
-              console.error('Token inválido:', error);
-            }
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          try {
+            const decodedToken = jwtDecode(token);
+            setUserId(decodedToken.user_id);
+          } catch (error) {
+            console.error('Token inválido:', error);
           }
+        }
+
+        if (storedConditions) {
+          setConditions(JSON.parse(storedConditions));
+          console.log('Conditions cargadas desde AsyncStorage.');
+        } else {
+          fetchConditions();
+        }
+  
+        if (storedConditionsMax) {
+          setConditionsMax(JSON.parse(storedConditionsMax));
+          console.log('Conditions_max cargadas desde AsyncStorage.');
+        } else {
+          fetchConditionsMax();
         }
       } catch (error) {
         console.error('Error al cargar los datos de la cuenta:', error);
@@ -61,47 +71,77 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (userId && !userName) {
+    if (userId ) {
       const fetchAccountDetails = async () => {
         try {
-
           const response = await getAccount(userId);
-          console.log('Detalles de la cuenta:', response);
-          const fullName = response.data.name;
-          const firstName = fullName.split(' ')[0];
-          const email = response.data.email;
-          const category = response.data.category;
-          const phone = response.data.phone;
-
-          setUserName(firstName);
-          setFullName(fullName);
-          setEmail(email);
-          setCategory(category);
-          setPhone(phone);
-
-          // Guarda los detalles de la cuenta en AsyncStorage
-          const accountDetails = {
-            userName: firstName,
-            fullName,
-            email,
-            category,
-            phone,
-          };
-
-          await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+          
+          if (response && response.data) {
+            console.log('Detalles de la cuenta recibidos:', response.data);
+            const fullName = response.data.name || 'Sin nombre';
+            const firstName = fullName.split(' ')[0];
+            const email = response.data.email || 'Sin email';
+            const category = response.data.category || 'Sin categoría';
+            const projection_id = response.data.projection_id || 'Sin proyección';
+      
+            setUserName(firstName);
+            setFullName(fullName);
+            setEmail(email);
+            setCategory(category);
+      
+            // Guarda en AsyncStorage
+            const accountDetails = { userName: firstName, fullName, email, category, projection_id };
+            await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+          } else {
+            console.warn('La API no devolvió datos de usuario válidos.');
+          }
         } catch (error) {
           console.error('Error al obtener los detalles de la cuenta:', error);
-          if (error.response && error.response.status === 401) {
+          if (error.response?.status === 401) {
             console.error('No autorizado: token inválido o caducado');
           }
         } finally {
           setLoading(false);
         }
       };
+      console.log('Intentando obtener detalles de la cuenta para el usuario:', userId);
 
       fetchAccountDetails();
     }
-  }, [userId, userName]);
+  }, [userId, userName]);    
+  
+  const fetchConditions = async () => {
+    try {
+      const response = await getConditions();
+      setConditions(response.data[0]);
+  
+      // Verificar que los datos sean válidos antes de guardar
+      if (response.data[0]) {
+        await AsyncStorage.setItem('conditions', JSON.stringify(response.data[0]));
+        console.log('Conditions guardadas en AsyncStorage.');
+      }
+    } catch (error) {
+      console.error('Error fetching conditions:', error);
+    }
+  };
+  
+  const fetchConditionsMax = async () => {
+    try {
+      const response = await getConditionsMax();
+  
+      // Verificar que los datos sean válidos
+      if (response && response.data) {
+        setConditionsMax(response.data);
+  
+        await AsyncStorage.setItem('conditions_max', JSON.stringify(response.data));
+        console.log('Conditions_max guardadas en AsyncStorage.');
+      } else {
+        console.warn('No se encontraron datos para conditions_max.');
+      }
+    } catch (error) {
+      console.error('Error fetching conditions_max:', error);
+    }
+  };
 
   return (
     <ImageBackground 

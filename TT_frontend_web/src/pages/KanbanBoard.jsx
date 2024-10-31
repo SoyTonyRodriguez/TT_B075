@@ -314,6 +314,10 @@ function KanbanBoard() {
     // Update task status when dropped in a different column
     const handleDrop = async (id, newStatus) => {
         const taskBeforeUpdate = tasks.find(task => task.id === id);
+        
+        // Si el estado no ha cambiado, no hacemos nada.
+        if (taskBeforeUpdate.status === newStatus) return;
+
     
         // Actualizamos las tareas en el estado temporalmente
         const updatedTasks = tasks.map(task =>
@@ -362,16 +366,28 @@ function KanbanBoard() {
         }
     
         try {
-            await updateTask(id, { status: newStatus });
-            toast.success('Tarea actualizada con éxito');
+            // Actualizamos localmente de forma optimista para mejorar la experiencia del usuario.
+            const updatedTasks = tasks.map(task =>
+                task.id === id ? { ...task, status: newStatus } : task
+            );
+            setTasks(updatedTasks);
     
-            if (updatedTask.projection_id) {
-                await updateProjectionProgress(updatedTask.projection_id, updatedTasks);
+            // Llamada a la API para actualizar la tarea.
+            await updateTask(id, { status: newStatus });
+    
+            // Si la tarea pertenece a una proyección, recalculamos el progreso.
+            if (taskBeforeUpdate.projection_id) {
+                await updateProjectionProgress(taskBeforeUpdate.projection_id, updatedTasks);
             }
+    
+            toast.success('Tarea actualizada con éxito');
         } catch (error) {
+            // Si ocurre un error, revertimos el cambio.
             console.error('Error updating task status:', error);
-            setError('Error actualizando el estado de la tarea.');
-            setTasks(tasks); // Revertimos el estado si hay error
+            toast.error('Error actualizando la tarea.');
+    
+            // Revertir el estado local si falla la API.
+            setTasks(tasks);
         }
     };
     
@@ -483,11 +499,16 @@ function KanbanBoard() {
         setTaskToEdit(null);
         setIsEditModalOpen(false);
     };
-    
+
+    // Mapeo de los estados internos a sus equivalentes en español
+    const STATUS_LABELS = {
+        'todo': 'Por Hacer',
+        'in-progress': 'En Progreso',
+        'done': 'Hecho',
+    };
 
     // Column component that holds the tasks for each status
     const Column = ({ status, children }) => {
-        // Hook para arrastrar y soltar
         const [{ isOver }, drop] = useDrop({
             accept: 'task',
             drop: (draggedItem) => {
@@ -499,16 +520,19 @@ function KanbanBoard() {
                 isOver: monitor.isOver(),
             }),
         });
-    
+
         return (
             <div
                 ref={drop}
                 className={`w-1/3 p-4 rounded-lg shadow-md transition-all duration-300 transform ${
                     isOver ? 'bg-blue-300 scale-105' : 'bg-gray-100 scale-100'
                 }`}
-                style={{ height: '650px', overflowY: 'auto' }} // Establece un tamaño fijo y scroll
+                style={{ height: '650px', overflowY: 'auto' }} // Tamaño fijo con scroll
             >
-                <h2 className="text-2xl font-bold text-center mb-4">{status.toUpperCase()}</h2>
+                {/* Usamos el mapeo para mostrar el nombre en español */}
+                <h2 className="text-2xl font-bold text-center mb-4">
+                    {STATUS_LABELS[status].toUpperCase()}
+                </h2>
                 <div>{children}</div>
             </div>
         );
@@ -545,17 +569,17 @@ function KanbanBoard() {
                     
                     {/* Columna de Tareas */}
                     <div className="flex-1 flex gap-x-6">
-                    <Column status="por hacer">
+                    <Column status="todo">
                         {tasks.filter(task => task.status === 'todo').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}
                     </Column>
-                    <Column status="en progreso">
+                    <Column status="in-progress">
                         {tasks.filter(task => task.status === 'in-progress').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}
                     </Column>
-                    <Column status="terminado">
+                    <Column status="done">
                         {tasks.filter(task => task.status === 'done').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}

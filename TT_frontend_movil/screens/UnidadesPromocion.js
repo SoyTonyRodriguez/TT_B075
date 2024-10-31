@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, ImageBackground, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker'; 
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { get_Check_Products } from '../api/check_products.api'; 
+import { AuthContext } from '../components/AuthContext';
+import { createProduct } from '../api/products.api';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
+import LoadingScreen from './LoadingScreen'; // Pantalla de carga
+
+import CustomToast from '../components/CustomToast'; // Toast personalizado
+import Toast from 'react-native-toast-message'; 
+
 import tw from 'twrnc';
 
   // Opciones de actividades por función con documentos requeridos y U.P
@@ -28,14 +37,14 @@ import tw from 'twrnc';
     ],
     "Investigación": [ //Falla la tercera y la ultima 
       { actividad: "Proyectos de investigación con financiamiento interno", documento: "Constancia emitida por la SIP.", up: ['5.00 U.P. con el 20% de avance inicial como director.', '3.00 U.P. con el 20% de avance inicial como participante.', '25.00 U.P. por proyecto terminado como director.', '15.00 U.P. por proyecto terminado como participante.', 'Máximo 2 proyectos como director y 3 proyectos como participante.'], rol: "Director o Participante" }, // OK //'Máximo 2 proyectos como director y 3 proyectos como participante por periodo de promoción.'
-      { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio, carta de aceptación del informe final o carta de finiquito, informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante"}, //OK
+      { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio\n Carta de aceptación del informe final o carta de finiquito\n Informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante", alcance: "Nacional" }, //OK
       { actividad: "Publicación de artículos científicos y técnicos", documento: "Constancia de validación emitida por la SIP.", up:['3.00 U.P. por artículo de circulación institucional.', '5.00 U.P. por artículo de circulación nacional.', '10.00 U.P. por artículo de circulación nacional con jurado.', '20.00 U.P. por artículo de circulación internacional.', 'Máximo 5 publicaciones por periodo de promoción.'], rol: "Autor", alcance: "Nacional o Internacional"  },//AQUI NO ME DEJA ELEGIR
-      { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia, dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica, carta de terminación expedida por la institución donde se realizó la estancia.", up: ['15.00 U.P. por año'] }, //OK
-      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro, resultado del examen de forma, título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante", alcance: "Nacional o Internacional" } //AQUI TAMPOCO SALE NADA 
+      { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia\n Dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica\n Carta de terminación expedida por la institución donde se realizó la estancia.", up: "15.00 U.P. por año" }, //OK
+      { actividad: "Desarrollo de patentes", documento: "Solicitud de registro\n Resultado del examen de forma\n Título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante o ", alcance: "Nacional o Internacional" } //OK
     ],
     "Superación académica": [ //TODAS BIEN
       { actividad: "Otra licenciatura", documento: "Constancia de validación emitida por la DES.", up: ['60.00 U.P. por licenciatura.'] }, //OK
-      { actividad: "Cursos de actualización, seminarios y talleres", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE para impartidos por el IPN, Constancia de validación emitida por la DEMS, DES o SIP para impartidos en institución distinta al IPN.", up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'] }, //OK
+      { actividad: "Cursos de actualización, seminarios y talleres", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE para impartidos por el IPN\n Constancia de validación emitida por la DEMS, DES o SIP para impartidos en institución distinta al IPN.", up: ['3.00 con evaluación por cada 15 horas', '1.00 sin evaluación por cada 15 horas', '8.00 con evaluación por cada 20 horas de identidad institucional', 'Máximo 7 cursos por periodo de promoción.'] }, //OK
       { actividad: "Estudios de especialidad, maestría y doctorado", documento: "Constancia de validación emitida por la SIP.", up: ['75.50 U.P. por especialidad.', '88.50 U.P. por maestría.', '108.50 U.P. por doctorado.'] }, //OK
       { actividad: "Cursos de propósito específico", documento: "Constancia emitida por la SIP.", up: ['6.00 U.P. por cada 30 horas de curso.' , 'Máximo: 30.00 U.P. por periodo de promoción.'] }, //OK
       { actividad: "Diplomados", documento: "Constancia emitida por la DEMS, DES, SIP o CGFIE.", up: ['40.00 U.P. por diplomado de 180 horas.'] }, //OK
@@ -66,14 +75,23 @@ import tw from 'twrnc';
     ],
   };
 
-  const prioridades = ['Baja', 'Media', 'Alta'];
+  const activitiesWithHours = new Set([
+    "Carga académica",
+    "Elaboración e Impartición de acciones de formación",
+    "Programa de inducción",
+    "Tutorías",
+    "Cursos de actualización, seminarios y talleres",
+    "Cursos de propósito específico",
+    "Diplomados",
+    "Servicio externo por obra puntual, sin compensación económica",
+    "Impartición de disciplinas deportivas y/o talleres culturales",
+  ]);
 
-  const CrearProyeccion = () => {
+  const CrearProyeccion = ({ navigation }) => {
     const [funcion, setFuncion] = useState('');
     const [actividad, setActividad] = useState('');
     const [actividadesDisponibles, setActividadesDisponibles] = useState([]);
     const [documento, setDocumento] = useState('');
-    const [up, setUp] = useState('');
     const [upsDisponibles, setUpsDisponibles] = useState([]); // Inicia vacío
     const [upSeleccionada, setUpSeleccionada] = useState(''); 
     const [fecha, setFecha] = useState('');
@@ -82,22 +100,164 @@ import tw from 'twrnc';
     const [alcance, setAlcance] = useState('');  
     const [modalVisible, setModalVisible] = useState(false); 
     const [modalType, setModalType] = useState('');
-    const [showCalendar, setShowCalendar] = useState(false); 
-    const [priority, setPriority] = useState(''); 
     const [rolesDisponibles, setRolesDisponibles] = useState([]); 
     const [mostrarRol, setMostrarRol] = useState(false);
     const [mostrarAlcance, setMostrarAlcance] = useState(false);
     const [mostrarUp, setMostrarUp] = useState(false); 
     const [mostrarDocumento, setMostrarDocumento] = useState(false);
     const [maximoUps, setMaximoUps] = useState([]); // Estado para U.P. con máximo permitido
+    const [projection_id, setProjectionId] = useState('');
+    const [documents_uploaded, setDocumentsUploaded] = useState([]);
+    const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
+
+    const [checkProductData, setCheckProductData] = useState(null); // Datos recibidos
+    const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
+    const [loading, setLoading] = useState(true); // Estado de carga inicial
+
+    // Nuevos estados
+    const [showWorkTime, setShowWorkTime] = useState(false); // Controla la visibilidad del campo
+
+    const [workTime, setWorkTime] = useState(''); // Almacena el tiempo seleccionado
+    const [category, setCategory] = useState(''); // Categoría del usuario
+    const [conditions, setConditions] = useState(null); // Condiciones desde localStorage
+    const [max_conditions, setMaxConditions] = useState(null) // Condiciones de maximos desde el localstorage
+    const [calculatedUnits, setCalculatedUnits] = useState(''); // U.P. calculadas
+
+    const [hours, setHours] = useState(''); // Estado para almacenar las horas
+    const [hoursError, setHoursError] = useState(''); // Estado para mostrar errores de validación
+    const [hourLimits, setHourLimits] = useState({ min: 0, max: 200 }); // Almacena los límites de horas
+
+    const [category_normalized, setCategoryNormalized] = useState(''); // Categoría normalizada
+    const [hoursCalculated, setHoursCalculated] = useState(1); // Estado para almacenar el segundo número (horas)
+
+    const [up_allowed, setUpAllowed] = useState(''); // Estado para almacenar las U.P. permitidas
+    const [isUnitsSelected, setIsUnitsSelected] = useState(false); 
+    const [modalWorkTimeVisible, setModalWorkTimeVisible] = useState(false); // Modal específico para tiempo de trabajo
+
+    
+    useEffect(() => {
   
-    const funciones = Object.keys(actividadesPorFuncion);
+      const fetchCheckProducts = async (userId) => {
+        try {
+          setLoading(true);
+          const response = await get_Check_Products(userId); // Llamada a la API
+          setCheckProductData(response.data); // Almacenar los datos recibidos
+          console.log('Datos recibidos:', response.data);
+        } catch (error) {
+          console.error('Error al obtener datos:', error);
+          setError('No se pudo cargar la información.'); // Mostrar mensaje de error
+        } finally {
+          setLoading(false);
+        }
+      };
   
-    const priorityColors = {
-      Baja: 'bg-blue-500',
-      Media: 'bg-yellow-500',
-      Alta: 'bg-red-500',
+      if (userId) {
+        fetchCheckProducts(userId);
+      }
+    }, [userId]);
+
+      // Obtener la categoría y las condiciones del localStorage al cargar el componente
+    useEffect(() => {
+      const load_data = async () => {
+        const storedAccountDetails = await AsyncStorage.getItem('accountDetails');
+        const storedConditions = await AsyncStorage.getItem('conditions');
+        const storedMaxConditions = await AsyncStorage.getItem('conditions_max');
+
+        if (storedAccountDetails && storedConditions && storedMaxConditions) {
+          const accountDetails = JSON.parse(storedAccountDetails);
+          const { projection_id } = JSON.parse(storedAccountDetails);
+          setProjectionId(projection_id);
+          const normalizedCategory = normalizeCategory(accountDetails.category);
+          console.log(userId);
+          setCategoryNormalized(normalizeCategory(accountDetails.category));
+
+          setCategory(normalizedCategory);
+          setConditions(JSON.parse(storedConditions));
+          setMaxConditions(JSON.parse(storedMaxConditions));
+        }
+      };
+      load_data();
+    }, []);
+
+    // Función para normalizar la categoría del usuario
+    const normalizeCategory = (category) => {
+      const words = category.toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
+      words.pop(); // Elimina la última palabra.
+      return words.join('_'); // Une las palabras restantes con '_'.
     };
+
+    const normalizeFuction = (functionField) => {
+      const mappings = {
+        "Docencia": "carga_academica",
+        "Otras actividades en docencia": "otras_actividades",
+        "Investigación": "investigacion",
+        "Superación académica": "superacion_academica",
+        "Actividades complementarias de apoyo a la docencia y a la investigación": "actividades_complementarias",
+        "Actividades de extensión, integración y difusión de la ciencia y de la cultura": "actividades_extension"
+      };
+  
+      return mappings[functionField];
+    };
+
+
+  // **Manejo del cambio en horas ingresadas**
+  const handleHoursChange = (text) => {
+    const enteredHours = parseInt(text, 10);
+    setHours(enteredHours);
+
+    const { min, max } = hourLimits;
+
+    if (enteredHours < min || enteredHours > max) {
+      setHoursError(`Las horas deben estar entre ${min} y ${max}.`);
+      setCalculatedUnits('');
+      return;
+    }
+
+    setHoursError(''); // Limpiar errores
+
+    // Calcular U.P. si la actividad es "Carga académica"
+    if (actividad === 'Carga académica') {
+      const units = enteredHours * 4; // 4 U.P. por hora
+      setCalculatedUnits(units);
+      validateUP(units);
+    } else if (actividad === "Programa de inducción") {
+      const units = enteredHours * 4;
+      setCalculatedUnits(units);
+    } else {
+      const units = Math.floor(enteredHours / hoursCalculated) * up_allowed;
+      setCalculatedUnits(units);
+    }
+  };
+
+  // **Validar que no se supere el límite de U.P. permitidas** (solo en carga académica)
+  const validateUP = (units) => {
+    if (conditions && category) {
+      const maxUP = conditions?.carga_academica?.[category]?.[workTime]?.up?.max || 0;
+      if (units > maxUP) {
+        setHoursError(`Las U.P. calculadas superan el máximo permitido (${maxUP} U.P.).`);
+        setCalculatedUnits(maxUP); // Establecer el máximo permitido
+      }
+    }
+  };
+
+  // **Manejo del cambio en tiempo de trabajo**
+  const handleWorkTimeChange = (selectedOption) => {
+    setWorkTime(selectedOption);
+
+    if (conditions && category) {
+      const horas = conditions.carga_academica[category]?.[selectedOption]?.horas || { min: 0, max: 200 };
+      setHourLimits(horas);
+    }
+  };
+
+  const options_work_time = [
+    { value: 'medio_tiempo', label: 'Medio tiempo' },
+    { value: 'tres_cuartos_tiempo', label: 'Tres cuartos' },
+    { value: 'tiempo_completo', label: 'Tiempo completo' },
+  ];
+
+
+    const funciones = Object.keys(actividadesPorFuncion);
   
     const filtrarUPs = (rolSeleccionado, alcanceSeleccionado) => {
       if (!actividad) return; // No hacer nada si no hay actividad seleccionada
@@ -150,6 +310,12 @@ import tw from 'twrnc';
         setUpSeleccionada(upsAMostrar.length === 1 ? upsAMostrar[0] : '');
       }
     };
+
+    const extractNumbers = (text) => {
+      const regex = /\d+(\.\d+)?/g; // Captura números enteros o decimales
+      const numbers = text.match(regex); // Extrae todos los números encontrados
+      return numbers ? numbers.slice(0, 2).map(Number) : []; // Retorna los dos primeros como números
+    };
     
     const handleModalSelect = (item) => {
       if (modalType === 'funcion') {
@@ -171,7 +337,9 @@ import tw from 'twrnc';
         setMostrarAlcance(false);
         setAlcancesDisponibles([]);
         setFecha('');
-        setPriority('');
+        setHourLimits({ min: 0, max: 200 });
+        setCalculatedUnits('');
+        setWorkTime('');
       } else if (modalType === 'actividad') {
         setActividad(item);
         const actividadEncontrada = actividadesDisponibles.find(
@@ -181,50 +349,252 @@ import tw from 'twrnc';
           setDocumento(actividadEncontrada.documento || '');
           setMostrarDocumento(!!actividadEncontrada.documento);
     
-          // Manejo de roles y su visibilidad
+          // Manejo de roles y visibilidad
           const roles = actividadEncontrada.rol ? actividadEncontrada.rol.split(' o ') : [];
           setRolesDisponibles(roles);
           setRol(roles.length === 1 ? roles[0] : '');
           setMostrarRol(roles.length > 0);
     
-          // Manejo de alcances y su visibilidad
+          // Manejo de alcances y visibilidad
           const alcance = actividadEncontrada.alcance ? actividadEncontrada.alcance.split(' o ') : [];
           setAlcancesDisponibles(alcance);
           setAlcance(alcance.length === 1 ? alcance[0] : '');
           setMostrarAlcance(alcance.length > 0);
     
           // Manejo de U.P.
-          const ups = actividadEncontrada.up || [];
-  
+          const ups = Array.isArray(actividadEncontrada.up) ? actividadEncontrada.up : [actividadEncontrada.up];
           setMaximoUps(ups.filter((up) => up.toLowerCase().includes('máximo')));
-  
-        // Filtra y actualiza las U.P. normales (excluyendo las que contienen "Máximo")
           setUpsDisponibles(ups.filter((up) => !up.toLowerCase().includes('máximo')));
-  
-        // Selecciona la U.P. automáticamente si solo hay una disponible
+    
           const normales = ups.filter((up) => !up.toLowerCase().includes('máximo'));
-          setUpSeleccionada(normales.length === 1 ? normales[0] : '');
-          setMostrarUp(true); // Muestra el campo U.P.
-        }
-      } if (modalType === 'rol') {
+          const seleccionada = normales.length === 1 ? normales[0] : '';
+          setUpSeleccionada(seleccionada);
+          if (seleccionada) {
+            const [firstNumber, secondNumber] = extractNumbers(seleccionada);
+            setUpAllowed(firstNumber);
+            setHoursCalculated(secondNumber);
+            console.log(up_allowed, hoursCalculated);
+          }
+          setMostrarUp(true);
+        }    
+      } else if (modalType === 'rol') {
         setRol(item);
-        filtrarUPs(item, alcance); // Volver a filtrar con el nuevo rol seleccionado
+        filtrarUPs(item, alcance);
       } else if (modalType === 'alcance') {
         setAlcance(item);
-        filtrarUPs(rol, item); // Volver a filtrar con el nuevo alcance seleccionado
+        filtrarUPs(rol, item);
       } else if (modalType === 'up') {
         setUpSeleccionada(item);
-      } else if (modalType === 'prioridad') {
-        setPriority(item);
+        const [firstNumber, secondNumber] = extractNumbers(item);
+        console.log('Números extraídos:', firstNumber, secondNumber); // Aquí tienes los dos primeros números
+        setUpAllowed(firstNumber);
+        setHoursCalculated(secondNumber);
       }
       setModalVisible(false);
-    };  
+    };
+
+    const handleWorkTimeSelect = (option) => {
+      handleWorkTimeChange(option);
+      setModalWorkTimeVisible(false); // Cerrar el modal de tiempo de trabajo
+    };
+
+    const validateForm = () => {
+      // Verificar que todos los campos obligatorios estén completos
+      if (!funcion) {
+        alert("Por favor selecciona una función.");
+        return false;
+      }
+    
+      if (!actividad) {
+        alert("Por favor selecciona una actividad.");
+        return false;
+      }
+    
+      if (mostrarDocumento && !documento) {
+        alert("Por favor completa el campo de documento requerido.");
+        return false;
+      }
+    
+      if (mostrarRol && !rol) {
+        alert("Por favor selecciona un rol.");
+        return false;
+      }
+    
+      if (mostrarAlcance && !alcance) {
+        alert("Por favor selecciona un alcance.");
+        return false;
+      }
+    
+      if (mostrarUp && !upSeleccionada) {
+        alert("Por favor selecciona una U.P.");
+        return false;
+      }
+    
+      if (activitiesWithHours.has(actividad)) {
+        if (actividad === "Carga académica" && !workTime) {
+          alert("Por favor selecciona un tiempo de trabajo.");
+          return false;
+        }
+    
+        if (!hours || hours < hourLimits.min || hours > hourLimits.max) {
+          alert(`Por favor ingresa una cantidad de horas entre ${hourLimits.min} y ${hourLimits.max}.`);
+          return false;
+        }
+      }
+    
+      return true; // Si todo está completo, retorna true
+    };
+    
+    const handleOnPress = async () => {
+      if (!validateForm()) {
+        return; // Detener ejecución si el formulario no es válido
+      }
+    
+      // Si el formulario es válido, continuar con las siguientes operaciones
+      const result = up_allowed;
+    
+      // Calcular la longitud de los documentos requeridos
+      const documentsList = documento.split('\n').map(doc => doc.trim()).filter(doc => doc);
+      const documentsCount = documentsList.length;
+
+          // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+      // Crea una variable temporal para almacenar la actividad ajustada según el rol
+      let activityToSend = actividad;
+
+      if (actividad === 'Proyectos de investigación con financiamiento interno' && rol === 'Director') {
+        activityToSend = 'Proyectos de investigación con financiamiento interno (Director)';
+      }
+      if (actividad === 'Proyectos de investigación con financiamiento interno' && rol === 'Participante') {
+        activityToSend = 'Proyectos de investigación con financiamiento interno (Participante)';
+      }
+      
+      // obtener la función normalizada
+      const normalized_function = normalizeFuction(funcion);
+
+      // Acceder a max_UP_allowed de forma segura
+      const max_UP_allowed = 
+        conditions?.[normalized_function]?.[category_normalized]?.[workTime]?.up?.max || 
+        conditions?.[normalized_function]?.[category_normalized]?.up?.max;
+      if (max_UP_allowed === 0) {
+        console.error('Tú categoría esta excenta de realizar está actividad.');
+        return;
+      }
+
+      // verifica si el objeto checkProductData tiene datos
+      if (Object.keys(checkProductData).length > 0) {
+        console.log( checkProductData?.[funcion]?.[activityToSend])
+
+        // Verificar si tiene datos para la función seleccionada
+        if (checkProductData?.[funcion]) {
+          console.log("Estoy aqui")
+          // Calcular el total de U.P. de la función
+          const total_UP_check_product = checkProductData?.[funcion].total;
+          console.log(total_UP_check_product)
+
+          // Calcular el total de U.P. con la actividad actual
+          const sum_total_funcition = total_UP_check_product + Number(calculatedUnits || result);
+
+          console.log('sum_total_funcition:', sum_total_funcition);
+          console.log('max_UP_allowed:', max_UP_allowed);
+          console.log("total_UP_check_product:", total_UP_check_product);
+
+          // Verificar si supera el límite máximo de U.P. de acuerdo a la categoría
+          if (sum_total_funcition > max_UP_allowed) {
+            Toast.show({ type: 'error', 
+              text1: `La cantidad de U.P. con está actividad será (${sum_total_funcition}), lo que supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`, 
+              visibilityTime: 2000 });
+            return;
+          }
+
+          // Verificar si tiene datos para la actividad seleccionada
+          if (checkProductData?.[funcion]?.[activityToSend]) {
+
+            const currentActivityData = checkProductData?.[funcion]?.[activityToSend];
+            const accumulatedUP = currentActivityData.up; // UP acumuladas para la actividad seleccionada
+            const accumulatedLength = currentActivityData.length; // Número de veces registrada
+            
+              const max_UP_Conditions = max_conditions.configuracion[activityToSend]?.max_up || 100;
+              const max_Length_Conditions = max_conditions.configuracion[activityToSend]?.max_length || 100;
+
+              const sum_UP = accumulatedUP + Number(calculatedUnits || result);
+              const sum_Length = accumulatedLength + 1;
+          
+              //console.log('max_UP_Conditions:', max_UP_Conditions);
+              // console.log('sum_UP:', sum_UP);
+              // console.log(sum_UP > max_UP_Conditions);
+              console.log('max_Length_Conditions:', max_Length_Conditions);
+              if (sum_UP > max_UP_Conditions) {
+                  Toast.show({ type: 'error', 
+                    text1: `Agregar esta activdad superará el máximo permitido (${max_UP_Conditions} U.P) de acuerdo al reglamento de promocion docente.`, 
+                    visibilityTime: 2000 });
+                  return;
+              }
+              
+              if (sum_Length > max_Length_Conditions) {
+                Toast.show({ type: 'error', 
+                  text1: `El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a al reglamento de promocion docente.`, 
+                  visibilityTime: 2000 });
+                return;
+              }
+
+              if (sum_UP > max_UP_allowed) {
+                Toast.show({ type: 'error', 
+                  text1: `La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`, 
+                  visibilityTime: 2000 });
+                return;
+              }
+          }
+        }
+
+      }
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_ FIN DE VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
+        
+      // return;
+
+          // Preparar los datos para la proyección
+      const projectionData = {
+        function: funcion,
+        activity: activityToSend,
+        role: rol,
+        scope: alcance,
+        documents_required: documento,
+        documents_number: documentsCount,
+        units: calculatedUnits || result,
+        projection_id,
+        tasks: [], // Agrega tasks como una lista vacía si no tiene valores
+        documents_uploaded: [] // Asegura que sea una lista vacía si está en None
+      };
+
+      console.log('Datos de la proyección:', projectionData);
+    
+      try {
+        setLoading(true);
+        setLoadingMessage("Creando ...");
+    
+        // Llama al método createProjection con los datos del formulario
+        const response = await createProduct(projectionData);
+        console.log('Proyección creada:', response.data);
+        navigation.navigate('KanbanBoard');
+      } catch (error) {
+        const apiErrors = error.response?.data || {};
+        if (error.response?.status === 400) {
+          const errorMessage = apiErrors.non_field_errors[0] || "Error en la solicitud. Verifica los datos.";
+        } else {
+          console.error('Error creando proyección:', error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
   
     return (
       <ImageBackground
         source={require('../assets/images/fondo.jpg')}
         style={tw`flex-1`}
       >
+
+        {/* Pantalla de carga */}
+        {loading && <LoadingScreen message={loadingMessage} />}
   
         <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
           <Text style={tw`text-2xl font-bold text-black`}>Unidades de promoción</Text>
@@ -269,15 +639,16 @@ import tw from 'twrnc';
           {/* Campo de documento autocompletado */}
           {mostrarDocumento && (
             <View style={tw`mb-4`}>
-              <Text style={tw`text-base font-bold text-black`}>Tipo de documento que debes presentar</Text>
-              <TextInput
-                style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 bg-white text-black`}
-                value={documento}
-                editable={false}
-                multiline={true}  
-                scrollEnabled={true} 
-                placeholder="Documento a presentar"
-              />
+              <Text style={tw`text-base font-bold text-black`}>Documento(s) requeridos</Text>
+              <View style={tw`bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-lg shadow-lg`}>
+                {documento.split('\n').map((doc, index) => (
+                  <View key={index} style={tw`flex-row items-start mb-2`}>
+                    {/* Icono o símbolo para el marcador de lista */}
+                    <Text style={tw`text-gray-800 mr-2`}>•</Text>
+                    <Text style={tw`text-gray-800 flex-1`}>{doc.trim()}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           )}
   
@@ -349,6 +720,80 @@ import tw from 'twrnc';
             </View>
           )}
   
+          {activitiesWithHours.has(actividad) && (
+              <>
+                {/* Si la actividad es "Carga académica", mostrar el selector de tiempo de trabajo */}
+                {actividad === "Carga académica" && (
+                  <View style={tw`mb-4`}>
+                    <Text style={tw`text-base font-bold text-black`}>
+                      Tiempo de trabajo
+                    </Text>
+                    <TouchableOpacity
+                    onPress={() => setModalWorkTimeVisible(true)} // Abrir modal de tiempo de trabajo
+                    style={tw`w-full p-4 border border-gray-700 rounded-lg bg-white flex-row justify-between items-center`}
+                  >
+                    <Text>{workTime || 'Selecciona una opción'}</Text>
+                    <Ionicons name="chevron-down" size={24} color="black" />
+                  </TouchableOpacity>
+
+                  <Modal
+                    visible={modalWorkTimeVisible}
+                    transparent={true}
+                    animationType="slide"
+                  >
+                    <View style={tw`flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]`}>
+                      <View style={tw`w-4/5 bg-white rounded-lg p-5`}>
+                        {options_work_time.map((options_work_time) => (
+                          <TouchableOpacity
+                            key={options_work_time.value}
+                            style={tw`py-3 border-b border-gray-300`}
+                            onPress={() => handleWorkTimeSelect(options_work_time.value)}
+                          >
+                            <Text style={tw`text-black`}>{options_work_time.label}</Text>
+                          </TouchableOpacity>
+                        ))}
+                        <TouchableOpacity
+                          style={tw`mt-5 items-center`}
+                          onPress={() => setModalWorkTimeVisible(false)}
+                        >
+                          <Text style={tw`text-blue-700`}>Cerrar</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </Modal>
+                </View>
+              )}
+
+              {/* Campo de horas con validación */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-base font-bold text-black`}>Horas de trabajo</Text>
+                <TextInput
+                  value={hours}
+                  onChangeText={handleHoursChange}
+                  keyboardType="numeric"
+                  placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
+                  style={tw`w-full p-4 border border-gray-700 rounded-lg bg-white text-black`}
+                  maxLength={3} // Limitar a 3 dígitos (por si acaso)
+                />
+                {hoursError ? <Text style={tw`text-red-500`}>{hoursError}</Text> : null}
+              </View>
+
+              {/* Campo de visualización de U.P. calculadas */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-base font-bold text-black`}>
+                  U.P. Calculadas
+                </Text>
+                <View
+                  style={tw`w-full p-4 border border-gray-700 rounded-lg bg-white ${!isUnitsSelected ? 'opacity-50' : ''}`}
+                >
+                  <Text style={tw`text-black`}>
+                    {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
+                  </Text>
+                </View>
+              </View>              
+            </>
+          )}
+  
           {maximoUps.length > 0 && (
               <View style={tw`mb-4`}>
                 <Text style={tw`text-base font-bold text-black`}>Máximo permitido</Text>
@@ -364,19 +809,11 @@ import tw from 'twrnc';
   
           {/* Selector de Prioridad */}
           <View style={tw`mb-4 flex-row items-center`}>
-            {/* Selector de prioridad */}
-            <TouchableOpacity
-              onPress={() => { setModalType('prioridad'); setModalVisible(true); }}
-              style={tw`flex-1 p-4 border border-gray-700 rounded-lg flex-row justify-between items-center bg-white text-black ${priorityColors[priority]} mr-2`}
-            >
-              <Text style={tw`text-black`}>{priority || "Selecciona prioridad"}</Text>
-              <Ionicons name="chevron-down" size={24} color="black" />
-            </TouchableOpacity>
   
             {/* Botón Agregar */}
             <TouchableOpacity
               style={tw`flex-1 p-4 bg-[#003366] rounded-lg ml-2`}
-              onPress={() => console.log("Agregar actividad")}
+              onPress={handleOnPress}
             >
               <Text style={tw`text-white text-center`}>Agregar</Text>
             </TouchableOpacity>
@@ -398,8 +835,7 @@ import tw from 'twrnc';
                   modalType === 'actividad' ? actividadesDisponibles.map(a => a.actividad) :
                   modalType === 'rol' ? rolesDisponibles :
                   modalType === 'alcance' ? alcancesDisponibles :
-                  modalType === 'up' ? upsDisponibles : // Asegúrate de mostrar las U.P.
-                  modalType === 'prioridad' ? prioridades : []
+                  modalType === 'up' ? upsDisponibles : []
                 }
                 keyExtractor={(item, index) => `${item}-${index}`} // Evita conflictos en las keys
                 renderItem={({ item }) => (
@@ -414,7 +850,9 @@ import tw from 'twrnc';
             </View>
           </View>
         </Modal>
-  
+        
+      {/* Toast container */}
+      <CustomToast />
       </ImageBackground>
     );
   };
