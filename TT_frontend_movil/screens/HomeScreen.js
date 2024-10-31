@@ -82,6 +82,7 @@ const HomeScreen = () => {
             const firstName = fullName.split(' ')[0];
             const email = response.data.email || 'Sin email';
             const category = response.data.category || 'Sin categoría';
+            const projection_id = response.data.projection_id || 'Sin proyección';
       
             setUserName(firstName);
             setFullName(fullName);
@@ -89,7 +90,7 @@ const HomeScreen = () => {
             setCategory(category);
       
             // Guarda en AsyncStorage
-            const accountDetails = { userName: firstName, fullName, email, category, phone };
+            const accountDetails = { userName: firstName, fullName, email, category, projection_id };
             await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
           } else {
             console.warn('La API no devolvió datos de usuario válidos.');
