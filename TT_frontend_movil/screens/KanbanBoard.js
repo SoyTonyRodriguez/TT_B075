@@ -6,16 +6,16 @@ import tw from 'twrnc';
 import Toast from 'react-native-toast-message'; 
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import CustomToast from '../components/CustomToast'; // Toast personalizado
-
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AuthContext } from '../components/AuthContext';
-
 import { getTasks, createTask, deleteTask, updateTask } from '../api/tasks.api';
 import { getProduct } from '../api/products.api';
+//import DraggableFlatList from 'react-native-draggable-flatlist';
 
 const KanbanBoard = () => {
   const [tasks, setTasks] = useState([]);
   const [projections, setProjections] = useState([]);
-  const [newTask, setNewTask] = useState({ title: '', description: '', priority: 'Media', projection_id: '' });
+  const [newTask, setNewTask] = useState({ title: '', description: '', priority: '', projection_id: '' });
   const [showTodo, setShowTodo] = useState(false);
   const [showInProcess, setShowInProcess] = useState(false);
   const [showDone, setShowDone] = useState(false);
@@ -205,24 +205,37 @@ const KanbanBoard = () => {
     const projectionActivity = projection ? projection.activity : 'Sin actividad';
     const projectionColor = projection ? projection.color : '#f0f0f0'; // Usar el color de la proyección de la API
   
-    return (
+      const confirmDelete = (taskId) => {
+        Alert.alert(
+          "Confirmar eliminación",
+          "¿Estás seguro de que deseas eliminar la actividad?",
+          [
+            { text: "Cancelar", style: "cancel" },
+            { text: "Eliminar", style: "destructive", onPress: () => handleDeleteTask(taskId) },
+          ],
+          { cancelable: true }
+        );
+      };
+
+    return (    
       <View style={tw`p-4 rounded-md shadow-md mb-3 ${getPriorityColor()} min-h-[120px] relative`}>
-        {/* Botón de eliminar (más grande y con padding) */}
+        
+        {/* Botón de eliminar, mejorado visualmente */}
         <TouchableOpacity
-          style={tw`absolute -top-3 -right-3 p-2 bg-white rounded-full shadow-md`}
-          onPress={() => handleDeleteTask(task.id)}
+          style={tw`absolute -top-3 -right-3 bg-red-100 rounded-full shadow-lg p-1`}
+          onPress={() => confirmDelete(task.id)}
         >
-        <Ionicons name="close-circle" size={36} color="red" />
+          <Ionicons name="close-circle" size={36} color="red" style={tw`shadow-sm`} />
         </TouchableOpacity>
-  
+
+        {/* Tarjeta de tarea editable */}
         <TouchableOpacity onPress={() => openEditModal(task)} style={tw`flex-1`}>
-          {/* Contenedor principal de título y fecha */}
           <View style={tw`flex-row justify-between items-center mb-2`}>
             <Text style={tw`text-base font-semibold text-gray-800 flex-shrink`} numberOfLines={1}>
               {task.title}
             </Text>
           </View>
-  
+
           {/* Descripción o proyección */}
           <View
             style={[
@@ -244,7 +257,12 @@ const KanbanBoard = () => {
 
   const priorities = ['Alta', 'Media', 'Baja'];
   const statuses = ['todo', 'in-progress', 'done']; // Lista de estados
-
+  const statusTranslations = {
+    'todo': 'Por hacer',
+    'in-progress': 'En progreso',
+    'done': 'Hecho',
+  };
+  
   return (
     <ImageBackground
       source={require('../assets/images/fondo.jpg')}  // Fondo restaurado
@@ -292,7 +310,7 @@ const KanbanBoard = () => {
         {/* Sección Done */}
         <TouchableOpacity onPress={() => toggleSection('done')}>
           <View style={tw`bg-blue-900 p-4 mt-5 rounded-xl`}>
-            <Text style={tw`text-lg font-semibold text-white`}>TERMINADO</Text>
+            <Text style={tw`text-lg font-semibold text-white`}>HECHO</Text>
           </View>
         </TouchableOpacity>
         {activeSection === 'done' && (
@@ -320,8 +338,8 @@ const KanbanBoard = () => {
           onRequestClose={closeModal}
         >
           <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
-            <View style={tw`bg-white p-8 rounded-lg shadow-xl w-96`}>
-              <Text style={tw`text-3xl font-bold mb-6 text-center text-gray-800`}>Crear Nueva Tarea</Text>
+            <View style={tw`bg-white p-8 rounded-lg shadow-xl w-90`}>
+              <Text style={tw`text-2xl font-bold mb-6 text-center text-gray-800`}>Crear nueva tarea</Text>
 
               {/* Campo del título */}
               <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Título de la tarea</Text>
@@ -329,7 +347,7 @@ const KanbanBoard = () => {
                 placeholder="Escribe el título"
                 value={newTask.title}
                 onChangeText={(text) => handleTaskChange('title', text)}
-                style={tw`border border-gray-300 rounded-lg px-4 py-2 mb-4 bg-white`}
+                style={tw`border border-gray-300 rounded-lg px-4 py-3 mb-4 bg-white text-lg`}
                 placeholderTextColor="#999"
               />
 
@@ -339,7 +357,7 @@ const KanbanBoard = () => {
                 placeholder="Escribe la descripción"
                 value={newTask.description}
                 onChangeText={(text) => handleTaskChange('description', text)}
-                style={tw`border border-gray-300 rounded-lg px-4 py-2 mb-4 bg-white`}
+                style={tw`border border-gray-300 rounded-lg px-4 py-3 mb-4 bg-white text-lg`}
                 placeholderTextColor="#999"
               />
 
@@ -347,25 +365,29 @@ const KanbanBoard = () => {
               <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Prioridad</Text>
               <TouchableOpacity
                 onPress={() => setShowPriorityModal(true)}
-                style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
+                style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white flex-row justify-between items-center`}
               >
-                <Text style={tw`text-gray-800 text-lg`}>{newTask.priority}</Text>
+                <Text style={tw`text-gray-800 text-lg`}>
+                  {newTask.priority || "Selecciona una prioridad"}
+                </Text>
+                <Text style={tw`text-gray-800`}>
+                  <FontAwesome name="chevron-down" style={tw`text-gray-500`} />
+                </Text>
               </TouchableOpacity>
 
-              {/* Selector de proyección */}
-              <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>
-                Proyección
-              </Text>
+              {/* Selector de proyección con ícono */}
+              <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Proyección</Text>
               <TouchableOpacity
                 onPress={() => setShowProjectionModal(true)}
-                style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
+                style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white flex-row justify-between items-center`}
               >
                 <Text style={tw`text-gray-800 text-lg`}>
                   {newTask.projection_id
-                    ? projections.find(
-                        (proj) => proj.id === newTask.projection_id
-                      )?.activity
+                    ? projections.find((proj) => proj.id === newTask.projection_id)?.activity
                     : 'Selecciona una proyección'}
+                </Text>
+                <Text style={tw`text-gray-800`}>
+                  <FontAwesome name="chevron-down" style={tw`text-gray-500`} />
                 </Text>
               </TouchableOpacity>
 
@@ -373,18 +395,18 @@ const KanbanBoard = () => {
               <View style={tw`flex-row justify-between mt-6`}>
                 <TouchableOpacity
                   onPress={closeModal}
-                  style={tw`bg-gray-500 px-4 py-2 rounded-lg shadow-lg`}
+                  style={tw`bg-gray-500 px-6 py-3 rounded-lg shadow-lg`}
                 >
-                  <Text style={tw`text-white font-semibold`}>Cancelar</Text>
+                  <Text style={tw`text-white font-semibold text-lg`}>Cancelar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
                     handleCreateTask();
                     setIsModalOpen(false);
                   }}
-                  style={tw`bg-green-500 px-4 py-2 rounded-lg shadow-lg`}
+                  style={tw`bg-green-500 px-6 py-3 rounded-lg shadow-lg`}
                 >
-                  <Text style={tw`text-white font-semibold`}>Crear</Text>
+                  <Text style={tw`text-white font-semibold text-lg`}>Crear</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -465,7 +487,7 @@ const KanbanBoard = () => {
                   }}
                   style={tw`py-2`}
                 >
-                  <Text style={tw`text-gray-800 text-center`}>{status}</Text>
+                  <Text style={tw`text-gray-800 text-center`}>{statusTranslations[status]}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -480,8 +502,8 @@ const KanbanBoard = () => {
         onRequestClose={closeEditModal}
       >
         <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
-          <View style={tw`bg-white p-8 rounded-lg shadow-xl w-96`}>
-            <Text style={tw`text-3xl font-bold mb-6 text-center text-gray-800`}>Editar Tarea</Text>
+          <View style={tw`bg-white p-8 rounded-lg shadow-xl w-90`}>
+            <Text style={tw`text-3xl font-bold mb-6 text-center text-gray-800`}>Editar tarea</Text>
 
             {/* Campo del título */}
             <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Título de la tarea</Text>
@@ -489,7 +511,7 @@ const KanbanBoard = () => {
               placeholder="Escribe el título"
               value={taskToEdit?.title || ''}
               onChangeText={(text) => setTaskToEdit({ ...taskToEdit, title: text })}
-              style={tw`border border-gray-300 rounded-lg px-4 py-2 mb-4 bg-white`}
+              style={tw`border border-gray-300 rounded-lg px-4 py-3 mb-4 bg-white text-lg`}
               placeholderTextColor="#999"
             />
 
@@ -499,7 +521,7 @@ const KanbanBoard = () => {
               placeholder="Escribe la descripción"
               value={taskToEdit?.description || ''}
               onChangeText={(text) => setTaskToEdit({ ...taskToEdit, description: text })}
-              style={tw`border border-gray-300 rounded-lg px-4 py-2 mb-4 bg-white`}
+              style={tw`border border-gray-300 rounded-lg px-4 py-3 mb-4 bg-white text-lg`}
               placeholderTextColor="#999"
             />
 
@@ -507,25 +529,31 @@ const KanbanBoard = () => {
             <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Prioridad</Text>
             <TouchableOpacity
               onPress={() => setShowPriorityModal(true)}
-              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
+              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white flex-row justify-between items-center`}
             >
               <Text style={tw`text-gray-800 text-lg`}>{taskToEdit?.priority || 'Selecciona una prioridad'}</Text>
+              <Text style={tw`text-gray-800`}>
+                <FontAwesome name="chevron-down" style={tw`text-gray-500 text-lg`} />
+              </Text>
             </TouchableOpacity>
 
             {/* Selector de estado */}
             <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Estado</Text>
             <TouchableOpacity
               onPress={() => setShowStatusModal(true)}
-              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
+              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white flex-row justify-between items-center`}
             >
               <Text style={tw`text-gray-800 text-lg`}>{taskToEdit?.status || 'Selecciona un estado'}</Text>
+              <Text style={tw`text-gray-800`}>
+                <FontAwesome name="chevron-down" style={tw`text-gray-500 text-lg`} />
+              </Text>
             </TouchableOpacity>
 
             {/* Selector de proyección */}
             <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Proyección</Text>
             <TouchableOpacity
               onPress={() => setShowProjectionModal(true)}
-              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white`}
+              style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white flex-row justify-between items-center`}
               disabled={true}
             >
               <Text style={tw`text-gray-800 text-lg`}>
@@ -539,23 +567,24 @@ const KanbanBoard = () => {
             <View style={tw`flex-row justify-between mt-6`}>
               <TouchableOpacity
                 onPress={closeEditModal}
-                style={tw`bg-gray-500 px-4 py-2 rounded-lg shadow-lg`}
+                style={tw`bg-gray-500 px-6 py-3 rounded-lg shadow-lg`}
               >
-                <Text style={tw`text-white font-semibold`}>Cancelar</Text>
+                <Text style={tw`text-white font-semibold text-lg`}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   handleUpdateTask();
                   setIsEditModalOpen(false);
                 }}
-                style={tw`bg-green-500 px-4 py-2 rounded-lg shadow-lg`}
+                style={tw`bg-green-500 px-6 py-3 rounded-lg shadow-lg`}
               >
-                <Text style={tw`text-white font-semibold`}>Guardar</Text>
+                <Text style={tw`text-white font-semibold text-lg`}>Guardar</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
+
       {/* Toast container */}
       <CustomToast />
 
