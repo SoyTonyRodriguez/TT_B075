@@ -1,28 +1,23 @@
 import React from 'react';
-import { View, Dimensions, ActivityIndicator } from 'react-native';
-import Pdf from 'react-native-pdf';
+import { View, ActivityIndicator } from 'react-native';
+import { WebView } from 'react-native-webview';
 import tw from 'twrnc';
 
 const PDFViewer = ({ route }) => {
-  const { pdfResource } = route.params; // Recibe el recurso del PDF
+  const { pdfUri } = route.params;  // Recibe la URI del PDF desde la navegación
 
-  return (
-    <View style={tw`flex-1`}>
-      <Pdf
-        source={pdfResource}
-        style={{ flex: 1, width: Dimensions.get('window').width }}
-        onLoadComplete={(numberOfPages) => {
-          console.log(`Total de páginas: ${numberOfPages}`);
-        }}
-        onError={(error) => {
-          console.error('Error al cargar PDF:', error);
-        }}
-        loadingIndicator={() => (
-          <ActivityIndicator size="large" color="#0000ff" style={tw`mt-10`} />
-        )}
-      />
-    </View>
-  );
-};
+    return (
+        <View style={tw`flex-1`}>
+        <WebView
+            source={{ uri: pdfUri }}
+            style={{ flex: 1 }}
+            startInLoadingState={true}
+            renderLoading={() => (
+            <ActivityIndicator size="large" color="#0000ff" style={tw`mt-10`} />
+            )}
+        />
+        </View>
+    );
+    };
 
 export default PDFViewer;
