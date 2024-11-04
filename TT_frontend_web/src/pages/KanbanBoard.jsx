@@ -31,7 +31,7 @@ function KanbanBoard() {
     const [newTask, setNewTask] = useState({
         title: '',
         description: '',
-        priority: 'Media',
+        priority: '',
         status: 'todo',
     });
 
@@ -676,124 +676,175 @@ function KanbanBoard() {
                 </DndProvider>
 
                 {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-8 rounded-lg shadow-xl w-96">
-                    <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">Crear Nueva Tarea</h3>
-                            
-                    {/* Campo del título */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Título de la tarea</label>
-                        <input
-                        type="text"
-                        name="title"
-                        value={newTask.title}
-                        onChange={handleTaskChange}
-                        placeholder="Escribe el título"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                            
-                    {/* Campo de la descripción */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
-                        <textarea
-                        name="description"
-                        value={newTask.description}
-                        onChange={handleTaskChange}
-                        placeholder="Escribe la descripción"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                        />
-                    </div>
-                            
-                    {/* Selector de prioridad */}
-                    <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
-                        <select
-                        name="priority"
-                        value={newTask.priority}
-                        onChange={handleTaskChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                        >
-                        <option value="Alta">Alta</option>
-                        <option value="Media">Media</option>
-                        <option value="Baja">Baja</option>
-                        </select>
-                    </div>
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white p-8 rounded-lg shadow-xl w-96">
+                        <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                            Crear Nueva Tarea
+                        </h3>
 
-                    {/* Selector de proyección */}
-                    <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Proyección</label>
-                        <select
-                        name="projection_id"
-                        value={newTask.projection_id}
-                        onChange={(e) => setNewTask({ ...newTask, projection_id: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                        >
-                        <option value="">Selecciona una proyección</option>
-                        {projections.map(projection => (
-                            <option key={projection.id} value={projection.id}>
-                            {projection.activity}
+                        {/* Campo del título */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Título de la tarea
+                            </label>
+                            <input
+                            type="text"
+                            name="title"
+                            value={newTask.title}
+                            onChange={handleTaskChange}
+                            placeholder="Escribe el título"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+
+                        {/* Campo de la descripción */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Descripción
+                            </label>
+                            <textarea
+                            name="description"
+                            value={newTask.description}
+                            onChange={handleTaskChange}
+                            placeholder="Escribe la descripción"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                            />
+                        </div>
+
+                        {/* Selector de prioridad */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Prioridad
+                            </label>
+                            <select
+                            name="priority"
+                            value={newTask.priority || ''}
+                            onChange={(e) => {
+                                handleTaskChange(e);
+                                handlePriorityChange(e.target.value); // Lógica de cambio de color
+                            }}
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${
+                                newTask.priority === 'Alta'
+                                ? 'bg-red-500 text-white'
+                                : newTask.priority === 'Media'
+                                ? 'bg-yellow-500 text-white'
+                                : newTask.priority === 'Baja'
+                                ? 'bg-blue-500 text-white'
+                                : ''
+                            }`}
+                            >
+                            <option value="" disabled>
+                                Seleccione una prioridad
                             </option>
-                        ))}
-                        </select>
+                            <option value="Alta">Alta</option>
+                            <option value="Media">Media</option>
+                            <option value="Baja">Baja</option>
+                            </select>
+                        </div>
+
+                        {/* Selector de proyección */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Proyección
+                            </label>
+                            <select
+                            name="projection_id"
+                            value={newTask.projection_id || ''}
+                            onChange={(e) =>
+                                setNewTask({ ...newTask, projection_id: e.target.value })
+                            }
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                            >
+                            <option value="">Selecciona una proyección</option>
+                            {projections.map((projection) => (
+                                <option key={projection.id} value={projection.id}>
+                                {projection.activity}
+                                </option>
+                            ))}
+                            </select>
+                        </div>
+
+                        {/* Botones para cancelar o crear */}
+                        <div className="flex justify-end space-x-4">
+                            <button
+                            onClick={closeModal}
+                            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+                            >
+                            Cancelar
+                            </button>
+                            <button
+                            onClick={handleCreateTask}
+                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+                            >
+                            Crear
+                            </button>
+                        </div>
+                        </div>
                     </div>
-                            
-                    {/* Botones para cancelar o crear */}
-                    <div className="flex justify-end space-x-4">
-                        <button
-                        onClick={closeModal}
-                        className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
-                        >
-                        Cancelar
-                        </button>
-                        <button
-                        onClick={handleCreateTask}
-                        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
-                        >
-                        Crear
-                        </button>
-                    </div>
-                    </div>
-                </div>
-                )}
+                    )}
+
 
                 {isEditModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-8 rounded-lg shadow-xl w-96">
-                    <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">Editar Tarea</h3>
-                    
+                    <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                        Editar Tarea
+                    </h3>
+
                     {/* Campo de título */}
                     <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Título de la tarea</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Título de la tarea
+                        </label>
                         <input
                         type="text"
                         name="title"
                         value={taskToEdit?.title || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, title: e.target.value })}
+                        onChange={(e) =>
+                            setTaskToEdit({ ...taskToEdit, title: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
-                    
+
                     {/* Campo de descripción */}
                     <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Descripción
+                        </label>
                         <textarea
                         name="description"
                         value={taskToEdit?.description || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, description: e.target.value })}
+                        onChange={(e) =>
+                            setTaskToEdit({ ...taskToEdit, description: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
 
                     {/* Selector de prioridad */}
                     <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Prioridad
+                        </label>
                         <select
                         name="priority"
                         value={taskToEdit?.priority || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, priority: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                        onChange={(e) => {
+                            setTaskToEdit({ ...taskToEdit, priority: e.target.value });
+                            handlePriorityChange(e.target.value); // Lógica de cambio de color
+                        }}
+                        className={`w-full px-4 py-2 border rounded-lg ${
+                            taskToEdit?.priority === 'Alta'
+                            ? 'bg-red-500 text-white'
+                            : taskToEdit?.priority === 'Media'
+                            ? 'bg-yellow-500 text-white'
+                            : taskToEdit?.priority === 'Baja'
+                            ? 'bg-blue-500 text-white'
+                            : ''
+                        }`}
                         >
+                        <option value="">Selecciona una prioridad</option>
                         <option value="Alta">Alta</option>
                         <option value="Media">Media</option>
                         <option value="Baja">Baja</option>
@@ -802,25 +853,41 @@ function KanbanBoard() {
 
                     {/* Selector de proyección */}
                     <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Proyección</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Proyección
+                        </label>
                         <select
                         name="projection_id"
                         value={taskToEdit?.projection_id || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, projection_id: e.target.value })}
+                        onChange={(e) =>
+                            setTaskToEdit({ ...taskToEdit, projection_id: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                         >
-                        <option value="" disabled>Selecciona una proyección</option>
-                        {projections.map(projection => (
+                        <option value="" disabled>
+                            Selecciona una proyección
+                        </option>
+                        {projections.map((projection) => (
                             <option key={projection.id} value={projection.id}>
                             {projection.activity}
                             </option>
                         ))}
                         </select>
                     </div>
-                    
+
                     <div className="flex justify-end space-x-4">
-                        <button onClick={closeEditModal} className="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</button>
-                        <button onClick={handleUpdateTask} className="bg-green-500 text-white px-4 py-2 rounded-lg">Actualizar</button>
+                        <button
+                        onClick={closeEditModal}
+                        className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                        >
+                        Cancelar
+                        </button>
+                        <button
+                        onClick={handleUpdateTask}
+                        className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                        >
+                        Actualizar
+                        </button>
                     </div>
                     </div>
                 </div>

@@ -9,6 +9,7 @@ import ConvocatoriaScreen from './ConvocatoriaScreen';
 import EditProfileScreen from './EditProfileScreen';
 import PrivacyScreen from './PrivacyScreen';
 import NotificationScreen from './NotificationScreen';
+import PDFViewer from './PDFViewer';
 
 const ProfileStack = createStackNavigator();
 
@@ -59,6 +60,11 @@ export default function ProfileStackNavigator() {
       <ProfileStack.Screen 
         name="NotificationScreen" 
         component={NotificationScreen} 
+      />
+
+      <ProfileStack.Screen 
+        name="PDFViewer" 
+        component={PDFViewer} 
       />
 
     </ProfileStack.Navigator>
