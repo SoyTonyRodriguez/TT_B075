@@ -14,7 +14,6 @@ function Account() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('');
-  const [phone, setPhone] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
   const navigate = useNavigate();
@@ -172,16 +171,6 @@ function Account() {
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                disabled={!isEditing}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm mb-2">Teléfono</label>
-              <input
-                type="text"
-                className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
                 disabled={!isEditing}
               />
             </div>

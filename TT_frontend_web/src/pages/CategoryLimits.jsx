@@ -124,17 +124,29 @@ const Categorias = () => {
     setCategoriaSeleccionada(categoria);
   };
 
+   // Verifica si la carga académica es un texto en lugar de un objeto
+  const renderCargaAcademica = (carga) => {
+    if (typeof carga === 'string') {
+      return <p>{carga}</p>;
+    }
+    return (
+      <>
+        <p>Horas: {carga.horas}</p>
+        <p>U.P.: {carga.up}</p>
+      </>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-cover bg-center flex flex-col justify-between">
-      {/* Incluye la navegación */}
       <Navigation />
 
-      {/* Línea de separación */}
       <hr className="border-t-2 border-black my-4" />
 
-      {/* Contenido principal */}
       <div className="container mx-auto mt-8 mb-8">
-        <label className="block  text-black text-lg font-bold mb-2">Selecciona una categoría:</label>
+        <label className="block text-black text-lg font-bold mb-2">
+          Selecciona una categoría:
+        </label>
         <select
           onChange={handleCategoriaChange}
           className="w-full p-2 border rounded-lg"
@@ -147,25 +159,21 @@ const Categorias = () => {
           ))}
         </select>
 
-        {/* Mostrar información según la categoría seleccionada */}
         <div className="mt-8 bg-gray-800 bg-opacity-40 shadow-lg rounded-lg p-6 text-white">
           <h2 className="text-2xl font-bold mb-4">{categoriaSeleccionada.categoria}</h2>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h3 className="font-semibold">Carga Académica (½ Tiempo):</h3>
-              <p>Horas: {categoriaSeleccionada.cargaAcademica.medioTiempo.horas}</p>
-              <p>U.P.: {categoriaSeleccionada.cargaAcademica.medioTiempo.up}</p>
+              {renderCargaAcademica(categoriaSeleccionada.cargaAcademica.medioTiempo)}
             </div>
             <div>
               <h3 className="font-semibold">Carga Académica (¾ Tiempo):</h3>
-              <p>Horas: {categoriaSeleccionada.cargaAcademica.tresCuartosTiempo.horas}</p>
-              <p>U.P.: {categoriaSeleccionada.cargaAcademica.tresCuartosTiempo.up}</p>
+              {renderCargaAcademica(categoriaSeleccionada.cargaAcademica.tresCuartosTiempo)}
             </div>
             <div>
               <h3 className="font-semibold">Carga Académica (Tiempo Completo):</h3>
-              <p>Horas: {categoriaSeleccionada.cargaAcademica.tiempoCompleto.horas}</p>
-              <p>U.P.: {categoriaSeleccionada.cargaAcademica.tiempoCompleto.up}</p>
+              {renderCargaAcademica(categoriaSeleccionada.cargaAcademica.tiempoCompleto)}
             </div>
             <div>
               <h3 className="font-semibold">Otras Actividades:</h3>
