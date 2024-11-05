@@ -4,7 +4,7 @@ from .models import Document
 class RegisterDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ['id', 'file_name', 'file_type', 'size', 'account_id', 'projection_id', 'file']
+        fields = ['id', 'file_name', 'file_type', 'size', 'account_id', 'projection_id', 'file']  # Cambia 'file' a 'file_content' si lo prefieres
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True},
@@ -13,25 +13,35 @@ class RegisterDocumentSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         request = self.context.get('request')
+        file = request.FILES.get('file')  # Asegúrate de obtener el archivo correctamente
+
+        if not file:
+            raise serializers.ValidationError({"file": "Debe subir un archivo válido."})
+
+        validated_data['file_name'] = file.name
+        validated_data['file_type'] = file.content_type
+        validated_data['size'] = file.size
+        validated_data['file'] = file.read()  # Leer como binario
+
         account_id = request.auth.get('user_id') if request.auth else request.user.id
         validated_data['account_id'] = account_id
+
         return super().create(validated_data)
     
     def update(self, instance, validated_data):
-        # Ensure the account_id cannot be changed during update
+        # No permitir cambiar el account_id durante la actualización
         validated_data['account_id'] = instance.account_id
 
-        # Apply validation logic for dates
-        self.validate(validated_data)
-        
-        # Update the Task instance
-        return super().update(instance, validated_data)
+        # Reemplazar el archivo si se sube uno nuevo
+        new_file = self.context.get('request').FILES.get('file', None)
+        if new_file:
+            validated_data['file_name'] = new_file.name
+            validated_data['file_type'] = new_file.content_type
+            validated_data['size'] = new_file.size
+            validated_data['file'] = new_file.read()  # Lee el nuevo archivo
 
-    def validate(self, data):
-        # Agrega validaciones personalizadas si es necesario
-        if 'file' not in data:
-            raise serializers.ValidationError("Debe subir un archivo.")
-        return data
+        # Actualiza el objeto
+        return super().update(instance, validated_data)
 
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:

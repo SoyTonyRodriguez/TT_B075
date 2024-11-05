@@ -26,8 +26,8 @@ class Products(models.Model):
     projection_id = models.CharField(max_length=255, default="test")  # Aqui es product_id, pero da hueva cambiarlo
     function = models.CharField(max_length=255)
     activity = models.CharField(max_length=255)
-    role = models.CharField(max_length=255)
-    scope = models.CharField(max_length=255)
+    role = models.CharField(max_length=255, blank=True, null=True)
+    scope = models.CharField(max_length=255, blank=True, null=True)
     tasks = models.JSONField(
         models.CharField(max_length=255),  # IDs de tareas
         blank=True, 
@@ -37,12 +37,15 @@ class Products(models.Model):
     documents_uploaded = models.JSONField(
         models.CharField(max_length=255),  # IDs de tareas
         blank=True, 
-        null=True
+        null=True,
+        default=list
     )
+    documents_number = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    units_str = models.CharField(max_length=255, blank=True, null=True)
     units = models.FloatField(null=True, blank=True, default=0) # Unidades de la proyección
-    priority = models.CharField(max_length=255)
+    priority = models.CharField(max_length=255, blank=True, null=True)
     color = models.CharField(max_length=7, default=generate_pastel_color, blank=True)
     progress = models.FloatField(default=0)
 

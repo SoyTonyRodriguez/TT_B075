@@ -3,12 +3,14 @@ import { format, startOfMonth, startOfWeek, addDays, setMonth, setYear, addMonth
 import { es } from 'date-fns/locale';
 import Navigation from './Navigation/Navigation';  
 import { getAllDates } from '../../../api/calendar_dates.api';
+import LoadingAnimation from '../components/LoadingAnimation';
 
 const CalendarWithDetails = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [activities, setActivities] = useState([]);
   const [activityDetails, setActivityDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const currentYear = new Date().getFullYear();
   const minYear = currentYear - 2;
@@ -21,12 +23,25 @@ const CalendarWithDetails = () => {
   // Fetch activities from API
   useEffect(() => {
     const fetchActivities = async () => {
-      const response = await getAllDates();
-      setActivities(response.data); 
+      try {
+        const response = await getAllDates();
+        setActivities(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchActivities();
   }, []);
+
+  // Show loading (Mostrar pantalla de carga)
+  if (loading) {
+      return <LoadingAnimation />;
+  }
+
 
   // Función para ajustar la fecha a la zona horaria local
   const adjustToLocaleDate = (dateString) => {

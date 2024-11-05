@@ -1,5 +1,5 @@
- import React, { useState } from "react";
-import { View, Text, TextInput, Image, ImageBackground, TouchableOpacity, ScrollView, Dimensions, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, Image, ImageBackground, TouchableOpacity, ScrollView, Dimensions, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native'; 
 import tw from 'twrnc'; 
@@ -7,9 +7,10 @@ import { useForm, Controller } from "react-hook-form";
 import { login } from "../api/accounts.api"; // Importa tu función de API
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
+import CustomToast from '../components/CustomToast'; // Toast personalizado
+import Toast from 'react-native-toast-message'; 
 
 const { width, height } = Dimensions.get('window');
-
 
 // Helper function to display styled error messages
 const renderErrorMessage = (error) => {
@@ -46,8 +47,6 @@ const LoginScreen = () => {
       if (response.status === 200) {
         // Save the token or user data as needed
         await AsyncStorage.setItem('token', JSON.stringify(response.data.access));
-
-        Alert.alert("Éxito", "Has iniciado sesión correctamente");
         navigation.navigate("HomeScreen");
         console.log("Inicio de sesión exitoso:", response.data);
 
@@ -210,6 +209,9 @@ const LoginScreen = () => {
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
+
+      {/* Toast container */}
+      <CustomToast />
       </ImageBackground>
   );
 };

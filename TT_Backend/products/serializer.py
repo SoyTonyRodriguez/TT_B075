@@ -7,7 +7,7 @@ class RegisterProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products
         fields = ['id', 'account_id', 'function', 'activity', 'role', 'scope', 
-                  'tasks', 'documents_required', 'documents_uploaded', 'units', 'priority', 'color', 'progress', 'projection_id']
+                  'tasks', 'documents_required', 'documents_number', 'documents_uploaded', 'units', 'color', 'progress', 'projection_id']
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True},
@@ -34,7 +34,6 @@ class RegisterProductSerializer(serializers.ModelSerializer):
         instance.documents_required = validated_data.get('documents_required', instance.documents_required)
         instance.progress = validated_data.get('progress', instance.progress)  # Ensure progress is updated
         instance.units = validated_data.get('units', instance.units)
-        instance.priority = validated_data.get('priority', instance.priority)
         instance.color = validated_data.get('color', instance.color)
         instance.projection_id = validated_data.get('projection_id', instance.projection_id)
         instance.documents_uploaded = validated_data.get('documents_uploaded', instance.documents_uploaded)

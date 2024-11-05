@@ -1,44 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+
 
 // new path:
-import { login } from '../../../api/accounts.api';
+import { login as apiLogin, getAccount } from '../../../api/accounts.api'; // Llamada a la API
 
 import LoadingAnimation from "../components/LoadingAnimation";  
 
+import AuthContext from '../components/AuthContext';  // Importa el contexto de autenticación
 
 function Login() {
+    const { login } = useContext(AuthContext);  // Obtén la función `login` del contexto
     const [loading, setLoading] = useState(false); // Loading state
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
 
     const onSubmit = handleSubmit(async (data) => {
-        setLoading(true); // Set loading to true when the form is submitted
+      setLoading(true); // Set loading to true when the form is submitted
 
-        try {
-            const response = await login(data);
-            toast.success('Inicio de sesión exitoso');
-            console.log('Respuesta de login:', response.data);
+      try {
+          const response = await apiLogin(data);  // Llamada a la API
+          toast.success('Inicio de sesión exitoso');
+          console.log('Respuesta de login:', response.data);
 
-            // Save the token or user data as needed
-            localStorage.setItem('token', response.data.access);
-            localStorage.setItem('refreshToken', response.data.refresh);
-            
-            navigate('/home'); // Redirect to the home
-        } catch (error) {
-            console.error('Error during login:', error);
-            // Handle error response from the API
-            if (error.response && error.response.status === 400) {
-                toast.error('Credenciales incorrectas');
-            } else {
-                toast.error("Error al iniciar sesión: " + error.message);
-            }
-        } finally {
-            setLoading(false); // Set loading to false after the operation is complete
-        }
-    });
+          // Save the token or user data as needed
+          localStorage.setItem('token', response.data.access);
+          localStorage.setItem('refreshToken', response.data.refresh);
+
+          // Decode the token to get the user ID
+          let userId;
+          if (response.data.access) {
+              try {
+                  const decodedToken = jwtDecode(response.data.access);
+                  userId = decodedToken.user_id;  // Extraer el user ID directamente
+                  console.log('User ID:', userId);
+              } catch (error) {
+                  console.error('Invalid token:', error);
+                  toast.error("Error en el token");
+                  return;  // Salir si el token no es válido
+              }
+          }
+
+          // Obtener datos de la cuenta usando el userId extraído
+          const responseAccount = await getAccount(userId);
+          const fullName = responseAccount.data.name;
+          const firstName = fullName.split(' ')[0];
+          const email = responseAccount.data.email;
+          const category = responseAccount.data.category;
+          const units_projection = responseAccount.data.units_projection;
+          const projection_id = responseAccount.data.projection_id;
+
+          const accountData = { 
+              email,
+              userName: firstName,
+              fullName,
+              category,
+              units_projection,
+              projection_id,
+          };
+
+          localStorage.setItem('accountDetails', JSON.stringify(accountData));
+          login(accountData);  // Actualiza el estado global con el contexto
+          
+          navigate('/home'); // Redirect to the home page
+      } catch (error) {
+          console.error('Error during login:', error);
+          if (error.response && error.response.status === 400) {
+              toast.error('Credenciales incorrectas');
+          } else {
+              toast.error("Error al iniciar sesión: " + error.message);
+          }
+      } finally {
+          setLoading(false); // Set loading to false after the operation is complete
+      }
+  });
 
     if (loading) {
       return <LoadingAnimation />;

@@ -1,45 +1,60 @@
 import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 
 // Initial set-up
 const TasksAPI = axios.create({
-    //baseURL: 'http://192.168.77.44:8000/api/v1/'
+    //baseURL: 'http://192.168.1.12:8000/api/v1/'
     baseURL: 'http://192.168.1.143:8000/api/v1/'
+    //baseURL: 'http://192.168.1.15:8000/api/v1/'
+    //baseURL: 'http://192.168.1.8:8000/api/v1/'
 })
 
 // create task method
-// export const createTask = (task) => accountsAPI.post('task/register/', task)
-export const createTask = (task) => {
-    const token = localStorage.getItem('token');
+export const createTask = async (task) => {
+    const token = await AsyncStorage.getItem('token');
+    const cleanToken = token.replace(/["]/g, '').trim();
+    
     return TasksAPI.post('task/register/', task, {
         headers: {
-            Authorization: `Bearer ${token}`,
-        }
+            'Content-Type': 'application/json', // Agrega este header
+            Authorization: `Bearer ${cleanToken}`,
+        },
     });
 }
 
-
 // getTasks from account method
-export const getTasks = (account_id) => {
-    const token = localStorage.getItem('token');
+export const getTasks = async (account_id) => {
+    const token = await AsyncStorage.getItem('token');
+    const cleanToken = token.replace(/["]/g, '').trim();
+
     return TasksAPI.get(`tasks/${account_id}/`, {
         headers: {
-            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json', // Agrega este header
+            Authorization: `Bearer ${cleanToken}`,
         },
     });
 };
 
-export const updateTaskStatus = (taskId, updatedData) => {
-    const token = localStorage.getItem('token');
+export const updateTask = async (taskId, updatedData) => {
+    const token = await AsyncStorage.getItem('token');
+    const cleanToken = token.replace(/["]/g, '').trim();
+    
     return TasksAPI.patch(`tasks/${taskId}/edit/`, updatedData, {
         headers: {
-            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json', // Agrega este header
+            Authorization: `Bearer ${cleanToken}`,
         },
     });
 };
 
-export const deleteTask = (taskId) => {
-    const token = localStorage.getItem('token');
+export const deleteTask = async (taskId) => {
+    const token = await AsyncStorage.getItem('token');
+    const cleanToken = token.replace(/["]/g, '').trim();
+    
     return TasksAPI.delete(`tasks/${taskId}/delete/`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+            'Content-Type': 'application/json', // Agrega este header
+            Authorization: `Bearer ${cleanToken}`,
+        },
     });
 };

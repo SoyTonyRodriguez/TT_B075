@@ -16,11 +16,15 @@ import ProjectScreen from './screens/ProjectScreen';
 import UnidadesPromocion from './screens/UnidadesPromocion';
 import KanbanBoard from './screens/KanbanBoard';
 import FilesScreen from './screens/FilesScreen';
+import PDFViewer from './screens/PDFViewer';
+
+import { AuthProvider } from './components/AuthContext';
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
+    <AuthProvider>
     <SafeAreaView className="flex-auto">
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
@@ -47,10 +51,11 @@ export default function App() {
           <Stack.Screen name="OfficialLinksScreen" component={OfficialLinksScreen} />
           <Stack.Screen name="MoreInfo" component={MoreInfoScreen} />
           <Stack.Screen name="ProjectScreen" component={ProjectScreen} />
-
+          <Stack.Screen name="PDFViewer" component={PDFViewer} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
+    </AuthProvider>
   );
 }
 
