@@ -492,7 +492,7 @@ const Documents = () => {
         {/* Barra de búsqueda */}
         <View style={tw`mb-6`}>
           <View style={tw`flex-row items-center border-b border-gray-300`}>
-            <Ionicons name="search" size={24} color="#888" />
+            <Ionicons name="search" size={24} color="#000" />
             <TextInput
               placeholder="Buscar en mis documentos"
               value={searchQuery}
@@ -589,7 +589,7 @@ const Documents = () => {
         </View>
 
         {/* Botón para abrir el modal de proyecciones */}
-        <Text style={tw`text-gray-700 font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
+        <Text style={tw`text-black font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
         <TouchableOpacity
           onPress={openProjectionModal}
           style={tw`bg-white p-4 rounded-lg mb-4 border border-gray-300 flex-row justify-between items-center`}
@@ -610,7 +610,7 @@ const Documents = () => {
 
           {/* Encabezado de la lista */}
           <View style={tw`flex-row py-2 border-b border-gray-300`}>
-            {["Nombre", "Tamaño", "Subido", "Proyección"].map((header) => (
+            {["Archivos"].map((header) => (
               <View key={header} style={tw`flex-1 items-center`}>
                 <Text style={tw`font-bold text-sm`}>{header}</Text>
               </View>
@@ -634,30 +634,22 @@ const Documents = () => {
                       selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`,
                     ]}
                   >
-                    <View style={tw`flex-1 items-center justify-center`}>
-                      <Ionicons 
-                        name={item.type === 'pdf' ? 'document' : 'image'} 
-                        size={20} 
-                        color={item.type === 'pdf' ? 'red' : 'blue'} 
-                      />
-                      <Text 
-                        style={tw`ml-2`} 
-                        numberOfLines={1} 
-                        ellipsizeMode="tail"
-                      >
-                        {item.name}
-                      </Text>
-                    </View>
-                    <View style={tw`flex-1 items-center`}>
-                      <Text numberOfLines={1} ellipsizeMode="tail">{item.size}</Text>
-                    </View>
-                    <View style={tw`flex-1 items-center`}>
-                      <Text numberOfLines={1} ellipsizeMode="tail">{item.date}</Text>
-                    </View>
-                    <View style={tw`flex-1 items-center`}>
-                      <Text numberOfLines={1} ellipsizeMode="tail">{item.projection}</Text>
-                    </View>
-                  </TouchableOpacity>
+                    <Ionicons name={item.type === 'pdf' ? 'document' : 'image'} size={24} color={item.type === 'pdf' ? 'red' : 'blue'} style={tw`mr-3`} />
+      
+                  {/* Contenedor del nombre y proyección */}
+                  <View style={tw`flex-1`}>
+                    {/* Nombre del documento */}
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={tw`text-lg font-semibold`}>
+                      {item.name}
+                    </Text>
+                    
+                    {/* Proyección debajo del nombre */}
+                    <Text style={tw`text-gray-500 text-sm`}>{item.projection}</Text>
+                  </View>
+                  
+                  {/* Icono de tres puntos para detalles */}
+                 
+                </TouchableOpacity>
                 )}
               />
             )}
@@ -668,7 +660,7 @@ const Documents = () => {
       {/* Modal para visualizar documentos */}
       <Modal visible={isModalOpen} transparent={true} animationType="fade" onRequestClose={() => setIsModalOpen(false)}>
       <View style={tw`flex-1 bg-black bg-opacity-90 justify-center items-center`}>
-        <View style={tw`absolute top-5 w-full flex-row justify-between items-center px-4`}>
+        <View style={tw`absolute top-12 w-full flex-row justify-between items-center px-4`}>
           
           {/* Botón de Cerrar */}
           <TouchableOpacity
@@ -746,7 +738,7 @@ const Documents = () => {
       {/* Modal para seleccionar proyección */}
       <Modal
           visible={isProjectionModalOpen}
-          transparent={true} // Esto permite el fondo con opacidad
+          transparent={true} 
           animationType="fade"
           onRequestClose={() => setIsProjectionModalOpen(false)}
         >
