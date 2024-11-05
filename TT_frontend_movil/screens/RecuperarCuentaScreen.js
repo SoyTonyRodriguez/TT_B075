@@ -41,7 +41,7 @@ const ForgotPasswordScreen = () => {
                 <Text style={tw`text-2xl font-bold text-black`}>Recupera tu cuenta</Text>
                 <Ionicons name="person-outline" size={30} color="black" style={tw`ml-2`} />
               </View>
-              <Text style={tw`text-lg text-gray-500 mt-2`}>Introduce los datos solicitados</Text>
+              <Text style={tw`text-lg text-black mt-2`}>Introduce los datos solicitados</Text>
               <View style={tw`h-0.5 bg-black mt-3 mb-5`} />
             </View>
 

@@ -115,11 +115,22 @@ const Documents = () => {
       const response = await getDocument(documentId);
       const { file, file_type } = response.data;
   
+      // Si el archivo es PDF y la plataforma es Android, guárdalo en la caché y usa el URI local
+      let localUri = null;
+      if (file_type === 'application/pdf' && Platform.OS === 'android') {
+        const fileUri = `${FileSystem.cacheDirectory}${documentData.name}.pdf`;
+        await FileSystem.writeAsStringAsync(fileUri, file, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        localUri = fileUri;
+      }
+  
       // Asigna todos los datos relevantes al estado `selectedDocument`
       setSelectedDocument({
         ...documentData, // Incluye nombre, tamaño, fecha y proyección
         data: file,
-        type: file_type
+        type: file_type,
+        localUri: localUri || `data:application/pdf;base64,${file}`, // Usar el URI en caché si está en Android
       });
       setIsModalOpen(true);
     } catch (error) {
@@ -136,18 +147,48 @@ const Documents = () => {
     const { data, type } = selectedDocument;
   
     if (type === 'application/pdf') {
-      // Generar la URI en formato base64 para el PDF
-      const pdfUri = `data:application/pdf;base64,${data}`;
+      // Incrustar el PDF en un HTML para WebView
+      const pdfHtml = `
+        <html>
+          <head>
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                height: 100%;
+              }
+              .pdf-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+              }
+              embed {
+                width: 100%;
+                height: 100%;
+                display: block;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="pdf-container">
+              <embed src="data:application/pdf;base64,${data}" type="application/pdf" />
+            </div>
+          </body>
+        </html>
+      `;
+  
       return (
         <WebView
           originWhitelist={['*']}
-          source={{ uri: pdfUri }}
+          source={{ html: pdfHtml }}
           style={{ flex: 1 }}
           onError={(error) => console.log('Error en WebView:', error)}
         />
       );
-
     } else if (type.startsWith('image/')) {
+      // Mostrar imagenes (jpg/jpeg) en el componente Image
       const imageUrl = `data:${type};base64,${data}`;
       return (
         <Image
@@ -160,6 +201,7 @@ const Documents = () => {
   
     return <Text>Tipo de archivo no soportado.</Text>;
   };
+  
 
   // Cerrar todos los dropdowns
   const closeDropdowns = () => {

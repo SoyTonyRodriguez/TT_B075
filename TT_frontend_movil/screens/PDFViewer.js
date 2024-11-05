@@ -1,23 +1,23 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
-import tw from 'twrnc';
+import { View, Text } from 'react-native';
 
-const PDFViewer = ({ route }) => {
-  const { pdfUri } = route.params;  // Recibe la URI del PDF desde la navegación
+export default function PDFViewer({ route }) {
+  const { pdfResource } = route.params;
 
-    return (
-        <View style={tw`flex-1`}>
-        <WebView
-            source={{ uri: pdfUri }}
-            style={{ flex: 1 }}
-            startInLoadingState={true}
-            renderLoading={() => (
-            <ActivityIndicator size="large" color="#0000ff" style={tw`mt-10`} />
-            )}
-        />
-        </View>
-    );
-    };
+  // Verifica si el PDF es una ruta local (require) o una URI
+  const pdfUri = pdfResource.uri || pdfResource;
 
-export default PDFViewer;
+  if (!pdfUri) {
+    return <Text>Error: No se pudo cargar el archivo PDF.</Text>;
+  }
+
+  return (
+    <View style={{ flex: 1 }}>
+      <WebView
+        source={{ uri: pdfUri }}
+        style={{ flex: 1 }}
+      />
+    </View>
+  );
+}

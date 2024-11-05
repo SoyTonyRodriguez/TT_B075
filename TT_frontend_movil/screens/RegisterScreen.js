@@ -155,13 +155,13 @@ const RegisterScreen = (route) => {
                   <Text style={tw`text-2xl font-bold text-black`}>Regístrate</Text>
                   <Ionicons name="person-outline" size={30} color="black" style={tw`ml-2`} />
                 </View>
-                <Text style={tw`text-lg text-gray-500 mt-2`}>Introduce los datos solicitados</Text>
+                <Text style={tw`text-lg text-black mt-2`}>Introduce los datos solicitados</Text>
                 <View style={tw`h-0.5 bg-black mt-3 mb-5`} />
               </View>
           </View>
 
           <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-            <View style={tw`px-5`}>
+            <View style={tw`px-5 mt-6`}>
 
               {/* Form inputs */}
               <Controller
@@ -173,6 +173,7 @@ const RegisterScreen = (route) => {
                     <TextInput
                       placeholder="Ingresa tu nombre completo"
                       style={inputStyle(errors.name)}
+                      placeholderTextColor="#555"
                       value={value}
                       onChangeText={onChange}
                     />
@@ -196,6 +197,7 @@ const RegisterScreen = (route) => {
                     <TextInput
                       placeholder="Ingresa tu correo electrónico"
                       style={inputStyle(errors.email)}
+                      placeholderTextColor="#555"
                       keyboardType="email-address"
                       value={value}
                       onChangeText={onChange}
@@ -229,10 +231,11 @@ const RegisterScreen = (route) => {
                 name="password"
                 rules={{ required: 'La contraseña es obligatoria.' }}
                 render={({ field: { onChange, value } }) => (
-                  <View style={tw`relative w-full mb-4`}>
+                  <View style={tw`relative w-full`}>
                     <TextInput
                       placeholder="Contraseña"
                       style={inputStyle(errors.password)}
+                      placeholderTextColor="#555"
                       secureTextEntry={!passwordVisible}
                       value={value}
                       onChangeText={onChange}
@@ -264,6 +267,7 @@ const RegisterScreen = (route) => {
                     <TextInput
                       placeholder="Confirma tu contraseña"
                       style={inputStyle(errors.confirmar_password)}
+                      placeholderTextColor="#555"
                       secureTextEntry={!confirmPasswordVisible}
                       value={value}
                       onChangeText={onChange}
@@ -287,7 +291,7 @@ const RegisterScreen = (route) => {
                 style={tw`bg-transparent mt-5`}
                 onPress={() => setRequirementsModalVisible(true)}
               >
-                <Text style={tw`text-blue-700 text-center underline`}>
+                <Text style={tw`text-blue-700 text-center text-base`}>
                   Conoce los requisitos para participar en el proceso de promoción docente
                 </Text>
               </TouchableOpacity>
