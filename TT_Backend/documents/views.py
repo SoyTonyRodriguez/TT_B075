@@ -11,7 +11,10 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 import base64
 from django.core.files.base import ContentFile
+from products.models import Products
 
+from django.db.models.signals import post_save, post_delete
+from products.signals import update_product_check
 
 class DocumentUploadAPIView(APIView):
     parser_classes = [JSONParser, MultiPartParser, FormParser]
@@ -19,6 +22,9 @@ class DocumentUploadAPIView(APIView):
     
     def post(self, request, *args, **kwargs):
         try:
+            # Desconectar la señal temporalmente si es un POST
+            if self.request.method == 'POST':
+                post_save.disconnect(update_product_check, sender=Products)
             file_name = request.data['file_name']
             file_type = request.data['file_type']
             size = request.data['size']
@@ -37,6 +43,10 @@ class DocumentUploadAPIView(APIView):
                 projection_id=projection_id,
                 file=binary_file,
             )
+
+            # Reconectar la señal
+            if self.request.method == 'POST':
+                post_save.connect(update_product_check, sender=Products)
 
             return Response({"message": "¡Documento subido exitosamente!"}, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -78,6 +88,10 @@ class DocumentReplace(RetrieveUpdateAPIView):
             # Decodificar el archivo base64
             binary_file = base64.b64decode(encoded_file)
 
+            # Desconectar la señal temporalmente si es un POST
+            if self.request.method == 'PATCH':
+                post_save.disconnect(update_product_check, sender=Products)
+
             # Actualizar los campos del documento
             serializer.save(
                 file_name=file_name,
@@ -85,6 +99,10 @@ class DocumentReplace(RetrieveUpdateAPIView):
                 size=size,
                 file=binary_file  # Guardar el archivo como binario en MongoDB
             )
+            
+            # Reconectar la señal
+            if self.request.method == 'PATCH':
+                post_save.connect(update_product_check, sender=Products)
 
             return Response({"message": "Documento actualizado correctamente."}, status=status.HTTP_200_OK)
 
@@ -102,9 +120,17 @@ class DocumentDeleteAPIView(DestroyAPIView):
     def perform_destroy(self, instance):
         if instance.account_id != self.request.user.id:
             raise PermissionDenied("No tienes permiso para eliminar este documento.")
+        
+        # Desconectar la señal temporalmente si es un POST
+        if self.request.method == 'DELETE':
+            post_save.disconnect(update_product_check, sender=Products)
 
         # Solo eliminamos la entrada en MongoDB, no hay archivos en el sistema
         instance.delete()
+
+        # Reconectar la señal
+        if self.request.method == 'DELETE':
+            post_save.connect(update_product_check, sender=Products)
 
 class DocumentRetrieveAPIView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)

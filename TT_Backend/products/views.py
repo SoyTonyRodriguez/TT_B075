@@ -77,5 +77,15 @@ class DeleteProductView(DestroyAPIView):
         #     post_save.disconnect(update_product_check, sender=Products)
         #     post_delete.disconnect(update_product_check, sender=Products)
 
+
+        # Desconectar la señal temporalmente si es un PATCH
+        if self.request.method == 'DELETE':
+            post_save.disconnect(update_product_check, sender=Products)
+
         # Eliminar el producto
         instance.delete()
+
+        # Reconectar la señal
+        if self.request.method == 'DELETE':
+            post_save.connect(update_product_check, sender=Products)
+
