@@ -8,8 +8,9 @@ const PDF_FILES = {
   reglamento: require('../assets/pdfs/reglamento.pdf'),
   cronograma: require('../assets/pdfs/cronograma.pdf'),
   valoracion: require('../assets/pdfs/valoracionactividades.pdf'),
-  gaceta1511: require('../assets/pdfs/gaceta.pdf'),
+  gaceta: require('../assets/pdfs/gaceta.pdf'),
 };
+
 
 export default function OfficialLinksScreen({ navigation }) {
   const openPDF = (pdfKey) => {
