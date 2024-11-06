@@ -84,6 +84,7 @@ export default function ProyeccionGrado() {
       tasks,
       projection_id,
       documents_uploaded: [],
+      type: "Grado Académico"
     };
     console.log(projectionData);
 
