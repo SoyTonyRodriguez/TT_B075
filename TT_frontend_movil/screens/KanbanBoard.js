@@ -7,7 +7,8 @@ import Toast from 'react-native-toast-message';
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import CustomToast from '../components/CustomToast'; // Toast personalizado
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { AuthContext } from '../components/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
+import {jwtDecode} from 'jwt-decode';
 import { getTasks, createTask, deleteTask, updateTask } from '../api/tasks.api';
 import { getProduct } from '../api/products.api';
 //import DraggableFlatList from 'react-native-draggable-flatlist';
@@ -28,11 +29,27 @@ const KanbanBoard = () => {
   const [taskToEdit, setTaskToEdit] = useState(null); // Nueva tarea para editar
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Estado del modal de edición
 
-  const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
-
-
   const [loading, setLoading] = useState(true); // Estado de carga inicial
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
+
+  const [userId, setUserId] = useState(''); // Accede al token y userId del contexto
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          console.log('Token decodificado:', decodedToken.user_id);
+          setUserId(decodedToken.user_id);
+        }
+      } catch (error) {
+        console.error('Error al obtener token:', error);
+      }
+    }
+    fetchToken();
+
+  }, [userId]);
 
   useEffect(() => {
     setLoadingMessage("Cargando tareas"); // Mensaje de carga

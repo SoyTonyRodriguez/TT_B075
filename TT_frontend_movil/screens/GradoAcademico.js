@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, ImageBackground, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AuthContext } from '../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import { createProduct } from '../api/products.api'; // Importa el método createProduct
+import {jwtDecode} from 'jwt-decode';
 
 import CustomToast from '../components/CustomToast'; // Toast personalizado
 import Toast from 'react-native-toast-message'; 
@@ -20,7 +20,25 @@ export default function ProyeccionGrado({navigation}) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
-  const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
+
+  const [userId, setUserId] = useState(''); // Accede al token y userId del contexto
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          console.log('Token decodificado:', decodedToken.user_id);
+          setUserId(decodedToken.user_id);
+        }
+      } catch (error) {
+        console.error('Error al obtener token:', error);
+      }
+    }
+    fetchToken();
+
+  }, [userId]);
 
   const documentosPorGrado = {
     pasante: 'Copia cotejada del original de la carta de pasante o en su caso, del original de la boleta de calificaciones con el 100% de los créditos. \nConstancia de realización de servicio social.',
@@ -79,7 +97,8 @@ export default function ProyeccionGrado({navigation}) {
       units: 100,
       projection_id,
       tasks: [], // Agrega tasks como una lista vacía si no tiene valores
-      documents_uploaded: [] // Asegura que sea una lista vacía si está en None
+      documents_uploaded: [], // Asegura que sea una lista vacía si está en None
+      type: 'Grado Académico',
     };
 
     console.log('Datos de la proyección:', projectionData);

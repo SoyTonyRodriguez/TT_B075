@@ -6,12 +6,13 @@ import * as MediaLibrary from 'expo-media-library'; // Importa MediaLibrary para
 import tw from 'twrnc'; 
 import { WebView } from 'react-native-webview';
 import * as FileSystem from 'expo-file-system';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
+import {jwtDecode} from 'jwt-decode';
 
 import Toast from 'react-native-toast-message'; 
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import CustomToast from '../components/CustomToast'; // Toast personalizado
 
-import { AuthContext } from '../components/AuthContext'; // Contexto de autenticación (Pasar token entre pantallas)
 import { getDocuments, getDocument, uploadDocument, deleteDocument, replaceDocument } from '../api/documents.api'; // Endpoints de documentos
 import { getProduct } from '../api/products.api'; // Endpoints de productos
 
@@ -40,7 +41,24 @@ const Documents = () => {
   const [loading, setLoading] = useState(true); // Estado de carga inicial
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
 
-  const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
+  const [userId, setUserId] = useState(''); // Accede al token y userId del contexto
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          console.log('Token decodificado:', decodedToken.user_id);
+          setUserId(decodedToken.user_id);
+        }
+      } catch (error) {
+        console.error('Error al obtener token:', error);
+      }
+    }
+    fetchToken();
+  }, []);
+
 
   // Obtener documentos desde la API
   // Obtener documentos y proyecciones desde la API
@@ -70,9 +88,9 @@ const Documents = () => {
         projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección',
       }));
   
-      setFileData(documents);
-      setFilteredFileData(documents);
-      setProjections(projectionsResponse.data);
+      setFileData(documents || []);
+      setFilteredFileData(documents || []);
+      setProjections(projectionsResponse.data || []);
       setErrorMessage('');
     } catch (error) {
       console.error('Error al obtener documentos y proyecciones:', error);
@@ -82,7 +100,9 @@ const Documents = () => {
     }
   };
   useEffect(() => {
-    fetchDocumentsAndProjections();
+    if (userId) {
+      fetchDocumentsAndProjections();
+    }
   }, [userId]);
 
   // Función para manejar la búsqueda de documentos

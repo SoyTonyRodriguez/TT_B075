@@ -12,21 +12,47 @@ export const AuthProvider = ({ children }) => {
     try {
       const storedToken = await AsyncStorage.getItem('token');
       if (storedToken) {
-        setToken(storedToken);
-        const decoded = jwtDecode(storedToken);
-        setUserId(decoded.user_id);
+        updateToken(storedToken);
       }
     } catch (error) {
       console.error('Error loading token:', error);
     }
   };
 
+  const updateToken = async (newToken) => {
+    try {
+      if (newToken) {
+        await AsyncStorage.setItem('token', newToken);
+        setToken(newToken);
+        const decoded = jwtDecode(newToken);
+        setUserId(decoded.user_id);
+      } else {
+        await AsyncStorage.removeItem('token');
+        setToken(null);
+        setUserId(null);
+      }
+    } catch (error) {
+      console.error('Error updating token:', error);
+    }
+  };
+
+  // Función de cierre de sesión
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');  // Remover el token de AsyncStorage
+      setToken(null);                          // Resetear token en el contexto
+      setUserId(null);                         // Resetear userId en el contexto
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
+
   useEffect(() => {
-    loadToken(); // Cargar el token al montar el contexto
+    loadToken();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, userId, setToken }}>
+    <AuthContext.Provider value={{ token, userId, setToken: updateToken, logout }}>
       {children}
     </AuthContext.Provider>
   );
