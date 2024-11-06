@@ -7,6 +7,23 @@ from check_products.models import ProductCheck
 # Variable global para almacenar el projection_id anterior
 old_product_id = None
 
+@receiver(post_save, sender=Products)
+def update_product_projection(sender, instance, created, **kwargs):
+    # Si el producto es creado, revisa la longitud de products en Projection
+    if created:
+        try:
+            projection = Projection.objects.get(id=instance.projection_id)
+            # Si products está vacío, asigna el valor deseado a type
+            if not projection.products:  # Verifica si products está vacío
+                projection.type = instance.type  # O el campo que quieres usar
+                projection.save()
+                
+            # Luego agrega el ID del producto a la lista de products en Projection
+            # projection.products.append(instance.id)
+            # projection.save()
+        except Projection.DoesNotExist:
+            print(f"Projection con ID {instance.projection_id} no existe.")
+
 @receiver(pre_save, sender=Products)
 def store_old_projection(sender, instance, **kwargs):
     global old_product_id
