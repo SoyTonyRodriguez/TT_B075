@@ -3,7 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, ImageBackground, M
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { get_Check_Products } from '../api/check_products.api'; 
-import { AuthContext } from '../components/AuthContext';
+
+import {jwtDecode} from 'jwt-decode';
+
 import { createProduct } from '../api/products.api';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
@@ -111,7 +113,6 @@ import tw from 'twrnc';
     const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
 
     const [checkProductData, setCheckProductData] = useState(null); // Datos recibidos
-    const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
     const [loading, setLoading] = useState(true); // Estado de carga inicial
 
     // Nuevos estados
@@ -133,7 +134,24 @@ import tw from 'twrnc';
     const [up_allowed, setUpAllowed] = useState(''); // Estado para almacenar las U.P. permitidas
     const [isUnitsSelected, setIsUnitsSelected] = useState(false); 
     const [modalWorkTimeVisible, setModalWorkTimeVisible] = useState(false); // Modal específico para tiempo de trabajo
+    const [userId, setUserId] = useState(''); // Accede al token y userId del contexto
 
+    useEffect(() => {
+      const fetchToken = async () => {
+        try {
+          const token = await AsyncStorage.getItem('token');
+          if (token) {
+            const decodedToken = jwtDecode(token);
+            console.log('Token decodificado:', decodedToken.user_id);
+            setUserId(decodedToken.user_id);
+          }
+        } catch (error) {
+          console.error('Error al obtener token:', error);
+        }
+      }
+      fetchToken();
+  
+    }, [userId]);
     
     useEffect(() => {
   
@@ -562,7 +580,8 @@ import tw from 'twrnc';
         units: calculatedUnits || result,
         projection_id,
         tasks: [], // Agrega tasks como una lista vacía si no tiene valores
-        documents_uploaded: [] // Asegura que sea una lista vacía si está en None
+        documents_uploaded: [], // Asegura que sea una lista vacía si está en None
+        type: 'Unidades de Promoción',
       };
 
       console.log('Datos de la proyección:', projectionData);

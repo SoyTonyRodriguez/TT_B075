@@ -6,7 +6,7 @@ from datetime import datetime
 class RegisterProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products
-        fields = ['id', 'account_id', 'function', 'activity', 'role', 'scope', 
+        fields = ['id', 'account_id', 'function', 'activity', 'role', 'scope', 'type',
                   'tasks', 'documents_required', 'documents_number', 'documents_uploaded', 'units', 'color', 'progress', 'projection_id']
         extra_kwargs = {
             'id': {'read_only': True},

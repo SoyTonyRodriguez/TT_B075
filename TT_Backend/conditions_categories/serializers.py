@@ -28,8 +28,8 @@ class ActividadSimpleSerializer(serializers.Serializer):
     profesor_asistente = ActividadSimpleItemSerializer()
     profesor_asociado = ActividadSimpleItemSerializer()
     profesor_titular = ActividadSimpleItemSerializer()
-    profesor_asignatura = ActividadSimpleItemSerializer()
-    tecnico_docente_asignatura = ActividadSimpleItemSerializer()
+    profesor_de_asignatura = ActividadSimpleItemSerializer()
+    tecnico_docente_de_asignatura = ActividadSimpleItemSerializer()
 
 class CargaAcademicaSerializer(serializers.Serializer):
     tecnico_docente_auxiliar = NivelDocenteSerializer()
@@ -38,8 +38,8 @@ class CargaAcademicaSerializer(serializers.Serializer):
     profesor_asistente = NivelDocenteSerializer()
     profesor_asociado = NivelDocenteSerializer()
     profesor_titular = NivelDocenteSerializer()
-    profesor_asignatura = NivelDocenteSerializer()
-    tecnico_docente_asignatura = NivelDocenteSerializer()
+    profesor_de_asignatura = NivelDocenteSerializer()
+    tecnico_docente_de_asignatura = NivelDocenteSerializer()
 
 class CategorySerializer(serializers.ModelSerializer):
     carga_academica = CargaAcademicaSerializer()
