@@ -17,6 +17,7 @@ import UnidadesPromocion from './screens/UnidadesPromocion';
 import KanbanBoard from './screens/KanbanBoard';
 import FilesScreen from './screens/FilesScreen';
 import PDFViewer from './screens/PDFViewer';
+import ProjectionFirstTime from './screens/Projection_FirstTime';
 
 import { AuthProvider } from './components/AuthContext';
 
@@ -43,8 +44,7 @@ export default function App() {
           {/* Pantallas adicionales de la navegacion Proyección */}
           <Stack.Screen name="ProjectionCreationScreen" component={ProjectionCreationScreen} />
           <Stack.Screen name="UnidadesPromocion" component={UnidadesPromocion} />
-          
-          
+          <Stack.Screen name="ProjectionFirstTime" component={ProjectionFirstTime} />
 
           {/* Pantallas adicionales de la navegacion Perfil */}
           <Stack.Screen name="Settings" component={SettingsScreen} />
