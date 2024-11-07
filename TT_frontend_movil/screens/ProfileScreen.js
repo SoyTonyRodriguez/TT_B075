@@ -4,10 +4,31 @@ import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
 
 const ProfileScreen = () => {
 
   const navigation = useNavigation(); 
+
+  const [userName, setUserName] = useState('');
+
+  // Load account data from localStorage on component mount
+  useEffect(() => {
+    const loadAccountData = async () => {
+      try {
+        const storedAccountData =  await AsyncStorage.getItem('accountDetails');
+        if (storedAccountData) {
+          const { userName } = JSON.parse(storedAccountData);
+          setUserName(userName);
+        }
+      } catch (error) {
+        console.error("Error accessing or parsing account details from localStorage:", error);
+        // You can clear invalid data if necessary
+        localStorage.removeItem('accountDetails');
+      }
+    };
+    loadAccountData();
+  }, []);
 
   const handleLogout = () => {
     // Función para mostrar un diálogo de confirmación
@@ -50,7 +71,7 @@ const ProfileScreen = () => {
       {/* Encabezado del perfil */}
       <View style={tw`items-center mt-20 mb-5`}>
         <Ionicons name="person-circle-outline" size={100} color="#000" />
-        <Text style={tw`text-2xl font-bold mt-3`}>Usuario</Text>
+        <Text style={tw`text-2xl font-bold mt-3`}>{userName}</Text>
       </View>
 
       {/* Contenedor de botones en cuadrícula */}
