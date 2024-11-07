@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, ImageBackground, TouchableOpacity, Modal, ScrollView, Dimensions, Alert } from "react-native";
+import { View, Text, TextInput, StatusBar, ImageBackground, TouchableOpacity, Modal, ScrollView, Dimensions, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import { useForm, Controller } from "react-hook-form";
@@ -143,224 +143,231 @@ const RegisterScreen = (route) => {
   const inputStyle = (hasError) => tw`w-full p-4 border ${hasError ? 'border-red-500' : 'border-gray-700'} rounded-lg text-base bg-transparent text-black mb-4`;
 
   return (
-    <ImageBackground source={require('../assets/images/fondologin.jpg')} style={{ width: width, height: height + 30, flex: 1 }} resizeMode="cover">
-      {/* Show LoadingScreen with a dynamic message */}
-      {loading && <LoadingScreen message={loadingMessage} />}
+    <View style={tw`flex-1 bg-white`}>
+      <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
+        <ImageBackground source={require('../assets/images/fondologin.jpg')} style={{ width: width, height: height + 30, flex: 1 }} resizeMode="cover">
+          {/* Show LoadingScreen with a dynamic message */}
+          {loading && <LoadingScreen message={loadingMessage} />}
 
-      <View style={tw`px-5`}>
-          <View style={tw`pt-12`}>
-            <View style={tw`flex-row items-center`}>
-              <Text style={tw`text-2xl font-bold text-black`}>Regístrate</Text>
-              <Ionicons name="person-outline" size={30} color="black" style={tw`ml-2`} />
-            </View>
-            <Text style={tw`text-lg text-gray-500 mt-2`}>Introduce los datos solicitados</Text>
-            <View style={tw`h-0.5 bg-black mt-3 mb-5`} />
-          </View>
-      </View>
-
-      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View style={tw`px-5`}>
-
-          {/* Form inputs */}
-          <Controller
-            control={control}
-            name="name"
-            rules={{ required: 'El nombre es obligatorio.' }}
-            render={({ field: { onChange, value } }) => (
-              <>
-                <TextInput
-                  placeholder="Ingresa tu nombre completo"
-                  style={inputStyle(errors.name)}
-                  value={value}
-                  onChangeText={onChange}
-                />
-                {errors.name && renderErrorMessage(getErrorMessage('name'))}
-              </>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="email"
-            rules={{
-              required: 'El correo electrónico es obligatorio.',
-              pattern: {
-                value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                message: 'El formato del correo no es válido.',
-              }
-            }}
-            render={({ field: { onChange, value } }) => (
-              <>
-                <TextInput
-                  placeholder="Ingresa tu correo electrónico"
-                  style={inputStyle(errors.email)}
-                  keyboardType="email-address"
-                  value={value}
-                  onChangeText={onChange}
-                />
-                {errors.email && renderErrorMessage(getErrorMessage('email'))}
-              </>
-            )}
-          />
-
-          {/* Category selection */}
-          <TouchableOpacity onPress={() => setCategoryModalVisible(true)} style={inputStyle(errors.category)}>
-            <Controller
-              control={control}
-              name="category"
-              rules={{ required: 'Selecciona una categoría.' }}
-              render={({ field: { value } }) => (
-                <View style={tw`flex-row items-center justify-between`}>
-                  <Text style={tw`${value ? "text-black" : "text-gray-500"} flex-1`}>
-                    {value || "Selecciona tu categoría"}
-                  </Text>
-                  <Ionicons name="chevron-down" size={24} color="rgba(0, 0, 0, 0.8)" />
+          <View style={tw`flex-1 justify-center px-5`}>
+              <View style={tw`pt-12`}>
+                <View style={tw`flex-row items-center`}>
+                  <Text style={tw`text-2xl font-bold text-black`}>Regístrate</Text>
+                  <Ionicons name="person-outline" size={30} color="black" style={tw`ml-2`} />
                 </View>
-              )}
-            />
-          </TouchableOpacity>
-          {errors.category && renderErrorMessage(getErrorMessage('category'))}
-
-          {/* Password and Confirm Password Inputs */}
-          <Controller
-            control={control}
-            name="password"
-            rules={{ required: 'La contraseña es obligatoria.' }}
-            render={({ field: { onChange, value } }) => (
-              <View style={tw`relative w-full mb-4`}>
-                <TextInput
-                  placeholder="Contraseña"
-                  style={inputStyle(errors.password)}
-                  secureTextEntry={!passwordVisible}
-                  value={value}
-                  onChangeText={onChange}
-                />
-                <TouchableOpacity
-                  style={tw`absolute right-4 top-4`}
-                  onPress={() => setPasswordVisible(!passwordVisible)}
-                >
-                  <Ionicons
-                    name={passwordVisible ? "eye-off" : "eye"}
-                    size={24}
-                    color="rgba(0, 0, 0, 0.8)"
-                  />
-                </TouchableOpacity>
-                {errors.password && renderErrorMessage(getErrorMessage('password'))}
+                <Text style={tw`text-lg text-black mt-2`}>Introduce los datos solicitados</Text>
+                <View style={tw`h-0.5 bg-black mt-3 mb-5`} />
               </View>
-            )}
-          />
+          </View>
 
-          <Controller
-            control={control}
-            name="confirmar_password"
-            rules={{
-              required: 'Confirma tu contraseña.',
-              validate: (value) => value === control._formValues.password || 'Las contraseñas no coinciden.'
-            }}
-            render={({ field: { onChange, value } }) => (
-              <View style={tw`relative w-full mb-4`}>
-                <TextInput
-                  placeholder="Confirma tu contraseña"
-                  style={inputStyle(errors.confirmar_password)}
-                  secureTextEntry={!confirmPasswordVisible}
-                  value={value}
-                  onChangeText={onChange}
+          <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+            <View style={tw`px-5 mt-6`}>
+
+              {/* Form inputs */}
+              <Controller
+                control={control}
+                name="name"
+                rules={{ required: 'El nombre es obligatorio.' }}
+                render={({ field: { onChange, value } }) => (
+                  <>
+                    <TextInput
+                      placeholder="Ingresa tu nombre completo"
+                      style={inputStyle(errors.name)}
+                      placeholderTextColor="#555"
+                      value={value}
+                      onChangeText={onChange}
+                    />
+                    {errors.name && renderErrorMessage(getErrorMessage('name'))}
+                  </>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="email"
+                rules={{
+                  required: 'El correo electrónico es obligatorio.',
+                  pattern: {
+                    value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                    message: 'El formato del correo no es válido.',
+                  }
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <>
+                    <TextInput
+                      placeholder="Ingresa tu correo electrónico"
+                      style={inputStyle(errors.email)}
+                      placeholderTextColor="#555"
+                      keyboardType="email-address"
+                      value={value}
+                      onChangeText={onChange}
+                    />
+                    {errors.email && renderErrorMessage(getErrorMessage('email'))}
+                  </>
+                )}
+              />
+
+              {/* Category selection */}
+              <TouchableOpacity onPress={() => setCategoryModalVisible(true)} style={inputStyle(errors.category)}>
+                <Controller
+                  control={control}
+                  name="category"
+                  rules={{ required: 'Selecciona una categoría.' }}
+                  render={({ field: { value } }) => (
+                    <View style={tw`flex-row items-center justify-between`}>
+                      <Text style={tw`${value ? "text-black" : "text-gray-500"} flex-1`}>
+                        {value || "Selecciona tu categoría"}
+                      </Text>
+                      <Ionicons name="chevron-down" size={24} color="rgba(0, 0, 0, 0.8)" />
+                    </View>
+                  )}
                 />
+              </TouchableOpacity>
+              {errors.category && renderErrorMessage(getErrorMessage('category'))}
+
+              {/* Password and Confirm Password Inputs */}
+              <Controller
+                control={control}
+                name="password"
+                rules={{ required: 'La contraseña es obligatoria.' }}
+                render={({ field: { onChange, value } }) => (
+                  <View style={tw`relative w-full`}>
+                    <TextInput
+                      placeholder="Contraseña"
+                      style={inputStyle(errors.password)}
+                      placeholderTextColor="#555"
+                      secureTextEntry={!passwordVisible}
+                      value={value}
+                      onChangeText={onChange}
+                    />
+                    <TouchableOpacity
+                      style={tw`absolute right-4 top-4`}
+                      onPress={() => setPasswordVisible(!passwordVisible)}
+                    >
+                      <Ionicons
+                        name={passwordVisible ? "eye-off" : "eye"}
+                        size={24}
+                        color="rgba(0, 0, 0, 0.8)"
+                      />
+                    </TouchableOpacity>
+                    {errors.password && renderErrorMessage(getErrorMessage('password'))}
+                  </View>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="confirmar_password"
+                rules={{
+                  required: 'Confirma tu contraseña.',
+                  validate: (value) => value === control._formValues.password || 'Las contraseñas no coinciden.'
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <View style={tw`relative w-full mb-4`}>
+                    <TextInput
+                      placeholder="Confirma tu contraseña"
+                      style={inputStyle(errors.confirmar_password)}
+                      placeholderTextColor="#555"
+                      secureTextEntry={!confirmPasswordVisible}
+                      value={value}
+                      onChangeText={onChange}
+                    />
+                    <TouchableOpacity
+                      style={tw`absolute right-4 top-4`}
+                      onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                    >
+                      <Ionicons
+                        name={confirmPasswordVisible ? "eye-off" : "eye"}
+                        size={24}
+                        color="rgba(0, 0, 0, 0.8)"
+                      />
+                    </TouchableOpacity>
+                    {errors.confirmar_password && renderErrorMessage(getErrorMessage('confirmar_password'))}
+                  </View>
+                )}
+              />
+
+              <TouchableOpacity
+                style={tw`bg-transparent mt-5`}
+                onPress={() => setRequirementsModalVisible(true)}
+              >
+                <Text style={tw`text-blue-700 text-center text-base`}>
+                  Conoce los requisitos para participar en el proceso de promoción docente
+                </Text>
+              </TouchableOpacity>
+
+              {/* Submit Button */}
+              <TouchableOpacity
+                style={tw`bg-[#003366] p-4 rounded-lg items-center mt-8 mb-10`}
+                onPress={handleSubmit(handleRegister)}
+                disabled={loading} // Disable button during loading
+              >
+                <Text style={tw`text-white font-bold text-lg`}>Ingresar</Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAwareScrollView>
+
+          <Modal visible={requirementsModalVisible} transparent={true} animationType="fade">
+            <View style={tw`flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]`}>
+              <View style={tw`w-4/5 bg-white rounded-xl p-6 shadow-2xl`}>
+                <Text style={tw`text-xl font-bold text-center mb-4 text-black`}>
+                  Requisitos para la Promoción Docente
+                </Text>
+
+                <ScrollView style={{ maxHeight: height * 0.4 }}>
+                  <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                    • Poseer plaza en propiedad (en carácter de alta definitiva) de medio, tres cuartos, tiempo completo o con máximo 19 horas de asignatura.
+                  </Text>
+                  <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                    • Tener categoría académica dictaminada con carácter definitivo.
+                  </Text>
+                  <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                    • Haber laborado en la categoría actual cuando menos dos años.
+                  </Text>
+                  <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                    • Cumplir con la carga académica frente a grupo establecida en los artículos 49, 50 y 51 del RCITPAIPN en cada uno de los semestres considerados en el periodo de promoción o contar con excepción parcial o total, según sea el caso, desde la fecha de efectos del último Comunicado Oficial a diciembre de 2023.
+                  </Text>
+                  <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
+                    • La carga académica y/o sus excepciones, los méritos y actividades contemplados en el RPDIPN y Puntos de Acuerdo de la CCMPPD, corresponderán exclusivamente a los semestres declarados en la solicitud, de acuerdo con la opción de promoción seleccionada.
+                  </Text>
+                </ScrollView>
+
                 <TouchableOpacity
-                  style={tw`absolute right-4 top-4`}
-                  onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                  style={tw`mt-5 bg-blue-700 py-3 rounded-lg`}
+                  onPress={() => setRequirementsModalVisible(false)}
                 >
-                  <Ionicons
-                    name={confirmPasswordVisible ? "eye-off" : "eye"}
-                    size={24}
-                    color="rgba(0, 0, 0, 0.8)"
-                  />
+                  <Text style={tw`text-white text-center text-lg`}>Cerrar</Text>
                 </TouchableOpacity>
-                {errors.confirmar_password && renderErrorMessage(getErrorMessage('confirmar_password'))}
               </View>
-            )}
-          />
+            </View>
+          </Modal>
 
-          <TouchableOpacity
-            style={tw`bg-transparent mt-5`}
-            onPress={() => setRequirementsModalVisible(true)}
-          >
-            <Text style={tw`text-blue-700 text-center underline`}>
-              Conoce los requisitos para participar en el proceso de promoción docente
-            </Text>
-          </TouchableOpacity>
-
-          {/* Submit Button */}
-          <TouchableOpacity
-            style={tw`bg-[#003366] p-4 rounded-lg items-center mt-8 mb-10`}
-            onPress={handleSubmit(handleRegister)}
-            disabled={loading} // Disable button during loading
-          >
-            <Text style={tw`text-white font-bold text-lg`}>Ingresar</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAwareScrollView>
-
-      <Modal visible={requirementsModalVisible} transparent={true} animationType="fade">
-        <View style={tw`flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]`}>
-          <View style={tw`w-4/5 bg-white rounded-xl p-6 shadow-2xl`}>
-            <Text style={tw`text-xl font-bold text-center mb-4 text-black`}>
-              Requisitos para la Promoción Docente
-            </Text>
-
-            <ScrollView style={{ maxHeight: height * 0.4 }}>
-              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
-                • Poseer plaza en propiedad (en carácter de alta definitiva) de medio, tres cuartos, tiempo completo o con máximo 19 horas de asignatura.
-              </Text>
-              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
-                • Tener categoría académica dictaminada con carácter definitivo.
-              </Text>
-              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
-                • Haber laborado en la categoría actual cuando menos dos años.
-              </Text>
-              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
-                • Cumplir con la carga académica frente a grupo establecida en los artículos 49, 50 y 51 del RCITPAIPN en cada uno de los semestres considerados en el periodo de promoción o contar con excepción parcial o total, según sea el caso, desde la fecha de efectos del último Comunicado Oficial a diciembre de 2023.
-              </Text>
-              <Text style={tw`text-base text-justify text-gray-700 mb-2`}>
-                • La carga académica y/o sus excepciones, los méritos y actividades contemplados en el RPDIPN y Puntos de Acuerdo de la CCMPPD, corresponderán exclusivamente a los semestres declarados en la solicitud, de acuerdo con la opción de promoción seleccionada.
-              </Text>
-            </ScrollView>
-
-            <TouchableOpacity
-              style={tw`mt-5 bg-blue-700 py-3 rounded-lg`}
-              onPress={() => setRequirementsModalVisible(false)}
-            >
-              <Text style={tw`text-white text-center text-lg`}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Modal de categorías */}
-      <Modal visible={categoryModalVisible} transparent={true} animationType="slide">
-        <View style={tw`flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]`}>
-          <View style={tw`w-4/5 h-1/2 bg-white rounded-lg p-5`}>
-            <ScrollView>
-              {categories.map((item) => (
+          {/* Modal de categorías */}
+          <Modal visible={categoryModalVisible} transparent={true} animationType="slide">
+            <View style={tw`flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]`}>
+              <View style={tw`w-4/5 h-1/2 bg-white rounded-lg p-5`}>
+                <ScrollView>
+                  {categories.map((item) => (
+                    <TouchableOpacity
+                      key={item}
+                      style={tw`py-3 border-b border-gray-300`}
+                      onPress={() => selectCategory(item)}
+                    >
+                      <Text>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
                 <TouchableOpacity
-                  key={item}
-                  style={tw`py-3 border-b border-gray-300`}
-                  onPress={() => selectCategory(item)}
+                  style={tw`mt-5 items-center`}
+                  onPress={() => setCategoryModalVisible(false)}
                 >
-                  <Text>{item}</Text>
+                  <Text style={tw`text-blue-700 text-base`}>Cerrar</Text>
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
-            <TouchableOpacity
-              style={tw`mt-5 items-center`}
-              onPress={() => setCategoryModalVisible(false)}
-            >
-              <Text style={tw`text-blue-700 text-base`}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </ImageBackground>
+              </View>
+            </View>
+          </Modal>
+        </ImageBackground>
+      </View>
   );
 };
 

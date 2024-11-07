@@ -22,6 +22,7 @@ export const createProjection = async (projection) => {
     });
 }
 
+
 export const getProjection = async (account_id) => {
     const token = await AsyncStorage.getItem('token');
     const cleanToken = token.replace(/["]/g, '').trim();
