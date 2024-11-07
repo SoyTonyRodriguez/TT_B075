@@ -29,7 +29,8 @@ const ProjectionScreen = () => {
 
   const handleCreateProjection = () => {
     setLoading(true);
-    if (projection_id === '') {
+    console.log(projection_id)
+    if (projection_id === 'Sin proyección') {
       navigation.navigate('ProjectionFirstTime');
     } else {
       navigation.navigate('ProjectionCreationScreen');
