@@ -146,7 +146,7 @@ function UnidadesPromocion() {
       if (horas) {
         setHourLimits({ min: horas.min, max: horas.max }); // Establece los límites
       } else {
-        setHourLimits({ min: 0, max: 0 });
+        setHourLimits({ min: 1, max: 100 });
       }
     }
   };
@@ -601,6 +601,7 @@ function UnidadesPromocion() {
     e.preventDefault();
     
     if (!validateForm()) {
+      toast.error('Por favor, completa todos los campos obligatorios.');
       return; // Si el formulario no es válido, no se envía
     }  
     // Si `units` está vacío y hay un máximo, lo usamos como valor por defecto
@@ -722,6 +723,7 @@ function UnidadesPromocion() {
       tasks,
       projection_id,
       documents_uploaded,
+      type: "Unidades de Promoción",
     };
   
     try {
@@ -730,8 +732,7 @@ function UnidadesPromocion() {
   
       // Llama al método createProjection con los datos del formulario
       const response = await createProduct(projectionData);
-      console.log('Proyección creada:', response.data);
-      toast.success('Proyección creada con éxito');
+      toast.success('Producto creado exitosamente');
       navigate('/KanbanBoard');
     } catch (error) {
       const apiErrors = error.response?.data || {};
@@ -740,7 +741,7 @@ function UnidadesPromocion() {
         toast.error(errorMessage);
       } else {
         console.error('Error creando proyección:', error);
-        toast.error('Error creando la proyección. Verifica los datos.');
+        toast.error('Error al crear el producto');
       }
     } finally {
       setLoading(false);
