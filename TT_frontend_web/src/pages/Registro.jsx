@@ -153,7 +153,7 @@ const Registro = () => {
     </div>
 
     <p className="text-white text-lg text-center mb-6">
-        Conoce los <button onClick={() => setShowModal(true)} className="text-blue-400 hover:underline">requisitos para participar en el proceso de promoción docente</button>
+        <button onClick={() => setShowModal(true)} className="text-blue-400 hover:underline">Conoce los requisitos para participar en el proceso de promoción docente</button>
     </p>
 
     <div className="flex flex-col sm:flex-row justify-end space-x-0 sm:space-x-2 space-y-2 sm:space-y-0">

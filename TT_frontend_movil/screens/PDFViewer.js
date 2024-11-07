@@ -1,15 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, Text, Alert } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { View, Text } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import { Asset } from 'expo-asset';
 
 export default function PDFViewer({ route }) {
   const { pdfResource } = route.params;
+  const [pdfUri, setPdfUri] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Verifica si el PDF es una ruta local (require) o una URI
-  const pdfUri = pdfResource.uri || pdfResource;
+  useEffect(() => {
+    const loadPdf = async () => {
+      try {
+        // Carga el archivo usando Asset de Expo si es un recurso local
+        const asset = Asset.fromModule(pdfResource);
+        await asset.downloadAsync();
+        
+        // Copia el archivo a un directorio accesible y establece la URI
+        const localUri = `${FileSystem.documentDirectory}${asset.name}`;
+        await FileSystem.copyAsync({
+          from: asset.localUri,
+          to: localUri,
+        });
 
-  if (!pdfUri) {
-    return <Text>Error: No se pudo cargar el archivo PDF.</Text>;
+        setPdfUri(localUri);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error al cargar el PDF:', error);
+        Alert.alert('Error', 'No se pudo cargar el archivo PDF.');
+      }
+    };
+
+    loadPdf();
+  }, [pdfResource]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Cargando PDF...</Text>
+      </View>
+    );
   }
 
   return (
