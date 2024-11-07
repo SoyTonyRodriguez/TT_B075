@@ -29,8 +29,7 @@ class GetProductsView(ListAPIView):
 
     def get_queryset(self):
         account_id = self.kwargs['account_id']
-        # if self.request.method == 'GET':
-        #     post_save.disconnect(update_product_check, sender=Products)
+
         return Products.objects.filter(account_id=account_id)
 
 from django.db.models.signals import post_save, post_delete
