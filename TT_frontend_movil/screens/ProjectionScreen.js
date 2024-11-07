@@ -54,7 +54,7 @@ const ProjectionScreen = () => {
         {/* Opción Crear Proyección */}
         <TouchableOpacity 
           style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-10 h-40`}
-          onPress={() => navigation.navigate('ProjectionFirstTime')}
+          onPress={handleCreateProjection}
         >
           <View style={tw`w-25 h-25 justify-center items-center bg-blue-500 rounded-3xl mr-5`}>
             <Ionicons name="pencil-outline" size={50} color="#fff" />
