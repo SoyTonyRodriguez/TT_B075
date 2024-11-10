@@ -16,14 +16,13 @@ import ProjectScreen from './screens/ProjectScreen';
 import UnidadesPromocion from './screens/UnidadesPromocion';
 import KanbanBoard from './screens/KanbanBoard';
 import FilesScreen from './screens/FilesScreen';
-
-import { AuthProvider } from './components/AuthContext';
+import PDFViewer from './screens/PDFViewer';
+import ProjectionFirstTime from './screens/Projection_FirstTime';
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <AuthProvider>
     <SafeAreaView className="flex-auto">
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
@@ -42,19 +41,17 @@ export default function App() {
           {/* Pantallas adicionales de la navegacion Proyección */}
           <Stack.Screen name="ProjectionCreationScreen" component={ProjectionCreationScreen} />
           <Stack.Screen name="UnidadesPromocion" component={UnidadesPromocion} />
-          
-          
+          <Stack.Screen name="ProjectionFirstTime" component={ProjectionFirstTime} />
 
           {/* Pantallas adicionales de la navegacion Perfil */}
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="OfficialLinksScreen" component={OfficialLinksScreen} />
           <Stack.Screen name="MoreInfo" component={MoreInfoScreen} />
           <Stack.Screen name="ProjectScreen" component={ProjectScreen} />
-
+          <Stack.Screen name="PDFViewer" component={PDFViewer} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
-    </AuthProvider>
   );
 }
 

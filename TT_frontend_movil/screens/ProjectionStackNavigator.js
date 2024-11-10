@@ -6,6 +6,7 @@ import UnidadesPromocion from './UnidadesPromocion'
 import GradoAcademico from './GradoAcademico';
 import GuideScreen from './GuideScreen';
 import KanbanBoard from './KanbanBoard';
+import ProjectionFirstTime from './Projection_FirstTime';
 
 const ProjectionStack = createStackNavigator();
 
@@ -42,6 +43,11 @@ const ProjectionStackNavigator = () => {
       <ProjectionStack.Screen 
         name="KanbanBoard" 
         component={KanbanBoard} 
+      />
+
+      <ProjectionStack.Screen 
+        name="ProjectionFirstTime" 
+        component={ProjectionFirstTime} 
       />
 
     </ProjectionStack.Navigator>

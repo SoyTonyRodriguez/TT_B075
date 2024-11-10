@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks.api";
@@ -14,38 +14,24 @@ import { AiOutlinePaperClip } from 'react-icons/ai'; // Importar el icono de cli
 import { Link } from 'react-router-dom';
 
 function KanbanBoard() {
-    // Get Tasks from the API
-    const [tasks, setTasks] = useState([]);
-
-    // Get user ID from the token
-    const [userId, setUserId] = useState(null);
-
-    // Loading state (Pantalla de carga XD)
-    const [loading, setLoading] = useState(true);
+    // -_-_-_-_-_-_-_-_-_-  States  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    const [tasks, setTasks] = useState([]);         // Get Tasks from the API
+    const [userId, setUserId] = useState(null);     // Get user ID from the token
+    const [loading, setLoading] = useState(true);   // Loading state (Pantalla de carga XD)
     const [isTaskLoading, setIsTaskLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
-
-    // Estado para guardar las proyecciones traídas de la API
-    const [projections, setProjections] = useState([]);
-    
-    // New task state
-    const [newTask, setNewTask] = useState({
+    const [projections, setProjections] = useState([]);  // Estado para guardar las proyecciones traídas de la API
+    const [newTask, setNewTask] = useState({             // Estado para guardar los datos de la nueva tarea
         title: '',
         description: '',
-        priority: 'Media',
+        priority: '',
         status: 'todo',
     });
-
-    // Error state
-    const [error, setError] = useState(null);
-
-    // Modal state, to show or hide the task creation form
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [error, setError] = useState(null);   // Error state
+    const [isModalOpen, setIsModalOpen] = useState(false);  // Modal state, to show or hide the task creation form
     const [taskToEdit, setTaskToEdit] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-    const [showDocuments, setShowDocuments] = useState(false);
     const [expandedProjectionId, setExpandedProjectionId] = useState(null);  // Estado para saber qué proyección está expandida
+    const [cache, setCache] = useState({ tasks: null, projections: null });
 
     // Decode JWT once at the start and get the user ID
     useEffect(() => {
@@ -62,45 +48,39 @@ function KanbanBoard() {
         }
     }, []);
 
-    // Fetch tasks only when userId is set
-    useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                const response = await getTasks(userId);
-                setTasks(response.data);
-            } catch (error) {
-                console.error('Error fetching tasks:', error);
-                setError('Error fetching tasks.');
+    // Fetch data with caching and parallel execution
+    const fetchData = useCallback(async () => {
+        setLoading(true);
+        try {
+            if (!cache.tasks || !cache.projections) {
+                const [tasksResponse, projectionsResponse] = await Promise.all([
+                    getTasks(userId),
+                    getProduct(userId)
+                ]);
+
+                const fetchedTasks = tasksResponse.data;
+                const fetchedProjections = projectionsResponse.data;
+
+                setTasks(fetchedTasks);
+                setProjections(fetchedProjections);
+                setCache({ tasks: fetchedTasks, projections: fetchedProjections });
+            } else {
+                setTasks(cache.tasks);
+                setProjections(cache.projections);
             }
-        };
-    
-        const fetchProjections = async () => {
-            try {
-                const response = await getProduct(userId);
-                console.log("Respuesta de la API con proyecciones:", response.data);  // Verifica si `progress` está presente
-                setProjections(response.data);
-            } catch (error) {
-                console.error('Error fetching projections:', error);
-                setError('Error fetching projections.');
-            }
-        };
-    
-        const fetchData = async () => {
-            setLoading(true); // Inicia la carga
-            try {
-                // Ejecuta ambas funciones en paralelo y espera a que ambas terminen
-                await Promise.all([fetchTasks(), fetchProjections()]);
-            } catch (error) {
-                console.error('Error in one or both requests:', error);
-            } finally {
-                setLoading(false); // Finaliza la carga cuando ambas han terminado
-            }
-        };
-    
-        if (userId) {
-            fetchData(); // Llama a la función que maneja ambas solicitudes
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setError('Error fetching data.');
+        } finally {
+            setLoading(false);
         }
-    }, [userId]);
+    }, [userId, cache.tasks, cache.projections]);
+
+    useEffect(() => {
+        if (userId) {
+            fetchData();
+        }
+    }, [userId, fetchData]);
 
     // Handle task form changes
     const handleTaskChange = (e) => {
@@ -110,60 +90,39 @@ function KanbanBoard() {
         });
     };
 
-    // Create a new task and add it to the tasks state
-    const handleCreateTask = async () => {
-        try {
-            setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
-
-            // Verificar si todos los campos obligatorios están llenos
-            if (!newTask.title || !newTask.description || !newTask.projection, !newTask.projection_id) {
-                toast.error('Todos los campos son obligatorios.');
-                return;
-            }
-    
-            // Llamar a la API para crear la tarea
-            const response = await createTask(newTask);
-    
-            // Verificar que haya datos en la respuesta (si la tarea fue creada)
-            if (!response || !response.data) {
-                throw new Error('Error creando la tarea');
-            }
-    
-            // Añadir la nueva tarea al estado local
-            setTasks([...tasks, response.data]);
-            
-            const createdTask = response.data;
-            // Si la tarea creada tiene un `projection_id`, actualizar el progreso de la proyección
-            if (createdTask.projection_id) {
-                await updateProjectionProgress(createdTask.projection_id, [...tasks, createdTask]);
-            }
-    
-            // Limpiar el formulario y cerrar el modal
-            setNewTask({
-                title: '',
-                description: '',
-                priority: 'Media',
-                status: 'todo',
-                projection_id: '' // Limpiar el campo de proyección
-            });
-    
-            setIsModalOpen(false);
-            toast.success('Tarea creada con éxito');  // Mostrar toast de éxito
-        } catch (error) {
-            const apiErrors = error.response.data || {};
-            if (error.response.status === 400) {
-                const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
-                toast.error(errorMessage);
-            }else {
-                console.error('Error creando tarea:', error);
-    
-                // Mostrar un toast si ocurre un error
-                toast.error('Error creando la tarea. Verifica los datos.');
-            }
-        } finally { 
-            setIsTaskLoading(false);  // Detener la pantalla de carga para tareas
+    // Create a new task
+    const handleCreateTask = useCallback(async () => {
+        if (!newTask.title || !newTask.description || !newTask.projection_id) {
+            toast.error('Todos los campos son obligatorios.');
+            return;
         }
-    };
+
+        try {
+            setIsTaskLoading(true);
+            const response = await createTask(newTask);
+
+            if (response && response.data) {
+                const createdTask = response.data;
+                const updatedTasks = [...tasks, createdTask];
+
+                setTasks(updatedTasks);
+                setCache({ ...cache, tasks: updatedTasks });
+
+                if (createdTask.projection_id) {
+                    await updateProjectionProgress(createdTask.projection_id, updatedTasks);
+                }
+
+                setNewTask({ title: '', description: '', priority: 'Media', status: 'todo', projection_id: '' });
+                setIsModalOpen(false);
+                toast.success('Tarea creada con éxito');
+            }
+        } catch (error) {
+            console.error('Error creando tarea:', error);
+            toast.error('Error creando la tarea. Verifica los datos.');
+        } finally {
+            setIsTaskLoading(false);
+        }
+    }, [newTask, tasks, cache]);
 
     // Eliminar una tarea del estado local (no de la API)
     const handleDeleteTask = async (id) => {
@@ -314,6 +273,10 @@ function KanbanBoard() {
     // Update task status when dropped in a different column
     const handleDrop = async (id, newStatus) => {
         const taskBeforeUpdate = tasks.find(task => task.id === id);
+        
+        // Si el estado no ha cambiado, no hacemos nada.
+        if (taskBeforeUpdate.status === newStatus) return;
+
     
         // Actualizamos las tareas en el estado temporalmente
         const updatedTasks = tasks.map(task =>
@@ -362,16 +325,28 @@ function KanbanBoard() {
         }
     
         try {
-            await updateTask(id, { status: newStatus });
-            toast.success('Tarea actualizada con éxito');
+            // Actualizamos localmente de forma optimista para mejorar la experiencia del usuario.
+            const updatedTasks = tasks.map(task =>
+                task.id === id ? { ...task, status: newStatus } : task
+            );
+            setTasks(updatedTasks);
     
-            if (updatedTask.projection_id) {
-                await updateProjectionProgress(updatedTask.projection_id, updatedTasks);
+            // Llamada a la API para actualizar la tarea.
+            await updateTask(id, { status: newStatus });
+    
+            // Si la tarea pertenece a una proyección, recalculamos el progreso.
+            if (taskBeforeUpdate.projection_id) {
+                await updateProjectionProgress(taskBeforeUpdate.projection_id, updatedTasks);
             }
+    
+            toast.success('Tarea actualizada con éxito');
         } catch (error) {
+            // Si ocurre un error, revertimos el cambio.
             console.error('Error updating task status:', error);
-            setError('Error actualizando el estado de la tarea.');
-            setTasks(tasks); // Revertimos el estado si hay error
+            toast.error('Error actualizando la tarea.');
+    
+            // Revertir el estado local si falla la API.
+            setTasks(tasks);
         }
     };
     
@@ -401,13 +376,12 @@ function KanbanBoard() {
         
                 // Llamar a la API para eliminar la tarea
                 onDelete(task.id);  // Eliminar la tarea del estado local
-                await deleteTask(task.id);
-                toast.success('Tarea eliminada con éxito');
+                // await deleteTask(task.id);
         
                 // Si la tarea pertenece a una proyección, recalcular el progreso
-                if (taskToDelete && taskToDelete.projection_id) {
-                    await updateProjectionProgress(taskToDelete.projection_id, updatedTasks);
-                }
+                // if (taskToDelete && taskToDelete.projection_id) {
+                //     await updateProjectionProgress(taskToDelete.projection_id, updatedTasks);
+                // }
         
             } catch (error) {
                 console.error('Error deleting task:', error);
@@ -483,11 +457,16 @@ function KanbanBoard() {
         setTaskToEdit(null);
         setIsEditModalOpen(false);
     };
-    
+
+    // Mapeo de los estados internos a sus equivalentes en español
+    const STATUS_LABELS = {
+        'todo': 'Por Hacer',
+        'in-progress': 'En Progreso',
+        'done': 'Hecho',
+    };
 
     // Column component that holds the tasks for each status
     const Column = ({ status, children }) => {
-        // Hook para arrastrar y soltar
         const [{ isOver }, drop] = useDrop({
             accept: 'task',
             drop: (draggedItem) => {
@@ -499,16 +478,19 @@ function KanbanBoard() {
                 isOver: monitor.isOver(),
             }),
         });
-    
+
         return (
             <div
                 ref={drop}
                 className={`w-1/3 p-4 rounded-lg shadow-md transition-all duration-300 transform ${
                     isOver ? 'bg-blue-300 scale-105' : 'bg-gray-100 scale-100'
                 }`}
-                style={{ height: '650px', overflowY: 'auto' }} // Establece un tamaño fijo y scroll
+                style={{ height: '650px', overflowY: 'auto' }} // Tamaño fijo con scroll
             >
-                <h2 className="text-2xl font-bold text-center mb-4">{status.toUpperCase()}</h2>
+                {/* Usamos el mapeo para mostrar el nombre en español */}
+                <h2 className="text-2xl font-bold text-center mb-4">
+                    {STATUS_LABELS[status].toUpperCase()}
+                </h2>
                 <div>{children}</div>
             </div>
         );
@@ -545,17 +527,17 @@ function KanbanBoard() {
                     
                     {/* Columna de Tareas */}
                     <div className="flex-1 flex gap-x-6">
-                    <Column status="por hacer">
+                    <Column status="todo">
                         {tasks.filter(task => task.status === 'todo').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}
                     </Column>
-                    <Column status="en progreso">
+                    <Column status="in-progress">
                         {tasks.filter(task => task.status === 'in-progress').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}
                     </Column>
-                    <Column status="terminado">
+                    <Column status="done">
                         {tasks.filter(task => task.status === 'done').map(task => (
                         <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
                         ))}
@@ -652,124 +634,175 @@ function KanbanBoard() {
                 </DndProvider>
 
                 {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-8 rounded-lg shadow-xl w-96">
-                    <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">Crear Nueva Tarea</h3>
-                            
-                    {/* Campo del título */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Título de la tarea</label>
-                        <input
-                        type="text"
-                        name="title"
-                        value={newTask.title}
-                        onChange={handleTaskChange}
-                        placeholder="Escribe el título"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                            
-                    {/* Campo de la descripción */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
-                        <textarea
-                        name="description"
-                        value={newTask.description}
-                        onChange={handleTaskChange}
-                        placeholder="Escribe la descripción"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                        />
-                    </div>
-                            
-                    {/* Selector de prioridad */}
-                    <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
-                        <select
-                        name="priority"
-                        value={newTask.priority}
-                        onChange={handleTaskChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                        >
-                        <option value="Alta">Alta</option>
-                        <option value="Media">Media</option>
-                        <option value="Baja">Baja</option>
-                        </select>
-                    </div>
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white p-8 rounded-lg shadow-xl w-96">
+                        <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                            Crear Nueva Tarea
+                        </h3>
 
-                    {/* Selector de proyección */}
-                    <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Proyección</label>
-                        <select
-                        name="projection_id"
-                        value={newTask.projection_id}
-                        onChange={(e) => setNewTask({ ...newTask, projection_id: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                        >
-                        <option value="">Selecciona una proyección</option>
-                        {projections.map(projection => (
-                            <option key={projection.id} value={projection.id}>
-                            {projection.activity}
+                        {/* Campo del título */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Título de la tarea
+                            </label>
+                            <input
+                            type="text"
+                            name="title"
+                            value={newTask.title}
+                            onChange={handleTaskChange}
+                            placeholder="Escribe el título"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+
+                        {/* Campo de la descripción */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Descripción
+                            </label>
+                            <textarea
+                            name="description"
+                            value={newTask.description}
+                            onChange={handleTaskChange}
+                            placeholder="Escribe la descripción"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                            />
+                        </div>
+
+                        {/* Selector de prioridad */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Prioridad
+                            </label>
+                            <select
+                            name="priority"
+                            value={newTask.priority || ''}
+                            onChange={(e) => {
+                                handleTaskChange(e);
+                                handlePriorityChange(e.target.value); // Lógica de cambio de color
+                            }}
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${
+                                newTask.priority === 'Alta'
+                                ? 'bg-red-500 text-white'
+                                : newTask.priority === 'Media'
+                                ? 'bg-yellow-500 text-white'
+                                : newTask.priority === 'Baja'
+                                ? 'bg-blue-500 text-white'
+                                : ''
+                            }`}
+                            >
+                            <option value="" disabled>
+                                Seleccione una prioridad
                             </option>
-                        ))}
-                        </select>
+                            <option value="Alta">Alta</option>
+                            <option value="Media">Media</option>
+                            <option value="Baja">Baja</option>
+                            </select>
+                        </div>
+
+                        {/* Selector de proyección */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Proyección
+                            </label>
+                            <select
+                            name="projection_id"
+                            value={newTask.projection_id || ''}
+                            onChange={(e) =>
+                                setNewTask({ ...newTask, projection_id: e.target.value })
+                            }
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                            >
+                            <option value="">Selecciona una proyección</option>
+                            {projections.map((projection) => (
+                                <option key={projection.id} value={projection.id}>
+                                {projection.activity}
+                                </option>
+                            ))}
+                            </select>
+                        </div>
+
+                        {/* Botones para cancelar o crear */}
+                        <div className="flex justify-end space-x-4">
+                            <button
+                            onClick={closeModal}
+                            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+                            >
+                            Cancelar
+                            </button>
+                            <button
+                            onClick={handleCreateTask}
+                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+                            >
+                            Crear
+                            </button>
+                        </div>
+                        </div>
                     </div>
-                            
-                    {/* Botones para cancelar o crear */}
-                    <div className="flex justify-end space-x-4">
-                        <button
-                        onClick={closeModal}
-                        className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
-                        >
-                        Cancelar
-                        </button>
-                        <button
-                        onClick={handleCreateTask}
-                        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
-                        >
-                        Crear
-                        </button>
-                    </div>
-                    </div>
-                </div>
-                )}
+                    )}
+
 
                 {isEditModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-8 rounded-lg shadow-xl w-96">
-                    <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">Editar Tarea</h3>
-                    
+                    <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                        Editar Tarea
+                    </h3>
+
                     {/* Campo de título */}
                     <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Título de la tarea</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Título de la tarea
+                        </label>
                         <input
                         type="text"
                         name="title"
                         value={taskToEdit?.title || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, title: e.target.value })}
+                        onChange={(e) =>
+                            setTaskToEdit({ ...taskToEdit, title: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
-                    
+
                     {/* Campo de descripción */}
                     <div className="mb-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Descripción
+                        </label>
                         <textarea
                         name="description"
                         value={taskToEdit?.description || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, description: e.target.value })}
+                        onChange={(e) =>
+                            setTaskToEdit({ ...taskToEdit, description: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
 
                     {/* Selector de prioridad */}
                     <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Prioridad
+                        </label>
                         <select
                         name="priority"
                         value={taskToEdit?.priority || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, priority: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                        onChange={(e) => {
+                            setTaskToEdit({ ...taskToEdit, priority: e.target.value });
+                            handlePriorityChange(e.target.value); // Lógica de cambio de color
+                        }}
+                        className={`w-full px-4 py-2 border rounded-lg ${
+                            taskToEdit?.priority === 'Alta'
+                            ? 'bg-red-500 text-white'
+                            : taskToEdit?.priority === 'Media'
+                            ? 'bg-yellow-500 text-white'
+                            : taskToEdit?.priority === 'Baja'
+                            ? 'bg-blue-500 text-white'
+                            : ''
+                        }`}
                         >
+                        <option value="">Selecciona una prioridad</option>
                         <option value="Alta">Alta</option>
                         <option value="Media">Media</option>
                         <option value="Baja">Baja</option>
@@ -778,25 +811,41 @@ function KanbanBoard() {
 
                     {/* Selector de proyección */}
                     <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Proyección</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Proyección
+                        </label>
                         <select
                         name="projection_id"
                         value={taskToEdit?.projection_id || ''}
-                        onChange={(e) => setTaskToEdit({ ...taskToEdit, projection_id: e.target.value })}
+                        onChange={(e) =>
+                            setTaskToEdit({ ...taskToEdit, projection_id: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                         >
-                        <option value="" disabled>Selecciona una proyección</option>
-                        {projections.map(projection => (
+                        <option value="" disabled>
+                            Selecciona una proyección
+                        </option>
+                        {projections.map((projection) => (
                             <option key={projection.id} value={projection.id}>
                             {projection.activity}
                             </option>
                         ))}
                         </select>
                     </div>
-                    
+
                     <div className="flex justify-end space-x-4">
-                        <button onClick={closeEditModal} className="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</button>
-                        <button onClick={handleUpdateTask} className="bg-green-500 text-white px-4 py-2 rounded-lg">Actualizar</button>
+                        <button
+                        onClick={closeEditModal}
+                        className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                        >
+                        Cancelar
+                        </button>
+                        <button
+                        onClick={handleUpdateTask}
+                        className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                        >
+                        Actualizar
+                        </button>
                     </div>
                     </div>
                 </div>

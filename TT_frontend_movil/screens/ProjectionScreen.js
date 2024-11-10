@@ -1,11 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';  
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import tw from 'twrnc'; 
+import { createProjection } from '../api/projections.api';
 
 const ProjectionScreen = () => {
   const navigation = useNavigation();
+  const [projection_id, setProjectionId] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchStoredAccountData = async () => {
+      try {
+        const storedAccountData = await AsyncStorage.getItem('accountDetails');
+        if (storedAccountData) {
+          const { projection_id } = JSON.parse(storedAccountData);
+          setProjectionId(projection_id);
+        }
+      } catch (error) {
+        console.error('Error fetching account details:', error);
+      }
+    };
+
+    fetchStoredAccountData();
+  }, []);
+
+  const handleCreateProjection = () => {
+    setLoading(true);
+    console.log(projection_id)
+    if (projection_id === 'Sin proyección') {
+      navigation.navigate('ProjectionFirstTime');
+    } else {
+      navigation.navigate('ProjectionCreationScreen');
+    }
+    setLoading(false);
+  };
 
   return (
     <ImageBackground 
@@ -24,7 +55,7 @@ const ProjectionScreen = () => {
         {/* Opción Crear Proyección */}
         <TouchableOpacity 
           style={tw`flex-row items-center bg-[rgba(0,0,0,0.3)] rounded-3xl px-10 h-40`}
-          onPress={() => navigation.navigate('ProjectionCreationScreen')}
+          onPress={handleCreateProjection}
         >
           <View style={tw`w-25 h-25 justify-center items-center bg-blue-500 rounded-3xl mr-5`}>
             <Ionicons name="pencil-outline" size={50} color="#fff" />

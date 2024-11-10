@@ -43,6 +43,7 @@ class Products(models.Model):
     documents_number = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    type = models.CharField(max_length=255, blank=True, null=True)
     units_str = models.CharField(max_length=255, blank=True, null=True)
     units = models.FloatField(null=True, blank=True, default=0) # Unidades de la proyección
     priority = models.CharField(max_length=255, blank=True, null=True)

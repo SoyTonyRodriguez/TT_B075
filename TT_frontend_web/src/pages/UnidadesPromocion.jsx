@@ -146,7 +146,7 @@ function UnidadesPromocion() {
       if (horas) {
         setHourLimits({ min: horas.min, max: horas.max }); // Establece los límites
       } else {
-        setHourLimits({ min: 0, max: 0 });
+        setHourLimits({ min: 1, max: 100 });
       }
     }
   };
@@ -237,7 +237,6 @@ function UnidadesPromocion() {
     investigacion: [ // TODO BIEN
       { actividad: "Proyectos de investigación con financiamiento interno", documento: "Constancia emitida por la SIP.", up: ['5.00 U.P. con el 20% de avance inicial como director.', '3.00 U.P. con el 20% de avance inicial como participante.', '25.00 U.P. por proyecto terminado como director.', '15.00 U.P. por proyecto terminado como participante.', 'Máximo 2 proyectos como director y 3 proyectos como participante.'], rol: "Director o Participante", alcance: "Nacional" }, // OK //'Máximo 2 proyectos como director y 3 proyectos como participante por periodo de promoción.'
       { actividad: "Proyectos vinculados con financiamiento externo", documento: "Contrato o convenio\n Carta de aceptación del informe final o carta de finiquito\n Informe técnico.", up: ['25.00 U.P. como director por proyecto terminado.', '15.00 U.P. como participante por proyecto terminado.'], rol: "Director o Participante", alcance: "Nacional" }, //OK
-
       { actividad: "Publicación de artículos científicos y técnicos", documento: "Constancia de validación emitida por la SIP.", up:['3.00 U.P. por artículo de circulación institucional.', '5.00 U.P. por artículo de circulación nacional.', '10.00 U.P. por artículo de circulación nacional con jurado.', '20.00 U.P. por artículo de circulación internacional.', 'Máximo 5 publicaciones por periodo de promoción.'], rol: "Autor", alcance: "Nacional o Internacional"  },//OK  //'Máximo 5 publicaciones por periodo de promoción.'
       { actividad: "Estancias de Investigación", documento: "Oficio de aceptación para realizar la estancia\n Dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica\n Carta de terminación expedida por la institución donde se realizó la estancia.", up: "15.00 U.P. por año" }, //OK
       { actividad: "Desarrollo de patentes", documento: "Solicitud de registro\n Resultado del examen de forma\n Título de la patente.", up: ['40.00 para solicitud de registro de patentes nacionales del IPN.', '50.00 para aprobación del examen nacional de forma.', '60.00 para obtención de patentes nacionales del IPN con registro en el IMPI ', '80.00 para obtención de patentes internacionales del IPN '],  rol: "Solicitante o ", alcance: "Nacional o Internacional" } //OK
@@ -261,7 +260,7 @@ function UnidadesPromocion() {
       { actividad: "Evaluación de prácticas escolares", documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", up: ['3.00 U.P. por grupo atendido.', 'Máximo: 6.00 U.P. por periodo de promoción.'] },
       { actividad: "Evaluación de informes de los prestadores de servicio social", documento: "Constancia emitida por el Departamento de Extensión y Apoyos Educativos con el visto bueno del Titular de la unidad académica.", up: ['1.00 U.P. por grupo atendido.', 'Máximo: 2.00 U.P. por periodo de promoción.'] },
       { actividad: "Evaluación de certámenes académicos", documento: "Constancia de participación emitida por la instancia correspondiente.", up: ['5.00 U.P. por evento evaluado.', 'Máximo: 15.00 U.P. por periodo de promoción.'] },
-      { actividad: "Servicio externo por obra puntual, sin compensación económica", documento: "Solicitud del servicio externo, aceptación por el centro de trabajo y constancia de participación.", up: '2.00 por cada 80 horas de servicio externo' },
+      { actividad: "Servicio externo por obra puntual, sin compensación económica", documento: "Solicitud del servicio externo, aceptación por el centro de trabajo y constancia de participación.", up: '2.00 U.P. por cada 80 horas de servicio externo' },
       { actividad: "Ponente en conferencias, videoconferencias y expositor de carteles", documento: "Constancia de participación como conferencista o expositor de carteles.", up: ['Nacional 3.00 por cartel o por conferencia.', 'Nacional 4.00 por videoconferencia.', 'Nacional 6.00 por conferencia magistral.', 'Internacional 6.00 por cartel o por conferencia.', 'Internacional 7.00 por videoconferencia.', 'Internacional 8.00 por conferencia magistral.', 'Máximo: 24.00 U.P. por periodo de promoción.'], rol: "Expositor", alcance: "Nacional o Internacional"}, //OK
       { actividad: "Expositor y asistente en congresos, simposios, reuniones, mesas redondas, coloquios, encuentros, paneles y foros", documento: "Constancia de participación emitida por la instancia correspondiente.", up: ['2.00 U.P. por asistente en evento nacional.', '4.00 U.P. por expositor en evento nacional.', '3.00 U.P. por asistente en evento internacional.', '7.00 U.P. por expositor en evento internacional.', 'Máximo 3 eventos por periodo de promoción.'], rol: "Expositor o Asistente", alcance: "Nacional o Internacional"}, //AQUI TODAVIA NO
       { actividad: "Comisiones de evaluación", documento: "Oficio de designación o constancia emitida por la DEMS, DES o SIP.", up: ['5.00 U.P. como coordinador.', '3.00 U.P. como analista'], rol: "Coordinador o Analista"},
@@ -481,7 +480,7 @@ function UnidadesPromocion() {
   };
   
   const handleScopeChange = (e) => {
-    const selectedScope = e.target.value;
+    const selectedScope = e.target.value || '';
     setScope(selectedScope);
     filterUPByRoleAndScope(role, selectedScope);
   
@@ -495,7 +494,7 @@ function UnidadesPromocion() {
   
       // Filtro preciso de las U.P. según el alcance seleccionado
       const filteredUPs = upsArray.filter((up) => {
-        const lowerUp = up.toLowerCase();
+        const lowerUp = up?.toLowerCase() || ''; 
         const lowerScope = selectedScope.toLowerCase();
   
         // Si el alcance es "nacional", evitamos las U.P. que contengan "internacional"
@@ -602,6 +601,7 @@ function UnidadesPromocion() {
     e.preventDefault();
     
     if (!validateForm()) {
+      toast.error('Por favor, completa todos los campos obligatorios.');
       return; // Si el formulario no es válido, no se envía
     }  
     // Si `units` está vacío y hay un máximo, lo usamos como valor por defecto
@@ -646,42 +646,66 @@ function UnidadesPromocion() {
 
      // verifica si el objeto checkProductData tiene datos
     if (Object.keys(checkProductData).length > 0) {
+      console.log( checkProductData?.[functionField]?.[activityToSend])
 
-      // Verificar si la actividad está en el objeto checkProductData
-      if (checkProductData.activities[activityToSend]) {
-        const currentActivityData = checkProductData.activities[activityToSend];
-        const accumulatedUP = currentActivityData.up; // UP acumuladas para la actividad seleccionada
-        const accumulatedLength = currentActivityData.length; // Número de veces registrada
-        
-        const max_UP_Conditions = max_conditions.configuracion[activityToSend]?.max_up || 0;
-        const max_Length_Conditions = max_conditions.configuracion[activityToSend]?.max_length || 0;
+      // Verificar si tiene datos para la función seleccionada
+      if (checkProductData?.[functionField]) {
+        console.log("Estoy aqui")
+        // Calcular el total de U.P. de la función
+        const total_UP_check_product = checkProductData?.[functionField].total;
+        console.log(total_UP_check_product)
 
-        const sum_UP = accumulatedUP + Number(calculatedUnits || result);
-        const sum_Length = accumulatedLength + 1;
-    
-        console.log('max_UP_Conditions:', max_UP_Conditions);
-        // console.log('sum_UP:', sum_UP);
-        // console.log(sum_UP > max_UP_Conditions);
-        console.log('max_Length_Conditions:', max_Length_Conditions);
-        if (sum_UP > max_UP_Conditions) {
-            toast.error(`Agregar esta activdad superará el máximo permitido (${max_UP_Conditions} U.P) de acuerdo al reglamento de promocion docente.`);
-            return;
-        }
-        
-        if (sum_Length > max_Length_Conditions) {
-          toast.error(`El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a al reglamento de promocion docente.`);
+        // Calcular el total de U.P. con la actividad actual
+        const sum_total_funcition = total_UP_check_product + Number(calculatedUnits || result);
+
+        console.log('sum_total_funcition:', sum_total_funcition);
+        console.log('max_UP_allowed:', max_UP_allowed);
+        console.log("total_UP_check_product:", total_UP_check_product);
+
+        // Verificar si supera el límite máximo de U.P. de acuerdo a la categoría
+        if (sum_total_funcition > max_UP_allowed) {
+          toast.error(`La cantidad de U.P. con está actividad será (${sum_total_funcition}), lo que supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`);
           return;
         }
 
-        if (sum_UP > max_UP_allowed) {
-          toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`);
-          return;
+        // Verificar si tiene datos para la actividad seleccionada
+        if (checkProductData?.[functionField]?.[activityToSend]) {
+
+          const currentActivityData = checkProductData?.[functionField]?.[activityToSend];
+          const accumulatedUP = currentActivityData.up; // UP acumuladas para la actividad seleccionada
+          const accumulatedLength = currentActivityData.length; // Número de veces registrada
+          
+            const max_UP_Conditions = max_conditions.configuracion[activityToSend]?.max_up || 100;
+            const max_Length_Conditions = max_conditions.configuracion[activityToSend]?.max_length || 100;
+
+            const sum_UP = accumulatedUP + Number(calculatedUnits || result);
+            const sum_Length = accumulatedLength + 1;
+        
+            //console.log('max_UP_Conditions:', max_UP_Conditions);
+            // console.log('sum_UP:', sum_UP);
+            // console.log(sum_UP > max_UP_Conditions);
+            console.log('max_Length_Conditions:', max_Length_Conditions);
+            if (sum_UP > max_UP_Conditions) {
+                toast.error(`Agregar esta activdad superará el máximo permitido (${max_UP_Conditions} U.P) de acuerdo al reglamento de promocion docente.`);
+                return;
+            }
+            
+            if (sum_Length > max_Length_Conditions) {
+              toast.error(`El número de veces registradas (${sum_Length}) supera el límite máximo permitido (${max_Length_Conditions}) de acuerdo a al reglamento de promocion docente.`);
+              return;
+            }
+
+            if (sum_UP > max_UP_allowed) {
+              toast.error(`La cantidad de U.P. (${sum_UP}) supera el límite máximo permitido (${max_UP_allowed}) de acuerdo a tú categoria.`);
+              return;
+            }
         }
       }
 
     }
     // -_-_-_-_-_-_-_-_-_-_-_-_-_-_ FIN DE VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
         
+    // return;
     // Calcular la longitud de los documentos requeridos
     const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);
     const documentsCount = documentsList.length;
@@ -699,6 +723,7 @@ function UnidadesPromocion() {
       tasks,
       projection_id,
       documents_uploaded,
+      type: "Unidades de Promoción",
     };
   
     try {
@@ -707,8 +732,7 @@ function UnidadesPromocion() {
   
       // Llama al método createProjection con los datos del formulario
       const response = await createProduct(projectionData);
-      console.log('Proyección creada:', response.data);
-      toast.success('Proyección creada con éxito');
+      toast.success('Producto creado exitosamente');
       navigate('/KanbanBoard');
     } catch (error) {
       const apiErrors = error.response?.data || {};
@@ -717,7 +741,7 @@ function UnidadesPromocion() {
         toast.error(errorMessage);
       } else {
         console.error('Error creando proyección:', error);
-        toast.error('Error creando la proyección. Verifica los datos.');
+        toast.error('Error al crear el producto');
       }
     } finally {
       setLoading(false);

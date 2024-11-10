@@ -50,6 +50,9 @@ function ProyeccionSeguimiento() {
       case 'crear':
         return "Inicia una proyección en cualquiera de las dos modalidades disponibles. Elige entre una proyección por unidades de promoción o por obtención de grado académico según tus necesidades y preferencias. Además, puedes gestionar varias proyecciones simultáneamente, facilitando el seguimiento de diferentes objetivos.";
       case 'ver':
+        if (!projection_id) {
+          return "Primero debes crear una proyección para poder verla. Dirígete a la opción de 'Crear proyección' para comenzar.";
+        }
         return "Ve todos los detalles de tu proyección actual y consulta el progreso de tus objetivos. Ajusta tus tareas en el tablero según tus avances y mantente al tanto de tus plazos importantes gracias a las alertas automáticas. Esta herramienta te permite tener control total sobre el estado de tu proyección en cualquier momento.";
       case 'guia':
         return "¿No sabes cómo iniciar una proyección? Consulta nuestra guía para obtener instrucciones detalladas. Sigue a detalle la explicación que tenemos que te ayudarán a comenzar, los cuáles te explican paso a paso cómo usar cada función. Además, encontrarás consejos útiles para aprovechar al máximo las herramientas de proyección y seguimiento.";
@@ -98,10 +101,12 @@ function ProyeccionSeguimiento() {
             transition={{ type: 'spring', stiffness: 300 }}
           >
             <Link
-              to="/KanbanBoard"
+              to={projection_id ? '/KanbanBoard' : '#'}
               onMouseEnter={() => handleMouseEnter('ver')}
               onMouseLeave={handleMouseLeave}
-              className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
+              className={`${
+                projection_id ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400 cursor-not-allowed'
+              } text-white p-8 rounded-lg shadow-lg transition-transform transform w-56 h-56 flex flex-col items-center justify-center`}
             >
               <IoGlassesOutline className="mb-4 w-20 h-20" />
               <p className="text-center text-lg font-semibold">Ver mi proyección</p>

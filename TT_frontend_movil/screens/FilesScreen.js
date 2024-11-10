@@ -1,17 +1,18 @@
 import React, { useState, useCallback, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, ImageBackground, Image, Platform, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, ImageBackground, Image, Platform, Modal, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker'; 
 import * as MediaLibrary from 'expo-media-library'; // Importa MediaLibrary para permisos de archivos
 import tw from 'twrnc'; 
 import { WebView } from 'react-native-webview';
 import * as FileSystem from 'expo-file-system';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
+import {jwtDecode} from 'jwt-decode';
 
 import Toast from 'react-native-toast-message'; 
 import LoadingScreen from './LoadingScreen'; // Pantalla de carga
 import CustomToast from '../components/CustomToast'; // Toast personalizado
 
-import { AuthContext } from '../components/AuthContext'; // Contexto de autenticación (Pasar token entre pantallas)
 import { getDocuments, getDocument, uploadDocument, deleteDocument, replaceDocument } from '../api/documents.api'; // Endpoints de documentos
 import { getProduct } from '../api/products.api'; // Endpoints de productos
 
@@ -25,6 +26,9 @@ const Documents = () => {
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [projections, setProjections] = useState([]); // Estado para las proyecciones
   const [selectedProjection, setSelectedProjection] = useState(''); // Proyección seleccionada
+  const [searchQuery, setSearchQuery] = useState(''); // Estado para la búsqueda
+  const [filteredFileData, setFilteredFileData] = useState([]);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const [isProjectionModalOpen, setIsProjectionModalOpen] = useState(false); // Estado del modal de proyecciones
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false); // Modal para opciones de documento
@@ -37,7 +41,24 @@ const Documents = () => {
   const [loading, setLoading] = useState(true); // Estado de carga inicial
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
 
-  const { userId, token } = useContext(AuthContext); // Accede al token y userId del contexto
+  const [userId, setUserId] = useState(''); // Accede al token y userId del contexto
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          console.log('Token decodificado:', decodedToken.user_id);
+          setUserId(decodedToken.user_id);
+        }
+      } catch (error) {
+        console.error('Error al obtener token:', error);
+      }
+    }
+    fetchToken();
+  }, []);
+
 
   // Obtener documentos desde la API
   // Obtener documentos y proyecciones desde la API
@@ -67,8 +88,9 @@ const Documents = () => {
         projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección',
       }));
   
-      setFileData(documents);
-      setProjections(projectionsResponse.data);
+      setFileData(documents || []);
+      setFilteredFileData(documents || []);
+      setProjections(projectionsResponse.data || []);
       setErrorMessage('');
     } catch (error) {
       console.error('Error al obtener documentos y proyecciones:', error);
@@ -78,44 +100,115 @@ const Documents = () => {
     }
   };
   useEffect(() => {
-    fetchDocumentsAndProjections();
+    if (userId) {
+      fetchDocumentsAndProjections();
+    }
   }, [userId]);
+
+  // Función para manejar la búsqueda de documentos
+  const handleSearch = (text) => {
+    setSearchQuery(text); // Actualiza el estado de búsqueda
+    if (text === '') {
+      // Si no hay búsqueda, mostrar todos los documentos
+      setFilteredFileData(fileData);
+    } else {
+      // Filtrar documentos cuyo nombre incluye el texto de búsqueda
+      const filteredData = fileData.filter((file) =>
+        file.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredFileData(filteredData);
+    }
+  };
 
   const handleDocumentClick = async (documentId) => {
     try {
       setLoadingMessage("Abriendo documento ...");
       setDocumentLoading(true);
+  
+      // Encuentra el documento seleccionado en `fileData`
+      const documentData = fileData.find(doc => doc.id === documentId);
+      if (!documentData) {
+        throw new Error("Documento no encontrado");
+      }
+  
+      // Obtén los datos binarios del documento (para renderizar su contenido)
       const response = await getDocument(documentId);
       const { file, file_type } = response.data;
-
-      setSelectedDocument({ data: file, type: file_type });
+  
+      // Si el archivo es PDF y la plataforma es Android, guárdalo en la caché y usa el URI local
+      let localUri = null;
+      if (file_type === 'application/pdf' && Platform.OS === 'android') {
+        const fileUri = `${FileSystem.cacheDirectory}${documentData.name}.pdf`;
+        await FileSystem.writeAsStringAsync(fileUri, file, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        localUri = fileUri;
+      }
+  
+      // Asigna todos los datos relevantes al estado `selectedDocument`
+      setSelectedDocument({
+        ...documentData, // Incluye nombre, tamaño, fecha y proyección
+        data: file,
+        type: file_type,
+        localUri: localUri || `data:application/pdf;base64,${file}`, // Usar el URI en caché si está en Android
+      });
       setIsModalOpen(true);
     } catch (error) {
-      console.error('Error fetching document:', error);
+      console.error('Error al obtener el documento:', error);
       setErrorMessage('Error al visualizar el documento.');
     } finally {
       setDocumentLoading(false);
     }
   };
-
+  
   const renderDocumentContent = () => {
     if (!selectedDocument) return null;
   
     const { data, type } = selectedDocument;
   
     if (type === 'application/pdf') {
-      // Generar la URI en formato base64 para el PDF
-      const pdfUri = `data:application/pdf;base64,${data}`;
+      // Incrustar el PDF en un HTML para WebView
+      const pdfHtml = `
+        <html>
+          <head>
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                height: 100%;
+              }
+              .pdf-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+              }
+              embed {
+                width: 100%;
+                height: 100%;
+                display: block;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="pdf-container">
+              <embed src="data:application/pdf;base64,${data}" type="application/pdf" />
+            </div>
+          </body>
+        </html>
+      `;
+  
       return (
         <WebView
           originWhitelist={['*']}
-          source={{ uri: pdfUri }}
+          source={{ html: pdfHtml }}
           style={{ flex: 1 }}
           onError={(error) => console.log('Error en WebView:', error)}
         />
       );
-
     } else if (type.startsWith('image/')) {
+      // Mostrar imagenes (jpg/jpeg) en el componente Image
       const imageUrl = `data:${type};base64,${data}`;
       return (
         <Image
@@ -128,6 +221,7 @@ const Documents = () => {
   
     return <Text>Tipo de archivo no soportado.</Text>;
   };
+  
 
   // Cerrar todos los dropdowns
   const closeDropdowns = () => {
@@ -169,16 +263,61 @@ const Documents = () => {
     setDateFilter('');
   };
 
-  // Filtrar documentos por tipo y fecha
-  const filteredFileData = fileData.filter(file => {
-    if (fileTypeFilter && file.type !== fileTypeFilter) {
-      return false;
+  // Función de búsqueda y filtrado
+  const applyFilters = () => {
+    let filteredData = fileData;
+
+    // Filtrar por tipo de archivo
+    if (fileTypeFilter) {
+      filteredData = filteredData.filter((file) => file.type === fileTypeFilter);
     }
-    if (dateFilter && file.date !== dateFilter) {
-      return false;
+
+    // Filtrar por fecha
+    if (dateFilter) {
+      const today = new Date();
+      filteredData = filteredData.filter((file) => {
+        const fileDate = new Date(file.date);
+        
+        switch (dateFilter) {
+          case 'today':
+            return fileDate.toDateString() === today.toDateString();
+          
+          case 'this-week':
+            const oneWeekAgo = new Date(today);
+            oneWeekAgo.setDate(today.getDate() - 7);
+            return fileDate >= oneWeekAgo && fileDate <= today;
+
+          case 'this-month':
+            return (
+              fileDate.getMonth() === today.getMonth() &&
+              fileDate.getFullYear() === today.getFullYear()
+            );
+
+          case 'this-year':
+            return fileDate.getFullYear() === today.getFullYear();
+
+          default:
+            return true;
+        }
+      });
     }
-    return true;
-  });
+
+    // Filtrar por búsqueda
+    if (searchQuery) {
+      filteredData = filteredData.filter((file) =>
+        file.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredFileData(filteredData); // Actualiza el estado con los datos filtrados
+  };
+
+  // Ejecuta applyFilters cada vez que cambian los filtros o la búsqueda
+  useEffect(() => {
+    applyFilters();
+  }, [fileTypeFilter, dateFilter, searchQuery, fileData]);
+
+
 
   // Pedir permisos para acceder a los archivos en Android
   const requestFilePermissions = async () => {
@@ -415,13 +554,15 @@ const Documents = () => {
         {/* Barra de búsqueda */}
         <View style={tw`mb-6`}>
           <View style={tw`flex-row items-center border-b border-gray-300`}>
-            <Ionicons name="search" size={24} color="#888" />
+            <Ionicons name="search" size={24} color="#000" />
             <TextInput
               placeholder="Buscar en mis documentos"
+              value={searchQuery}
+              onChangeText={handleSearch} 
               style={tw`flex-1 py-2 ml-3`}
             />
           </View>
-        </View>
+        </View>  
 
         {/* Filtros */}
         <View style={tw`flex-row justify-around mb-6 relative z-20`}>
@@ -510,7 +651,7 @@ const Documents = () => {
         </View>
 
         {/* Botón para abrir el modal de proyecciones */}
-        <Text style={tw`text-gray-700 font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
+        <Text style={tw`text-black font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
         <TouchableOpacity
           onPress={openProjectionModal}
           style={tw`bg-white p-4 rounded-lg mb-4 border border-gray-300 flex-row justify-between items-center`}
@@ -531,7 +672,7 @@ const Documents = () => {
 
           {/* Encabezado de la lista */}
           <View style={tw`flex-row py-2 border-b border-gray-300`}>
-            {["Nombre", "Tamaño", "Subido", "Proyección"].map((header) => (
+            {["Archivos"].map((header) => (
               <View key={header} style={tw`flex-1 items-center`}>
                 <Text style={tw`font-bold text-sm`}>{header}</Text>
               </View>
@@ -539,94 +680,155 @@ const Documents = () => {
           </View>
 
           {/* Renderizar los documentos filtrados */}
-          {fileData.length === 0 ? (
-            <Text style={tw`text-center text-gray-500 mt-4`}>No tienes documentos cargados</Text>
-          ) : (
-            <FlatList
-              data={fileData}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item, index }) => (
-                <TouchableOpacity
-                onPress={() => handleDocumentClick(item.id)}
-                onLongPress={() => openOptionsModal(item.id)} 
-                style={[
-                    tw`flex-row items-center py-3 border-b border-gray-300`,
-                    selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`,
-                  ]}
-                >
-                  <View style={tw`flex-1 items-center justify-center`}>
-                    <Ionicons 
-                      name={item.type === 'pdf' ? 'document' : 'image'} 
-                      size={20} 
-                      color={item.type === 'pdf' ? 'red' : 'blue'} 
-                    />
-                    <Text 
-                      style={tw`ml-2`} 
-                      numberOfLines={1} 
-                      ellipsizeMode="tail"
-                    >
+          <View style={tw`bg-white p-4 rounded-lg shadow-lg`}>
+            {filteredFileData.length === 0 ? (
+              <Text style={tw`text-center text-gray-500 mt-4`}>No se encontraron documentos</Text>
+            ) : (
+              <FlatList
+                data={filteredFileData}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item, index }) => (
+                  <TouchableOpacity
+                  onPress={() => handleDocumentClick(item.id)}
+                  onLongPress={() => openOptionsModal(item.id)} 
+                  style={[
+                      tw`flex-row items-center py-3 border-b border-gray-300`,
+                      selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`,
+                    ]}
+                  >
+                    <Ionicons name={item.type === 'pdf' ? 'document' : 'image'} size={24} color={item.type === 'pdf' ? 'red' : 'blue'} style={tw`mr-3`} />
+      
+                  {/* Contenedor del nombre y proyección */}
+                  <View style={tw`flex-1`}>
+                    {/* Nombre del documento */}
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={tw`text-lg font-semibold`}>
                       {item.name}
                     </Text>
+                    
+                    {/* Proyección debajo del nombre */}
+                    <Text style={tw`text-gray-500 text-sm`}>{item.projection}</Text>
                   </View>
-                  <View style={tw`flex-1 items-center`}>
-                    <Text numberOfLines={1} ellipsizeMode="tail">{item.size}</Text>
-                  </View>
-                  <View style={tw`flex-1 items-center`}>
-                    <Text numberOfLines={1} ellipsizeMode="tail">{item.date}</Text>
-                  </View>
-                  <View style={tw`flex-1 items-center`}>
-                    <Text numberOfLines={1} ellipsizeMode="tail">{item.projection}</Text>
-                  </View>
+                  
+                  {/* Icono de tres puntos para detalles */}
+                 
                 </TouchableOpacity>
-              )}
-            />
-          )}
+                )}
+              />
+            )}
+          </View>
         </View>
       </View>
 
       {/* Modal para visualizar documentos */}
-      <Modal visible={isModalOpen} animationType="slide" onRequestClose={() => setIsModalOpen(false)}>
-        <View style={{ flex: 1 }}>
-        <TouchableOpacity
-          onPress={() => setIsModalOpen(false)}
-          style={tw`bg-blue-500 p-3 mx-4 my-4 rounded-lg`}
+      <Modal visible={isModalOpen} transparent={true} animationType="fade" onRequestClose={() => setIsModalOpen(false)}>
+      <View style={tw`flex-1 bg-black bg-opacity-90 justify-center items-center`}>
+        <View style={tw`absolute top-12 w-full flex-row justify-between items-center px-4`}>
+          
+          {/* Botón de Cerrar */}
+          <TouchableOpacity
+            onPress={() => setIsModalOpen(false)}
+            style={tw`bg-gray-800 p-2 rounded-full`}
           >
-            <Text style={tw`text-white text-center text-lg`}>Cerrar</Text>
+            <Ionicons name="close" size={24} color="white" />
           </TouchableOpacity>
-          {/* <TouchableOpacity title="Cerrar" onPress={() => setIsModalOpen(false)} /> */}
-          <View style={{ flex: 1, marginTop: 10 }}>{renderDocumentContent()}</View>
+          
+          <ScrollView
+            style={tw`flex-1 mx-2 max-h-15`} 
+          >
+            <Text style={tw`text-white text-lg font-bold text-center`}>
+              {selectedDocument?.name || 'Sin título'}
+            </Text>
+          </ScrollView>
+          
+          {/* Icono para mostrar detalles */}
+          <TouchableOpacity
+            onPress={() => setIsDetailsModalOpen(true)} 
+            style={tw`bg-gray-800 p-2 rounded-full`}
+          >
+            <Ionicons name="ellipsis-vertical" size={24} color="white" />
+          </TouchableOpacity>
         </View>
-      </Modal>
+
+        {/* Contenedor para mostrar el documento */}
+        <View style={tw`w-full h-5/6 bg-black justify-center items-center p-4 mt-10`}>
+          <View style={tw`flex-1 w-full`}>
+            {renderDocumentContent()}
+          </View>
+        </View>
+
+        {/* Modal de detalles del documento */}
+        <Modal visible={isDetailsModalOpen} transparent={true} animationType="slide" onRequestClose={() => setIsDetailsModalOpen(false)}>
+          <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
+            <View style={tw`w-3/4 bg-white p-6 rounded-lg shadow-lg w-90`}>
+              <Text style={tw`text-xl font-bold mb-4 text-center`}>Detalles del documento</Text>
+              
+              <View style={tw`mb-2`}>
+                <Text style={tw`text-lg font-semibold`}>Nombre:</Text>
+                <Text style={tw`text-base`}>{selectedDocument?.name}</Text>
+              </View>
+
+              <View style={tw`mb-2`}>
+                <Text style={tw`text-lg font-semibold`}>Tamaño:</Text>
+                <Text style={tw`text-base`}>{selectedDocument?.size}</Text>
+              </View>
+
+              <View style={tw`mb-2`}>
+                <Text style={tw`text-lg font-semibold`}>Fecha:</Text>
+                <Text style={tw`text-base`}>{selectedDocument?.date}</Text>
+              </View>
+
+              <View style={tw`mb-2`}>
+                <Text style={tw`text-lg font-semibold`}>Proyección:</Text>
+                <Text style={tw`text-base`}>{selectedDocument?.projection || 'Sin proyección'}</Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => setIsDetailsModalOpen(false)}
+                style={tw`bg-red-500 p-3 mt-4 rounded-lg`}
+              >
+                <Text style={tw`text-white text-center text-lg`}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </Modal>
+
+
       {documentLoading && <LoadingScreen message={loadingMessage} />}
 
       {/* Modal para seleccionar proyección */}
       <Modal
           visible={isProjectionModalOpen}
-          animationType="slide"
+          transparent={true} 
+          animationType="fade"
           onRequestClose={() => setIsProjectionModalOpen(false)}
         >
-          <View style={tw`flex-1 p-6`}>
-            <Text style={tw`text-xl font-bold mb-4`}>Seleccione una Proyección</Text>
-            <FlatList
-              data={projections}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => selectProjection(item)}
-                  style={tw`p-4 border-b border-gray-300`}
-                >
-                  <Text>{item.activity}</Text>
-                </TouchableOpacity>
-              )}
-            />
+          <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
+            <View style={tw`w-3/4 bg-white p-6 rounded-lg shadow-lg w-90`}>
+              <Text style={tw`text-2xl font-bold mb-4 text-center`}>Seleccione una proyección</Text>
+              
+              <FlatList
+                data={projections}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => selectProjection(item)}
+                    style={tw`p-4 border-b border-gray-300`}
+                  >
+                    <Text style={tw`text-center text-base`}>{item.activity}</Text>
+                  </TouchableOpacity>
+                )}
+              />
             <TouchableOpacity
               onPress={() => setIsProjectionModalOpen(false)}
               style={tw`bg-red-500 p-3 mt-4 rounded-lg`}
             >
-              <Text style={tw`text-white text-center`}>Cancelar</Text>
+              <Text style={tw`text-white text-center text-lg`}>Cancelar</Text>
             </TouchableOpacity>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
         {/* Modal para opciones de documento */}
         <Modal

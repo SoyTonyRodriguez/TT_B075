@@ -29,7 +29,11 @@ class GetProductsView(ListAPIView):
 
     def get_queryset(self):
         account_id = self.kwargs['account_id']
+
         return Products.objects.filter(account_id=account_id)
+
+from django.db.models.signals import post_save, post_delete
+from products.signals import update_product_check
 
 class EditProductView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
@@ -37,14 +41,22 @@ class EditProductView(RetrieveUpdateAPIView):
     lookup_field = 'id'
 
     def get_queryset(self):
-        # Restrict the queryset to only the projections that belong to the authenticated user's account
         return Products.objects.filter(account_id=self.request.user.id)
-    
+
     def perform_update(self, serializer):
         product = self.get_object()
         if product.account_id != self.request.user.id:
             raise PermissionDenied("You do not have permission to edit this product.")
+
+        # Desconectar la señal temporalmente si es un PATCH
+        if self.request.method == 'PATCH':
+            post_save.disconnect(update_product_check, sender=Products)
+
         serializer.save()
+
+        # Reconectar la señal
+        if self.request.method == 'PATCH':
+            post_save.connect(update_product_check, sender=Products)
 
 class DeleteProductView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
@@ -52,11 +64,27 @@ class DeleteProductView(DestroyAPIView):
     lookup_field = 'id'
 
     def get_queryset(self):
-        # Only return projections that belong to the authenticated user
+        # Retornar solo los productos del usuario autenticado
         return Products.objects.filter(account_id=self.request.user.id)
-    
+
     def perform_destroy(self, instance):
-        # Check if the projection belongs to the authenticated user
+        # Verificar que el usuario tenga permiso para eliminar el producto
         if instance.account_id != self.request.user.id:
             raise PermissionDenied("You do not have permission to delete this product.")
+
+        # if self.request.method == 'DELETE':
+        #     post_save.disconnect(update_product_check, sender=Products)
+        #     post_delete.disconnect(update_product_check, sender=Products)
+
+
+        # Desconectar la señal temporalmente si es un PATCH
+        if self.request.method == 'DELETE':
+            post_save.disconnect(update_product_check, sender=Products)
+
+        # Eliminar el producto
         instance.delete()
+
+        # Reconectar la señal
+        if self.request.method == 'DELETE':
+            post_save.connect(update_product_check, sender=Products)
+
