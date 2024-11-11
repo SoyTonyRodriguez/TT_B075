@@ -1,17 +1,41 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import logo from "../img/logoescom.png";
 import AuthContext from "./AuthContext";
+import { FaUserCircle, FaRegStar } from "react-icons/fa"; // Importa el icono adicional
+
 
 function Header() {
     const { isAuthenticated, email, logout } = useContext(AuthContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [unitsProjection, setUnitsProjection] = useState(0); // Agrega el estado para las unidades
+
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Obtener el valor de units_projection de localStorage al cargar el componente
+    useEffect(() => {
+        const updateUnitsProjection = () => {
+            const accountDetails = JSON.parse(localStorage.getItem("accountDetails"));
+            if (accountDetails && accountDetails.units_projection) {
+                setUnitsProjection(accountDetails.units_projection);
+            }
+        };
+    
+        // Llama a la función al cargar el componente
+        updateUnitsProjection();
+    
+        // Comprueba periódicamente si hay cambios en el localStorage
+        const interval = setInterval(() => {
+            updateUnitsProjection();
+        }, 1000); // Verifica cada segundo
+    
+        // Limpia el intervalo al desmontar el componente
+        return () => clearInterval(interval);
+    }, []);
 
   // Cerrar el menú móvil al cambiar de ruta
 useEffect(() => {
@@ -42,6 +66,14 @@ return (
 
             {/* Botón de usuario / Login */}
             <div className="hidden md:flex items-center space-x-4">
+            {isAuthenticated && (
+                        <div className="flex items-center space-x-2 bg-sky-600 p-2 rounded-lg shadow-md">
+                            <FaRegStar className="text-yellow-300 text-xl" />
+                            <span className="text-white font-medium">
+                                U.P. acumuladas: {unitsProjection}
+                            </span>
+                        </div>
+                    )}
             {isAuthenticated ? (
                 <UserButton
                 email={email}

@@ -8,6 +8,8 @@ import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { createProduct } from '../../../api/products.api';
 import { get_Check_Products } from '../../../api/check_products.api';
+import { getProjection } from '../../../api/projections.api';
+import { getAccount } from '../../../api/accounts.api';
 
 function UnidadesPromocion() {
   const navigate = useNavigate();
@@ -58,6 +60,9 @@ function UnidadesPromocion() {
 
   const [up_allowed, setUpAllowed] = useState(''); // Estado para almacenar las U.P. permitidas
 
+  const [start_date, setStartDate] = useState(''); // Estado para almacenar la fecha de inicio
+  const [end_date, setEndDate] = useState(''); // Estado para almacenar la fecha de fin
+
   // Obtener account_id de localStorage y llamar a get_Check_Products
   // Decode JWT once at the start and get the user ID
   useEffect(() => {
@@ -74,6 +79,27 @@ function UnidadesPromocion() {
     }
 
   }, []);
+
+  useEffect(() => {
+
+    const fetchProjection = async (userId) => {
+      try {
+        setLoading(true);
+        const response = await getProjection(userId); // Llamada a la API
+        setStartDate(response.data[0].start_date); // Almacenar los datos recibidos
+        setEndDate(response.data[0].end_date);
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+        setError('No se pudo cargar la información.'); // Mostrar mensaje de error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      fetchProjection(userId);
+    }
+  }, [userId]);
 
 
   useEffect(() => {
@@ -734,6 +760,14 @@ function UnidadesPromocion() {
       const response = await createProduct(projectionData);
       toast.success('Producto creado exitosamente');
       navigate('/KanbanBoard');
+
+      const responseProductCheck = await get_Check_Products(userId);
+      const accountDetails = JSON.parse(localStorage.getItem('accountDetails')) || {};
+      console.log('responseProductCheck:', responseProductCheck);
+      accountDetails.units_projection = responseProductCheck.data.total_up;
+      localStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+
+
     } catch (error) {
       const apiErrors = error.response?.data || {};
       if (error.response?.status === 400) {
@@ -1010,9 +1044,14 @@ function UnidadesPromocion() {
               <h3 className="text-lg font-bold text-gray-700">Tú proyección actual:</h3>
               <div className="bg-yellow-300 border-l-4 border-yellow-600 text-yellow-800 p-4 rounded-lg shadow-lg">
                 <p className="font-semibold">
-                  Tu proyección cubrirá el período del <strong>2024 al 2026</strong>. 
+                  Tu proyección cubrirá el período:
+                  <br />
+                    <strong>{start_date} al {end_date}</strong>
+                  <br />
+                  <br />
                   Aquí puedes comenzar a registrar actividades que realices dentro de este período, donde acumularás U.P. 
                 </p>
+
                 <p className='font-semibold mt-4'>
                 Cada actividad que completes contribuirá a tus unidades de promoción (U.P), que te beneficiarán en tu proceso de promoción docente.
                 </p>
