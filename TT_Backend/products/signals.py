@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from .models import Products
 from projections.models import Projection
 from check_products.models import ProductCheck
+from accounts.models import Accounts
 
 # Variable global para almacenar el projection_id anterior
 old_product_id = None
@@ -46,6 +47,10 @@ def update_product_check(sender, instance, created, **kwargs):
             if isinstance(category, dict) and 'total' in category
         )
         product_check.categories['total_up'] = total_up
+
+        account = Accounts.objects.get(id=account_id)
+        account.units_projection = total_up
+        account.save()
 
         # Guardar los cambios en el ProductCheck
         product_check.save()
