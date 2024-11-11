@@ -385,7 +385,7 @@ function KanbanBoard() {
         
             } catch (error) {
                 console.error('Error deleting task:', error);
-                toast.error('Error eliminando la tarea');
+                // toast.error('Error eliminando la tarea');
             }
         };
     
