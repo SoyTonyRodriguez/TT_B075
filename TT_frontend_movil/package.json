@@ -21,6 +21,7 @@
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
     "expo": "~51.0.24",
+    "expo-build-properties": "~0.12.5",
     "expo-constants": "^16.0.2",
     "expo-document-picker": "~12.0.2",
     "expo-file-system": "~17.0.1",
@@ -54,8 +55,7 @@
     "react-native-webview": "^13.8.6",
     "react-native-zip-archive": "^7.0.1",
     "tailwind-rn": "^4.2.0",
-    "twrnc": "^4.5.1",
-    "expo-build-properties": "~0.12.5"
+    "twrnc": "^4.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
