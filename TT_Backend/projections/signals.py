@@ -2,6 +2,7 @@ from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from projections.models import Projection
 from accounts.models import Accounts
+from products.models import Products
 
 # Variable global para almacenar el projection_id anterior
 old_projection_id = None
@@ -52,3 +53,14 @@ def update_account_projection(sender, instance, created, **kwargs):
 
     # Resetear el valor global old_projection_id después de usarlo
     old_projection_id = None
+
+@receiver(post_delete, sender=Products)
+def remove_product_from_projections(sender, instance, **kwargs):
+    # Buscar todas las proyecciones que contienen el producto eliminado
+    projections = Projection.objects.filter(products__contains=instance.id)
+
+    for projection in projections:
+        # Eliminar el producto de la lista `products`
+        if instance.id in projection.products:
+            projection.products.remove(instance.id)
+            projection.save()

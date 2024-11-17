@@ -83,15 +83,15 @@ def store_old_projection(sender, instance, **kwargs):
         else:
             old_product_id = None
 
-@receiver(post_delete, sender=Products)
-def remove_product_from_projections(sender, instance, **kwargs):
-    # Buscar todas las proyecciones que contienen la tarea eliminada
-    product = Projection.objects.filter(tasks__contains=instance.id)
-    for projection in product:
-        # Eliminar el ID de la tarea de la lista
-        projection.products.remove(instance.id)
-        # Guardar los cambios en la proyección
-        projection.save()
+# @receiver(post_delete, sender=Products)
+# def remove_product_from_projections(sender, instance, **kwargs):
+#     # Buscar todas las proyecciones que contienen la tarea eliminada
+#     product = Projection.objects.filter(tasks__contains=instance.id)
+#     for projection in product:
+#         # Eliminar el ID de la tarea de la lista
+#         projection.products.remove(instance.id)
+#         # Guardar los cambios en la proyección
+#         projection.save()
 
 @receiver(post_save, sender=Products)
 def update_product_projection(sender, instance, created, **kwargs):

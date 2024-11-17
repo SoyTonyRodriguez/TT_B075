@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks.api";
-import { getProduct, updateProduct } from '../../../api/products.api';
+import { getProduct, updateProduct, deleteProduct } from '../../../api/products.api';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
@@ -11,6 +11,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { IoTime } from "react-icons/io5";
 import { TbXboxXFilled } from "react-icons/tb";
 import { AiOutlinePaperClip } from 'react-icons/ai'; // Importar el icono de clip
+import { get_Check_Products } from '../../../api/check_products.api';
+
 import { Link } from 'react-router-dom';
 
 function KanbanBoard() {
@@ -76,6 +78,43 @@ function KanbanBoard() {
         }
     }, [userId, cache.tasks, cache.projections]);
 
+    const handleDeleteProduct = async (productid) => {
+        try {
+            setLoading(true);
+    
+            // Llama al endpoint
+            await deleteProduct(productid);
+    
+            // Actualiza los estados
+            setTasks((prevTasks) => {
+                const updatedTasks = prevTasks.filter(task => task.projection_id !== productid);
+                return updatedTasks;
+            });
+    
+            setProjections((prevProjections) => {
+                const updatedProjections = prevProjections.filter(proj => proj.id !== productid);
+                return updatedProjections;
+            });
+    
+            // Actualiza los datos de Check Products
+            const responseProductCheck = await get_Check_Products(userId);
+            const accountDetails = JSON.parse(localStorage.getItem('accountDetails')) || {};
+            if (responseProductCheck.data.total_up === 0) {
+                accountDetails.units_projection = '0';
+            } else {
+                accountDetails.units_projection = responseProductCheck.data.total_up;
+            }            
+            localStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+    
+            toast.success('Producto y tareas eliminadas con éxito');
+        } catch (error) {
+            console.error('Error eliminando proyección:', error);
+            toast.error('Error al eliminar la proyección y sus tareas asociadas.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
     useEffect(() => {
         if (userId) {
             fetchData();
@@ -565,7 +604,7 @@ function KanbanBoard() {
                                 return (
                                     <div 
                                         key={projection.id} 
-                                        className="shadow-md p-4 hover:shadow-lg transition-all duration-300 border mb-4 flex flex-col gap-2" 
+                                        className="relative shadow-md p-4 hover:shadow-lg transition-all duration-300 border mb-4 flex flex-col gap-2" 
                                         style={{ 
                                             borderColor: projection.color || '#cccccc',
                                             borderWidth: '2px',
@@ -573,6 +612,14 @@ function KanbanBoard() {
                                             boxShadow: `0 2px 6px ${projection.color}22`, 
                                         }}
                                     >
+                                        {/* Botón de eliminación en la esquina superior derecha */}
+                                        <div 
+                                            className="absolute top-1 right-1 text-red-500 hover:text-red-700 cursor-pointer"
+                                            onClick={() => handleDeleteProduct(projection.id)}
+                                        >
+                                            <TbXboxXFilled size={20} title="Eliminar Proyección" />
+                                        </div>
+                                        
                                         <h3 className="text-sm font-semibold text-gray-800 truncate">
                                             {projection.activity}
                                         </h3>
@@ -679,7 +726,6 @@ function KanbanBoard() {
                             value={newTask.priority || ''}
                             onChange={(e) => {
                                 handleTaskChange(e);
-                                handlePriorityChange(e.target.value); // Lógica de cambio de color
                             }}
                             className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${
                                 newTask.priority === 'Alta'
@@ -790,7 +836,6 @@ function KanbanBoard() {
                         value={taskToEdit?.priority || ''}
                         onChange={(e) => {
                             setTaskToEdit({ ...taskToEdit, priority: e.target.value });
-                            handlePriorityChange(e.target.value); // Lógica de cambio de color
                         }}
                         className={`w-full px-4 py-2 border rounded-lg ${
                             taskToEdit?.priority === 'Alta'
