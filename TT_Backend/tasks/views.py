@@ -27,6 +27,8 @@ class RegisterTaskView(APIView):
             post_save.disconnect(update_product_check, sender=Products)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        # if self.request.method == 'POST':
+        #     post_save.connect(update_product_check, sender=Products)
         return Response(serializer.data)
 
 class GetTasksView(ListAPIView):
@@ -55,6 +57,11 @@ class EditTaskView(RetrieveUpdateAPIView):
         # Desconectar la señal temporalmente si es un PATCH
         if self.request.method == 'PATCH':
             post_save.disconnect(update_product_check, sender=Products)
+            post_save.disconnect(update_product_check, sender=Products)
+        
+        if self.request.method == 'OPTIONS':
+            post_save.disconnect(update_product_check, sender=Products)
+            post_delete.disconnect(update_product_check, sender=Products)
         serializer.save()
 
 class DeleteTaskView(DestroyAPIView):
@@ -74,4 +81,18 @@ class DeleteTaskView(DestroyAPIView):
         if self.request.method == 'DELETE':
             post_save.disconnect(update_product_check, sender=Products)
             post_delete.disconnect(update_product_check, sender=Products)
+        
+        if self.request.method == 'OPTIONS':
+            post_save.disconnect(update_product_check, sender=Products)
+            post_delete.disconnect(update_product_check, sender=Products)
+
+        if self.request.method == 'PATCH':
+            post_save.disconnect(update_product_check, sender=Products)
+            post_delete.disconnect(update_product_check, sender=Products)
+        
+        if self.request.method == 'GET':
+            post_save.disconnect(update_product_check, sender=Products)
+            post_delete.disconnect(update_product_check, sender=Products)
+
+
         instance.delete()

@@ -1,23 +1,54 @@
-import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, Text, Alert } from 'react-native';
 import { WebView } from 'react-native-webview';
-import tw from 'twrnc';
+import * as FileSystem from 'expo-file-system';
+import { Asset } from 'expo-asset';
 
-const PDFViewer = ({ route }) => {
-  const { pdfUri } = route.params;  // Recibe la URI del PDF desde la navegación
+export default function PDFViewer({ route }) {
+  const { pdfResource } = route.params;
+  const [pdfUri, setPdfUri] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    return (
-        <View style={tw`flex-1`}>
-        <WebView
-            source={{ uri: pdfUri }}
-            style={{ flex: 1 }}
-            startInLoadingState={true}
-            renderLoading={() => (
-            <ActivityIndicator size="large" color="#0000ff" style={tw`mt-10`} />
-            )}
-        />
-        </View>
-    );
+  useEffect(() => {
+    const loadPdf = async () => {
+      try {
+        // Carga el archivo usando Asset de Expo si es un recurso local
+        const asset = Asset.fromModule(pdfResource);
+        await asset.downloadAsync();
+        
+        // Copia el archivo a un directorio accesible y establece la URI
+        const localUri = `${FileSystem.documentDirectory}${asset.name}`;
+        await FileSystem.copyAsync({
+          from: asset.localUri,
+          to: localUri,
+        });
+
+        setPdfUri(localUri);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error al cargar el PDF:', error);
+        Alert.alert('Error', 'No se pudo cargar el archivo PDF.');
+      }
     };
 
-export default PDFViewer;
+    loadPdf();
+  }, [pdfResource]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Cargando PDF...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1 }}>
+      <WebView
+        source={{ uri: pdfUri }}
+        style={{ flex: 1 }}
+      />
+    </View>
+  );
+}

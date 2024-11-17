@@ -3,51 +3,57 @@ from django.dispatch import receiver
 from .models import Products
 from projections.models import Projection
 from check_products.models import ProductCheck
+from accounts.models import Accounts
 
 # Variable global para almacenar el projection_id anterior
 old_product_id = None
 @receiver(post_save, sender=Products)
-def update_product_check(sender, instance, **kwargs):
-    print(f"Signal triggered for {instance.id}")  # Verificar si la señal se activa
-    account_id = instance.account_id
-    activity_name = instance.activity
-    units = instance.units
-    category_name = instance.function
+def update_product_check(sender, instance, created, **kwargs):
+    if created:
+        print(f"Signal triggered for {instance.id}")  # Verificar si la señal se activa
+        account_id = instance.account_id
+        activity_name = instance.activity
+        units = instance.units
+        category_name = instance.function
 
-    # Buscar o crear un ProductCheck para la cuenta
-    product_check, _ = ProductCheck.objects.get_or_create(account_id=account_id)
+        # Buscar o crear un ProductCheck para la cuenta
+        product_check, _ = ProductCheck.objects.get_or_create(account_id=account_id)
 
-    # Inicializar la categoría si no existe
-    if category_name not in product_check.categories:
-        product_check.categories[category_name] = {}
+        # Inicializar la categoría si no existe
+        if category_name not in product_check.categories:
+            product_check.categories[category_name] = {}
 
-    # Inicializar la actividad si no existe
-    if activity_name not in product_check.categories[category_name]:
-        product_check.categories[category_name][activity_name] = {
-            'length': 0,
-            'up': 0
-        }
+        # Inicializar la actividad si no existe
+        if activity_name not in product_check.categories[category_name]:
+            product_check.categories[category_name][activity_name] = {
+                'length': 0,
+                'up': 0
+            }
 
-    # Actualizar los valores de la actividad
-    product_check.categories[category_name][activity_name]['length'] += 1
-    product_check.categories[category_name][activity_name]['up'] += units
+        # Actualizar los valores de la actividad
+        product_check.categories[category_name][activity_name]['length'] += 1
+        product_check.categories[category_name][activity_name]['up'] += units
 
-    # Calcular el total de 'up' para la categoría
-    total_category_up = sum(
-        activity.get('up', 0) for key, activity in product_check.categories[category_name].items()
-        if isinstance(activity, dict)
-    )
-    product_check.categories[category_name]['total'] = total_category_up
+        # Calcular el total de 'up' para la categoría
+        total_category_up = sum(
+            activity.get('up', 0) for key, activity in product_check.categories[category_name].items()
+            if isinstance(activity, dict)
+        )
+        product_check.categories[category_name]['total'] = total_category_up
 
-    # Calcular el total general de 'up' para todas las categorías
-    total_up = sum(
-        category.get('total', 0) for key, category in product_check.categories.items()
-        if isinstance(category, dict) and 'total' in category
-    )
-    product_check.categories['total_up'] = total_up
+        # Calcular el total general de 'up' para todas las categorías
+        total_up = sum(
+            category.get('total', 0) for key, category in product_check.categories.items()
+            if isinstance(category, dict) and 'total' in category
+        )
+        product_check.categories['total_up'] = total_up
 
-    # Guardar los cambios en el ProductCheck
-    product_check.save()
+        account = Accounts.objects.get(id=account_id)
+        account.units_projection = total_up
+        account.save()
+
+        # Guardar los cambios en el ProductCheck
+        product_check.save()
 
 @receiver(post_save, sender=Products)
 def update_product_projection(sender, instance, created, **kwargs):
@@ -77,15 +83,15 @@ def store_old_projection(sender, instance, **kwargs):
         else:
             old_product_id = None
 
-@receiver(post_delete, sender=Products)
-def remove_product_from_projections(sender, instance, **kwargs):
-    # Buscar todas las proyecciones que contienen la tarea eliminada
-    product = Projection.objects.filter(tasks__contains=instance.id)
-    for projection in product:
-        # Eliminar el ID de la tarea de la lista
-        projection.products.remove(instance.id)
-        # Guardar los cambios en la proyección
-        projection.save()
+# @receiver(post_delete, sender=Products)
+# def remove_product_from_projections(sender, instance, **kwargs):
+#     # Buscar todas las proyecciones que contienen la tarea eliminada
+#     product = Projection.objects.filter(tasks__contains=instance.id)
+#     for projection in product:
+#         # Eliminar el ID de la tarea de la lista
+#         projection.products.remove(instance.id)
+#         # Guardar los cambios en la proyección
+#         projection.save()
 
 @receiver(post_save, sender=Products)
 def update_product_projection(sender, instance, created, **kwargs):

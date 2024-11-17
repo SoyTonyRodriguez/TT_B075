@@ -4,12 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 
 const PDF_FILES = {
-  convocatoria: require('../assets/pdfs/convocatoria.pdf'),
-  reglamento: require('../assets/pdfs/reglamento.pdf'),
-  cronograma: require('../assets/pdfs/cronograma.pdf'),
-  valoracion: require('../assets/pdfs/valoracionactividades.pdf'),
-  gaceta1511: require('../assets/pdfs/gaceta.pdf'),
+  convocatoria: require('../assets/pdfs/Convocatoria.pdf'),
+  reglamento: require('../assets/pdfs/Reglamento.pdf'),
+  cronograma: require('../assets/pdfs/Cronograma.pdf'),
+  valoracion: require('../assets/pdfs/Valoracion.pdf'),
+  gaceta: require('../assets/pdfs/Gaceta.pdf'),
 };
+
 
 export default function OfficialLinksScreen({ navigation }) {
   const openPDF = (pdfKey) => {

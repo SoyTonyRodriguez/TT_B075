@@ -16,8 +16,13 @@ import os
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Ruta para PDFs en el frontend web
+FRONTEND_WEB_PDFS_PATH = os.path.normpath(os.path.join(BASE_DIR, '../TT_frontend_web/public/pdfs/'))
+
+# Ruta para PDFs en el frontend móvil
+FRONTEND_MOBILE_PDFS_PATH = os.path.normpath(os.path.join(BASE_DIR, '../TT_frontend_movil/assets/pdfs/'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -54,6 +59,7 @@ INSTALLED_APPS = [
     'conditions_categories',
     'check_products',
     'conditions_max',
+    'documents_admin',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -183,7 +189,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'UTC'
 
@@ -211,6 +217,8 @@ CORS_ALLOWED_ORIGINS = [
   'http://192.168.100.97:8000',
   'http://192.168.100.97:8081',
   'http://0.0.0.0:8000',
+  'http://0.0.0.0:8081',
+
 ]
 
 ALLOWED_HOSTS = ["*"]

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks.api";
-import { getProduct, updateProduct } from '../../../api/products.api';
+import { getProduct, updateProduct, deleteProduct } from '../../../api/products.api';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
@@ -11,41 +11,29 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { IoTime } from "react-icons/io5";
 import { TbXboxXFilled } from "react-icons/tb";
 import { AiOutlinePaperClip } from 'react-icons/ai'; // Importar el icono de clip
+import { get_Check_Products } from '../../../api/check_products.api';
+
 import { Link } from 'react-router-dom';
 
 function KanbanBoard() {
-    // Get Tasks from the API
-    const [tasks, setTasks] = useState([]);
-
-    // Get user ID from the token
-    const [userId, setUserId] = useState(null);
-
-    // Loading state (Pantalla de carga XD)
-    const [loading, setLoading] = useState(true);
+    // -_-_-_-_-_-_-_-_-_-  States  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    const [tasks, setTasks] = useState([]);         // Get Tasks from the API
+    const [userId, setUserId] = useState(null);     // Get user ID from the token
+    const [loading, setLoading] = useState(true);   // Loading state (Pantalla de carga XD)
     const [isTaskLoading, setIsTaskLoading] = useState(false);  // Pantalla de carga para tareas (crear/editar)
-
-    // Estado para guardar las proyecciones traídas de la API
-    const [projections, setProjections] = useState([]);
-    
-    // New task state
-    const [newTask, setNewTask] = useState({
+    const [projections, setProjections] = useState([]);  // Estado para guardar las proyecciones traídas de la API
+    const [newTask, setNewTask] = useState({             // Estado para guardar los datos de la nueva tarea
         title: '',
         description: '',
         priority: '',
         status: 'todo',
     });
-
-    // Error state
-    const [error, setError] = useState(null);
-
-    // Modal state, to show or hide the task creation form
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [error, setError] = useState(null);   // Error state
+    const [isModalOpen, setIsModalOpen] = useState(false);  // Modal state, to show or hide the task creation form
     const [taskToEdit, setTaskToEdit] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-    const [showDocuments, setShowDocuments] = useState(false);
     const [expandedProjectionId, setExpandedProjectionId] = useState(null);  // Estado para saber qué proyección está expandida
+    const [cache, setCache] = useState({ tasks: null, projections: null });
 
     // Decode JWT once at the start and get the user ID
     useEffect(() => {
@@ -62,45 +50,76 @@ function KanbanBoard() {
         }
     }, []);
 
-    // Fetch tasks only when userId is set
-    useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                const response = await getTasks(userId);
-                setTasks(response.data);
-            } catch (error) {
-                console.error('Error fetching tasks:', error);
-                setError('Error fetching tasks.');
+    // Fetch data with caching and parallel execution
+    const fetchData = useCallback(async () => {
+        setLoading(true);
+        try {
+            if (!cache.tasks || !cache.projections) {
+                const [tasksResponse, projectionsResponse] = await Promise.all([
+                    getTasks(userId),
+                    getProduct(userId)
+                ]);
+
+                const fetchedTasks = tasksResponse.data;
+                const fetchedProjections = projectionsResponse.data;
+
+                setTasks(fetchedTasks);
+                setProjections(fetchedProjections);
+                setCache({ tasks: fetchedTasks, projections: fetchedProjections });
+            } else {
+                setTasks(cache.tasks);
+                setProjections(cache.projections);
             }
-        };
-    
-        const fetchProjections = async () => {
-            try {
-                const response = await getProduct(userId);
-                console.log("Respuesta de la API con proyecciones:", response.data);  // Verifica si `progress` está presente
-                setProjections(response.data);
-            } catch (error) {
-                console.error('Error fetching projections:', error);
-                setError('Error fetching projections.');
-            }
-        };
-    
-        const fetchData = async () => {
-            setLoading(true); // Inicia la carga
-            try {
-                // Ejecuta ambas funciones en paralelo y espera a que ambas terminen
-                await Promise.all([fetchTasks(), fetchProjections()]);
-            } catch (error) {
-                console.error('Error in one or both requests:', error);
-            } finally {
-                setLoading(false); // Finaliza la carga cuando ambas han terminado
-            }
-        };
-    
-        if (userId) {
-            fetchData(); // Llama a la función que maneja ambas solicitudes
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setError('Error fetching data.');
+        } finally {
+            setLoading(false);
         }
-    }, [userId]);
+    }, [userId, cache.tasks, cache.projections]);
+
+    const handleDeleteProduct = async (productid) => {
+        try {
+            setLoading(true);
+    
+            // Llama al endpoint
+            await deleteProduct(productid);
+    
+            // Actualiza los estados
+            setTasks((prevTasks) => {
+                const updatedTasks = prevTasks.filter(task => task.projection_id !== productid);
+                return updatedTasks;
+            });
+    
+            setProjections((prevProjections) => {
+                const updatedProjections = prevProjections.filter(proj => proj.id !== productid);
+                return updatedProjections;
+            });
+    
+            // Actualiza los datos de Check Products
+            const responseProductCheck = await get_Check_Products(userId);
+            const accountDetails = JSON.parse(localStorage.getItem('accountDetails')) || {};
+            if (responseProductCheck.data.total_up === 0) {
+                accountDetails.units_projection = '0';
+            } else {
+                accountDetails.units_projection = responseProductCheck.data.total_up;
+            }            
+            localStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+    
+            toast.success('Producto y tareas eliminadas con éxito');
+        } catch (error) {
+            console.error('Error eliminando proyección:', error);
+            toast.error('Error al eliminar la proyección y sus tareas asociadas.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    useEffect(() => {
+        if (userId) {
+            fetchData();
+        }
+    }, [userId, fetchData]);
 
     // Handle task form changes
     const handleTaskChange = (e) => {
@@ -110,60 +129,39 @@ function KanbanBoard() {
         });
     };
 
-    // Create a new task and add it to the tasks state
-    const handleCreateTask = async () => {
-        try {
-            setIsTaskLoading(true);  // Inicia la pantalla de carga para tareas
-
-            // Verificar si todos los campos obligatorios están llenos
-            if (!newTask.title || !newTask.description || !newTask.projection, !newTask.projection_id) {
-                toast.error('Todos los campos son obligatorios.');
-                return;
-            }
-    
-            // Llamar a la API para crear la tarea
-            const response = await createTask(newTask);
-    
-            // Verificar que haya datos en la respuesta (si la tarea fue creada)
-            if (!response || !response.data) {
-                throw new Error('Error creando la tarea');
-            }
-    
-            // Añadir la nueva tarea al estado local
-            setTasks([...tasks, response.data]);
-            
-            const createdTask = response.data;
-            // Si la tarea creada tiene un `projection_id`, actualizar el progreso de la proyección
-            if (createdTask.projection_id) {
-                await updateProjectionProgress(createdTask.projection_id, [...tasks, createdTask]);
-            }
-    
-            // Limpiar el formulario y cerrar el modal
-            setNewTask({
-                title: '',
-                description: '',
-                priority: 'Media',
-                status: 'todo',
-                projection_id: '' // Limpiar el campo de proyección
-            });
-    
-            setIsModalOpen(false);
-            toast.success('Tarea creada con éxito');  // Mostrar toast de éxito
-        } catch (error) {
-            const apiErrors = error.response.data || {};
-            if (error.response.status === 400) {
-                const errorMessage = apiErrors.non_field_errors[0] || "Hubo un error en la solicitud. Verifica los datos ingresados.";
-                toast.error(errorMessage);
-            }else {
-                console.error('Error creando tarea:', error);
-    
-                // Mostrar un toast si ocurre un error
-                toast.error('Error creando la tarea. Verifica los datos.');
-            }
-        } finally { 
-            setIsTaskLoading(false);  // Detener la pantalla de carga para tareas
+    // Create a new task
+    const handleCreateTask = useCallback(async () => {
+        if (!newTask.title || !newTask.description || !newTask.projection_id) {
+            toast.error('Todos los campos son obligatorios.');
+            return;
         }
-    };
+
+        try {
+            setIsTaskLoading(true);
+            const response = await createTask(newTask);
+
+            if (response && response.data) {
+                const createdTask = response.data;
+                const updatedTasks = [...tasks, createdTask];
+
+                setTasks(updatedTasks);
+                setCache({ ...cache, tasks: updatedTasks });
+
+                if (createdTask.projection_id) {
+                    await updateProjectionProgress(createdTask.projection_id, updatedTasks);
+                }
+
+                setNewTask({ title: '', description: '', priority: 'Media', status: 'todo', projection_id: '' });
+                setIsModalOpen(false);
+                toast.success('Tarea creada con éxito');
+            }
+        } catch (error) {
+            console.error('Error creando tarea:', error);
+            toast.error('Error creando la tarea. Verifica los datos.');
+        } finally {
+            setIsTaskLoading(false);
+        }
+    }, [newTask, tasks, cache]);
 
     // Eliminar una tarea del estado local (no de la API)
     const handleDeleteTask = async (id) => {
@@ -417,17 +415,16 @@ function KanbanBoard() {
         
                 // Llamar a la API para eliminar la tarea
                 onDelete(task.id);  // Eliminar la tarea del estado local
-                await deleteTask(task.id);
-                toast.success('Tarea eliminada con éxito');
+                // await deleteTask(task.id);
         
                 // Si la tarea pertenece a una proyección, recalcular el progreso
-                if (taskToDelete && taskToDelete.projection_id) {
-                    await updateProjectionProgress(taskToDelete.projection_id, updatedTasks);
-                }
+                // if (taskToDelete && taskToDelete.projection_id) {
+                //     await updateProjectionProgress(taskToDelete.projection_id, updatedTasks);
+                // }
         
             } catch (error) {
                 console.error('Error deleting task:', error);
-                toast.error('Error eliminando la tarea');
+                // toast.error('Error eliminando la tarea');
             }
         };
     
@@ -607,7 +604,7 @@ function KanbanBoard() {
                                 return (
                                     <div 
                                         key={projection.id} 
-                                        className="shadow-md p-4 hover:shadow-lg transition-all duration-300 border mb-4 flex flex-col gap-2" 
+                                        className="relative shadow-md p-4 hover:shadow-lg transition-all duration-300 border mb-4 flex flex-col gap-2" 
                                         style={{ 
                                             borderColor: projection.color || '#cccccc',
                                             borderWidth: '2px',
@@ -615,6 +612,14 @@ function KanbanBoard() {
                                             boxShadow: `0 2px 6px ${projection.color}22`, 
                                         }}
                                     >
+                                        {/* Botón de eliminación en la esquina superior derecha */}
+                                        <div 
+                                            className="absolute top-1 right-1 text-red-500 hover:text-red-700 cursor-pointer"
+                                            onClick={() => handleDeleteProduct(projection.id)}
+                                        >
+                                            <TbXboxXFilled size={20} title="Eliminar Proyección" />
+                                        </div>
+                                        
                                         <h3 className="text-sm font-semibold text-gray-800 truncate">
                                             {projection.activity}
                                         </h3>
@@ -721,7 +726,6 @@ function KanbanBoard() {
                             value={newTask.priority || ''}
                             onChange={(e) => {
                                 handleTaskChange(e);
-                                handlePriorityChange(e.target.value); // Lógica de cambio de color
                             }}
                             className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${
                                 newTask.priority === 'Alta'
@@ -832,7 +836,6 @@ function KanbanBoard() {
                         value={taskToEdit?.priority || ''}
                         onChange={(e) => {
                             setTaskToEdit({ ...taskToEdit, priority: e.target.value });
-                            handlePriorityChange(e.target.value); // Lógica de cambio de color
                         }}
                         className={`w-full px-4 py-2 border rounded-lg ${
                             taskToEdit?.priority === 'Alta'

@@ -127,8 +127,11 @@ const KanbanBoard = () => {
   };
 
   const handleTaskChange = (name, value) => {
-    setNewTask({ ...newTask, [name]: value });
-  };
+    setNewTask((prevTask) => ({
+      ...prevTask,
+      [name]: value,
+    }));
+  };  
 
   // Función para abrir el modal
   const openModal = () => {
@@ -137,8 +140,15 @@ const KanbanBoard = () => {
 
   // Función para cerrar el modal
   const closeModal = () => {
+    setNewTask({
+      title: '',
+      description: '',
+      priority: '', // Restablece la prioridad
+      projection_id: '',
+    });
     setIsModalOpen(false);
   };
+  
 
   const handleCreateTask = async () => {
     if (!newTask.title || !newTask.description || !newTask.projection_id) {
@@ -154,7 +164,7 @@ const KanbanBoard = () => {
       setNewTask({
         title: '',
         description: '',
-        priority: 'Media',
+        priority: '',
         status: 'todo',
         projection_id: '',
       });
@@ -282,7 +292,7 @@ const KanbanBoard = () => {
   
   return (
     <ImageBackground
-      source={require('../assets/images/fondo.jpg')}  // Fondo restaurado
+      source={require('../assets/images/fondo.jpg')}  
       style={tw`flex-1 w-full h-full`}
       resizeMode="cover"
     >
@@ -295,7 +305,7 @@ const KanbanBoard = () => {
         <Ionicons name="glasses-outline" size={40} color="#000" style={tw`ml-2`} />
       </View>
 
-      <ScrollView style={tw`p-5`}>
+      <ScrollView style={tw`p-5 mb-15`}>
         {/* Sección To-Do */}
         <TouchableOpacity onPress={() => toggleSection('todo')}>
           <View style={tw`bg-blue-900 p-4 rounded-xl`}>
@@ -385,7 +395,7 @@ const KanbanBoard = () => {
                 style={tw`border border-gray-300 px-4 py-3 rounded-lg mb-4 bg-white flex-row justify-between items-center`}
               >
                 <Text style={tw`text-gray-800 text-lg`}>
-                  {newTask.priority || "Selecciona una prioridad"}
+                  {newTask.priority || "Selecciona una prioridad"} {/* Asegúrate de que aquí esté mostrando el valor correcto */}
                 </Text>
                 <Text style={tw`text-gray-800`}>
                   <FontAwesome name="chevron-down" style={tw`text-gray-500`} />
@@ -445,8 +455,12 @@ const KanbanBoard = () => {
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    handleEditTaskChange('priority', priority); // Actualiza la prioridad
-                    setShowPriorityModal(false); // Cierra el modal
+                    if (isEditModalOpen) {
+                      setTaskToEdit({ ...taskToEdit, priority }); // Actualiza `taskToEdit`
+                    } else {
+                      handleTaskChange('priority', priority); // Actualiza `newTask`
+                    }
+                    setShowPriorityModal(false);
                   }}
                   style={tw`py-2`}
                 >

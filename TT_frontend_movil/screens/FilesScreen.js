@@ -85,7 +85,7 @@ const Documents = () => {
         size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
         date: new Date(doc.upload_date).toLocaleDateString(),
         type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
-        projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección',
+        projection: doc.activity || 'Sin proyección',
       }));
   
       setFileData(documents || []);
@@ -135,11 +135,22 @@ const Documents = () => {
       const response = await getDocument(documentId);
       const { file, file_type } = response.data;
   
+      // Si el archivo es PDF y la plataforma es Android, guárdalo en la caché y usa el URI local
+      let localUri = null;
+      if (file_type === 'application/pdf' && Platform.OS === 'android') {
+        const fileUri = `${FileSystem.cacheDirectory}${documentData.name}.pdf`;
+        await FileSystem.writeAsStringAsync(fileUri, file, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        localUri = fileUri;
+      }
+  
       // Asigna todos los datos relevantes al estado `selectedDocument`
       setSelectedDocument({
         ...documentData, // Incluye nombre, tamaño, fecha y proyección
         data: file,
-        type: file_type
+        type: file_type,
+        localUri: localUri || `data:application/pdf;base64,${file}`, // Usar el URI en caché si está en Android
       });
       setIsModalOpen(true);
     } catch (error) {
@@ -156,18 +167,48 @@ const Documents = () => {
     const { data, type } = selectedDocument;
   
     if (type === 'application/pdf') {
-      // Generar la URI en formato base64 para el PDF
-      const pdfUri = `data:application/pdf;base64,${data}`;
+      // Incrustar el PDF en un HTML para WebView
+      const pdfHtml = `
+        <html>
+          <head>
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                height: 100%;
+              }
+              .pdf-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+              }
+              embed {
+                width: 100%;
+                height: 100%;
+                display: block;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="pdf-container">
+              <embed src="data:application/pdf;base64,${data}" type="application/pdf" />
+            </div>
+          </body>
+        </html>
+      `;
+  
       return (
         <WebView
           originWhitelist={['*']}
-          source={{ uri: pdfUri }}
+          source={{ html: pdfHtml }}
           style={{ flex: 1 }}
           onError={(error) => console.log('Error en WebView:', error)}
         />
       );
-
     } else if (type.startsWith('image/')) {
+      // Mostrar imagenes (jpg/jpeg) en el componente Image
       const imageUrl = `data:${type};base64,${data}`;
       return (
         <Image
@@ -180,6 +221,7 @@ const Documents = () => {
   
     return <Text>Tipo de archivo no soportado.</Text>;
   };
+  
 
   // Cerrar todos los dropdowns
   const closeDropdowns = () => {
@@ -361,12 +403,21 @@ const Documents = () => {
         encoding: FileSystem.EncodingType.Base64,
       });
   
+      // Buscar la proyección seleccionada
+      const selectedProjectionData = projections.find(p => p.id === selectedProjection);
+  
+      if (!selectedProjectionData) {
+        setErrorMessage('Proyección seleccionada no encontrada.');
+        return;
+      }
+  
       const document = {
         file_name: file.name,
         file_type: fileType,
         size: file.size,
         file: fileData, // Archivo en formato base64
-        projection_id: projections.find(p => p.id === selectedProjection).id,
+        projection_id: selectedProjectionData.id,
+        activity: selectedProjectionData.activity, // Agregar el campo "activity"
         account_id: userId,
       };
   
@@ -386,13 +437,13 @@ const Documents = () => {
       await fetchDocumentsAndProjections();
     } catch (error) {
       console.error('Error al subir el documento:', error);
-
+  
       // Manejamos diferentes tipos de errores
       const errorMsg =
         error.response?.data?.message ||
         error.message ||
         'Error desconocido al subir el documento.';
-      
+  
       setErrorMessage(errorMsg); // Mostrar mensaje de error
     } finally {
       setLoading(false); // Ocultar pantalla de carga
@@ -512,7 +563,7 @@ const Documents = () => {
         {/* Barra de búsqueda */}
         <View style={tw`mb-6`}>
           <View style={tw`flex-row items-center border-b border-gray-300`}>
-            <Ionicons name="search" size={24} color="#888" />
+            <Ionicons name="search" size={24} color="#000" />
             <TextInput
               placeholder="Buscar en mis documentos"
               value={searchQuery}
@@ -609,7 +660,7 @@ const Documents = () => {
         </View>
 
         {/* Botón para abrir el modal de proyecciones */}
-        <Text style={tw`text-gray-700 font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
+        <Text style={tw`text-black font-bold mb-2 text-base`}>Selecciona una actividad para subir un documento nuevo:</Text>
         <TouchableOpacity
           onPress={openProjectionModal}
           style={tw`bg-white p-4 rounded-lg mb-4 border border-gray-300 flex-row justify-between items-center`}
@@ -630,7 +681,7 @@ const Documents = () => {
 
           {/* Encabezado de la lista */}
           <View style={tw`flex-row py-2 border-b border-gray-300`}>
-            {["Nombre", "Tamaño", "Subido", "Proyección"].map((header) => (
+            {["Archivos"].map((header) => (
               <View key={header} style={tw`flex-1 items-center`}>
                 <Text style={tw`font-bold text-sm`}>{header}</Text>
               </View>
@@ -654,30 +705,22 @@ const Documents = () => {
                       selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`,
                     ]}
                   >
-                    <View style={tw`flex-1 items-center justify-center`}>
-                      <Ionicons 
-                        name={item.type === 'pdf' ? 'document' : 'image'} 
-                        size={20} 
-                        color={item.type === 'pdf' ? 'red' : 'blue'} 
-                      />
-                      <Text 
-                        style={tw`ml-2`} 
-                        numberOfLines={1} 
-                        ellipsizeMode="tail"
-                      >
-                        {item.name}
-                      </Text>
-                    </View>
-                    <View style={tw`flex-1 items-center`}>
-                      <Text numberOfLines={1} ellipsizeMode="tail">{item.size}</Text>
-                    </View>
-                    <View style={tw`flex-1 items-center`}>
-                      <Text numberOfLines={1} ellipsizeMode="tail">{item.date}</Text>
-                    </View>
-                    <View style={tw`flex-1 items-center`}>
-                      <Text numberOfLines={1} ellipsizeMode="tail">{item.projection}</Text>
-                    </View>
-                  </TouchableOpacity>
+                    <Ionicons name={item.type === 'pdf' ? 'document' : 'image'} size={24} color={item.type === 'pdf' ? 'red' : 'blue'} style={tw`mr-3`} />
+      
+                  {/* Contenedor del nombre y proyección */}
+                  <View style={tw`flex-1`}>
+                    {/* Nombre del documento */}
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={tw`text-lg font-semibold`}>
+                      {item.name}
+                    </Text>
+                    
+                    {/* Proyección debajo del nombre */}
+                    <Text style={tw`text-gray-500 text-sm`}>{item.projection}</Text>
+                  </View>
+                  
+                  {/* Icono de tres puntos para detalles */}
+                 
+                </TouchableOpacity>
                 )}
               />
             )}
@@ -688,7 +731,7 @@ const Documents = () => {
       {/* Modal para visualizar documentos */}
       <Modal visible={isModalOpen} transparent={true} animationType="fade" onRequestClose={() => setIsModalOpen(false)}>
       <View style={tw`flex-1 bg-black bg-opacity-90 justify-center items-center`}>
-        <View style={tw`absolute top-5 w-full flex-row justify-between items-center px-4`}>
+        <View style={tw`absolute top-12 w-full flex-row justify-between items-center px-4`}>
           
           {/* Botón de Cerrar */}
           <TouchableOpacity
@@ -766,7 +809,7 @@ const Documents = () => {
       {/* Modal para seleccionar proyección */}
       <Modal
           visible={isProjectionModalOpen}
-          transparent={true} // Esto permite el fondo con opacidad
+          transparent={true} 
           animationType="fade"
           onRequestClose={() => setIsProjectionModalOpen(false)}
         >
