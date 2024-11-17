@@ -22,8 +22,8 @@ class Date_Event(models.Model):
         return self.activity
     
     class Meta:
-        verbose_name = _('date')
-        verbose_name_plural = _('dates')
+        verbose_name = _('Fecha en calendario')
+        verbose_name_plural = _('Fechas en calendario')
         db_table = 'dates'
         indexes = [
             models.Index(fields=['start_date', 'end_date']),
