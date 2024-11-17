@@ -85,7 +85,7 @@ const Documents = () => {
         size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
         date: new Date(doc.upload_date).toLocaleDateString(),
         type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
-        projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección',
+        projection: doc.activity || 'Sin proyección',
       }));
   
       setFileData(documents || []);
@@ -403,12 +403,21 @@ const Documents = () => {
         encoding: FileSystem.EncodingType.Base64,
       });
   
+      // Buscar la proyección seleccionada
+      const selectedProjectionData = projections.find(p => p.id === selectedProjection);
+  
+      if (!selectedProjectionData) {
+        setErrorMessage('Proyección seleccionada no encontrada.');
+        return;
+      }
+  
       const document = {
         file_name: file.name,
         file_type: fileType,
         size: file.size,
         file: fileData, // Archivo en formato base64
-        projection_id: projections.find(p => p.id === selectedProjection).id,
+        projection_id: selectedProjectionData.id,
+        activity: selectedProjectionData.activity, // Agregar el campo "activity"
         account_id: userId,
       };
   
@@ -428,13 +437,13 @@ const Documents = () => {
       await fetchDocumentsAndProjections();
     } catch (error) {
       console.error('Error al subir el documento:', error);
-
+  
       // Manejamos diferentes tipos de errores
       const errorMsg =
         error.response?.data?.message ||
         error.message ||
         'Error desconocido al subir el documento.';
-      
+  
       setErrorMessage(errorMsg); // Mostrar mensaje de error
     } finally {
       setLoading(false); // Ocultar pantalla de carga

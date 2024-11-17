@@ -20,8 +20,13 @@ function Header() {
     useEffect(() => {
         const updateUnitsProjection = () => {
             const accountDetails = JSON.parse(localStorage.getItem("accountDetails"));
-            if (accountDetails && accountDetails.units_projection) {
-                setUnitsProjection(accountDetails.units_projection);
+            if (accountDetails && accountDetails.units_projection !== undefined) {
+                // Si units_projection es 0, lo convertimos en la cadena "0"
+                const projectionValue =
+                    accountDetails.units_projection === 0
+                        ? "0"
+                        : accountDetails.units_projection;
+                setUnitsProjection(projectionValue);
             }
         };
     

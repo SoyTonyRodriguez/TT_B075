@@ -1,52 +1,62 @@
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
-# from .models import ProductCheck
-# from products.models import Products
-# from accounts.models import Accounts
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from products.models import Products
+from .models import ProductCheck
+from accounts.models import Accounts
 
-# @receiver(post_save, sender=Products)
-# def update_product_check(sender, instance, **kwargs):
-#     account_id = instance.account_id
-#     activity_name = instance.activity
-#     units = instance.units
+@receiver(post_delete, sender=Products)
+def update_product_check_on_delete(sender, instance, **kwargs):
+    # Verificar si el campo progress es 100
+    if instance.progress == 100:
+        return  # No ejecutar la señal si el progreso es 100
 
-#     # Obtener o crear un ProductCheck para la cuenta
-#     product_check, created = ProductCheck.objects.get_or_create(account_id=account_id)
+    account_id = instance.account_id
+    activity_name = instance.activity
+    category_name = instance.function
+    units = instance.units
 
-#     # Actualizar las actividades dentro de ProductCheck
-#     if activity_name in product_check.categories:
-#         product_check.categories[activity_name]['length'] += 1
-#         product_check.categories[activity_name]['up'] += units
-#     else:
-#         product_check.categories[activity_name] = {
-#             'length': 1,
-#             'up': units
-#         }
+    # Buscar el ProductCheck asociado
+    try:
+        product_check = ProductCheck.objects.get(account_id=account_id)
+    except ProductCheck.DoesNotExist:
+        return  # No hay ProductCheck asociado, no es necesario realizar cambios
 
-#     account = Accounts.objects.get(id=account_id)
-#     print(account)
-#     account.units_projection = product_check.categories['total_up']
-#     account.save()
+    # Verificar si la categoría y la actividad existen en el ProductCheck
+    if category_name in product_check.categories:
+        if activity_name in product_check.categories[category_name]:
+            # Reducir valores en la actividad
+            product_check.categories[category_name][activity_name]['length'] -= 1
+            product_check.categories[category_name][activity_name]['up'] -= units
 
-#     # Guardar los cambios
-#     product_check.save()
+            # Eliminar la actividad si su `length` llega a 0
+            if product_check.categories[category_name][activity_name]['length'] <= 0:
+                del product_check.categories[category_name][activity_name]
 
+        # Recalcular el total de la categoría
+        total_category_up = sum(
+            activity.get('up', 0) for key, activity in product_check.categories[category_name].items()
+            if isinstance(activity, dict)
+        )
+        product_check.categories[category_name]['total'] = total_category_up
 
-# # @receiver(post_save, sender=ProductCheck)
-# # def update_units_projection(sender, instance, **kwargs):
-# #     try:
-# #         account_id = instance.account_id
-# #         # Calcula el total_up a partir de las categorías (aquí debes definir cómo se calcula exactamente)
-# #         total_up = sum(
-# #             sum(activity['value'] for activity in category['activities'])
-# #             for category in instance.categories.values()
-# #             if 'activities' in category
-# #         )
-        
-# #         # Busca la cuenta asociada por account_id y actualiza units_projection
-# #         account = Accounts.objects.get(id=instance.account_id)
-# #         account.units_projection = total_up
-# #         account.save()
-# #     except Accounts.DoesNotExist:
-# #         # Maneja el caso donde no se encuentra la cuenta
-# #         print(f"No se encontró la cuenta con id {instance.account_id}")
+        # Eliminar la categoría si ya no tiene actividades
+        if not product_check.categories[category_name]:
+            del product_check.categories[category_name]
+
+    # Recalcular el total general de 'up'
+    total_up = sum(
+        category.get('total', 0) for key, category in product_check.categories.items()
+        if isinstance(category, dict) and 'total' in category
+    )
+    product_check.categories['total_up'] = total_up
+
+    # Actualizar el total en la cuenta
+    try:
+        account = Accounts.objects.get(id=account_id)
+        account.units_projection = total_up
+        account.save()
+    except Accounts.DoesNotExist:
+        pass  # Si la cuenta no existe, no se realiza ninguna acción
+
+    # Guardar los cambios en el ProductCheck
+    product_check.save()
