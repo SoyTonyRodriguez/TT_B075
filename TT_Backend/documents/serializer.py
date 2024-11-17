@@ -4,7 +4,7 @@ from .models import Document
 class RegisterDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ['id', 'file_name', 'file_type', 'size', 'account_id', 'projection_id', 'file']  # Cambia 'file' a 'file_content' si lo prefieres
+        fields = ['id', 'file_name', 'file_type', 'size', 'account_id', 'projection_id', 'activity', 'file'] 
         extra_kwargs = {
             'id': {'read_only': True},
             'account_id': {'read_only': True},
@@ -21,6 +21,8 @@ class RegisterDocumentSerializer(serializers.ModelSerializer):
         validated_data['file_name'] = file.name
         validated_data['file_type'] = file.content_type
         validated_data['size'] = file.size
+        validated_data['projection_id'] = request.data.get('projection_id', None)
+        validated_data['activity'] = request.data.get('activity', None)
         validated_data['file'] = file.read()  # Leer como binario
 
         account_id = request.auth.get('user_id') if request.auth else request.user.id
@@ -38,6 +40,8 @@ class RegisterDocumentSerializer(serializers.ModelSerializer):
             validated_data['file_name'] = new_file.name
             validated_data['file_type'] = new_file.content_type
             validated_data['size'] = new_file.size
+            validated_data['projection_id'] = new_file.projection_id
+            validated_data['activity'] = new_file.activity
             validated_data['file'] = new_file.read()  # Lee el nuevo archivo
 
         # Actualiza el objeto

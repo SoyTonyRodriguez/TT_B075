@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import perfilImage from '../img/perfi.png';
 import Navigation from './Navigation/Navigation';
 import { updateAccount } from '../../../api/accounts.api';
+import LoadingAnimation from "../components/LoadingAnimation";
 
 function Account() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,6 +16,7 @@ function Account() {
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -23,74 +25,82 @@ function Account() {
     try {
       const storedAccountData = localStorage.getItem('accountDetails');
       if (storedAccountData) {
-        const { userName, fullName, email, category, phone } = JSON.parse(storedAccountData);
+        const { userName, fullName, email, category } = JSON.parse(storedAccountData);
         setUserName(userName);
         setFullName(fullName);
         setEmail(email);
         setCategory(category);
-        setPhone(phone);
       }
     } catch (error) {
-      console.error("Error accessing or parsing account details from localStorage:", error);
-      localStorage.removeItem('accountDetails');
+      console.error('Error accessing or parsing account details from localStorage:', error);
     }
   }, []);
 
   const handleEdit = () => {
-    setIsEditing(true);  // Habilitar modo edición
+    setIsEditing(true); // Habilitar modo edición
   };
 
   // Función para decodificar el token JWT manualmente
   const decodeToken = (token) => {
-    const base64Url = token.split('.')[1]; // Extraer el payload
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Reemplazar caracteres para base64url
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+        .join('')
+    );
     return JSON.parse(jsonPayload);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-  
-    const token = localStorage.getItem('token');  // Obtener el token del localStorage
-  
+
+    const token = localStorage.getItem('token'); // Obtener el token del localStorage
+
     if (!token) {
-      console.error("Token no encontrado");
+      console.error('Token no encontrado');
       return;
     }
-  
-    // Decodificar el token manualmente
+
     const decodedToken = decodeToken(token);
-    const userId = decodedToken.user_id;  // Obtenemos el user_id del payload
-  
-    console.log(`UserID: ${userId}`);
-    console.log(`Token: ${token}`);
-  
-    // Actualizar los nombres de los campos según lo que el backend espera
+    const userId = decodedToken.user_id;
+
     const updatedData = {
-      name: fullName,  // El backend espera "name" en lugar de "full_name"
-      email: email,    // Este está bien
-      category: category,  // Este está bien
-      // Puedes añadir "employee_number" si lo necesitas
+      name: fullName,
+      email: email,
+      category: category,
     };
-  
-    console.log('Datos enviados:', updatedData);
-  
+
     try {
-      console.log(`URL: http://192.168.100.97:8000/api/v1/account/${userId}/`);
-  
-      const response = await updateAccount(userId, token, updatedData);  // Llamada a la API para actualizar la cuenta
+      setLoading(true); // Activar el indicador de carga
+      const response = await updateAccount(userId, token, updatedData); // Llamada a la API para actualizar la cuenta
       console.log('Respuesta del servidor:', response);
-      
-      setIsEditing(false);  // Desactivar modo edición
-      navigate('/home');  // Redirigir a otra página existente, como la pantalla de inicio
+
+      // Actualizar `localStorage` con los datos actualizados
+      const storedAccountData = JSON.parse(localStorage.getItem('accountDetails')) || {};
+      const updatedAccountData = {
+        ...storedAccountData, // Mantener datos existentes
+        userName: userName,   // Actualizar con nuevos valores
+        fullName: fullName,
+        email: email,
+        category: category,
+      };
+      localStorage.setItem('accountDetails', JSON.stringify(updatedAccountData));
+      console.log('Datos actualizados en localStorage:', updatedAccountData);
+
+      setIsEditing(false); // Desactivar modo edición
+      navigate('/home'); // Redirigir a otra página existente, como la pantalla de inicio
     } catch (error) {
-      console.error("Error actualizando la cuenta:", error.response ? error.response.data : error.message);
+      console.error('Error actualizando la cuenta:', error.response ? error.response.data : error.message);
+    } finally {
+      setLoading(false); // Desactivar el indicador de carga
     }
   };
-  
-  
+
+  if (loading) {
+    return <LoadingAnimation />;
+  }
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -116,9 +126,7 @@ function Account() {
   return (
     <div className="min-h-screen bg-cover bg-center">
       <Navigation />
-
       <hr className="border-t-2 border-black my-4" />
-
       <div className="bg-gray-700 text-white p-8 rounded-lg shadow-md max-w-4xl mx-auto flex items-center">
         <div className="w-1/3 flex flex-col items-center">
           <div className="bg-blue-400 rounded-full h-40 w-40 flex items-center justify-center text-white text-4xl mb-4">
@@ -137,10 +145,7 @@ function Account() {
           <button onClick={handleImageSave} className="text-blue-300 hover:underline mt-2">
             Guardar imagen
           </button>
-          <div className="mt-8 flex items-center">
-            <input type="checkbox" className="mr-2" checked />
-            <label className="text-sm">Recibir notificaciones</label>
-          </div>
+
         </div>
         <div className="w-2/3 ml-8">
           <form onSubmit={handleSave}>
