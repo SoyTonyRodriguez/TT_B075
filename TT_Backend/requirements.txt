@@ -17,3 +17,4 @@ sqlparse==0.2.4
 types-PyYAML==6.0.12.20240808
 typing_extensions==4.12.2
 uuid==1.30
+gunicorn
