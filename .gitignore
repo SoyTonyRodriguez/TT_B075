@@ -38,7 +38,8 @@ yarn-error.*
 # Python virtaul enviroment
 env/
 
-.env
+TT_Backend/mongo.env
+*.env
 
 # Byte-compiled / optimized / DLL files
 TT_Backend/**/__pycache__/
