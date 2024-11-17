@@ -38,6 +38,8 @@ yarn-error.*
 # Python virtaul enviroment
 env/
 
+.env
+
 # Byte-compiled / optimized / DLL files
 TT_Backend/**/__pycache__/
 *.py[cod]

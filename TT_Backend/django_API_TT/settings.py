@@ -142,15 +142,21 @@ MIGRATION_MODULES = {
 #  }
 #}
 
-# Cluster conection
+# Configuración de entorno
+env = environ.Env()
+# Lee el archivo .env
+environ.Env.read_env(os.path.join(BASE_DIR, 'mongo.env'))
+
+# Configuración de la base de datos
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'TT_DB',  # The name of your MongoDB database
+        'NAME': env('MONGO_NAME'),  # Nombre de la base de datos
         'CLIENT': {
-            'host': 'mongodb+srv://rodriguezfloresantonioo:<db_password>@clustertt.txd45.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTT',
-            'username': 'rodriguezfloresantonioo',  # Replace with your MongoDB username
-            'password': 'FXue6Nm47gbDniW3',  # Replace with your MongoDB password
+            'host': env('MONGO_HOST'),  # Host de MongoDB
+            'username': env('MONGO_USERNAME'),  # Usuario de MongoDB
+            'password': env('MONGO_PASSWORD'),  # Contraseña de MongoDB
+            'authSource': env('MONGO_AUTH_DB'),  # Base de autenticación
         }
     }
 }
@@ -218,7 +224,7 @@ CORS_ALLOWED_ORIGINS = [
   'http://192.168.100.97:8081',
   'http://0.0.0.0:8000',
   'http://0.0.0.0:8081',
-
+  'https://tt-b075.onrender.com',
 ]
 
 ALLOWED_HOSTS = ["*"]
