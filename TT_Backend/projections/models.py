@@ -46,8 +46,8 @@ class Projection(models.Model):
         return self.id
 
     class Meta:
-        verbose_name = _('projection')
-        verbose_name_plural = _('projections')
+        verbose_name = _('Proyeccion')
+        verbose_name_plural = _('Proyecciones')
         db_table = 'projections'
         indexes = [
             models.Index(fields=['start_date', 'end_date']),
