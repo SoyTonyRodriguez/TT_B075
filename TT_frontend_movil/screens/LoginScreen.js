@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Image, ImageBackground, TouchableOpacity, ScrollView, Dimensions, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons'; 
-import { useNavigation } from '@react-navigation/native'; 
+import { useNavigation, CommonActions } from '@react-navigation/native';
 import tw from 'twrnc'; 
 import { useForm, Controller } from "react-hook-form";
 import { login } from "../api/accounts.api"; // Importa tu función de API
@@ -47,7 +47,12 @@ const LoginScreen = () => {
       if (response.status === 200) {
         // Save the token or user data as needed
         await AsyncStorage.setItem('token', JSON.stringify(response.data.access));
-        navigation.navigate("HomeScreen");
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "HomeScreen" }],
+          })
+        );
         console.log("Inicio de sesión exitoso:", response.data);
 
       } else {
