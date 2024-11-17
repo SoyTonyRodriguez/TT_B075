@@ -18,7 +18,8 @@ class Document(models.Model):
     file_name = models.CharField(max_length=255)  # Nombre del archivo
     file_type = models.CharField(max_length=50)   # Tipo MIME del archivo
     size = models.IntegerField()                  # Tamaño del archivo en bytes
-    projection_id = models.CharField(max_length=255) 
+    projection_id = models.CharField(max_length=255)  # Relacionado con el producto al que pertenece el documento
+    activity = models.CharField(max_length=255)  # Actividad a la que pertenece el documento
     upload_date = models.DateTimeField(auto_now_add=True)  # Fecha de subida
     file = models.BinaryField()  # Almacena el archivo como datos binarios
 
