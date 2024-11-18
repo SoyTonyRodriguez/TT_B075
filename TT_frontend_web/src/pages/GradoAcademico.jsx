@@ -4,8 +4,7 @@ import Navigation from './Navigation/Navigation';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { toast } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
-import { createProduct } from '../../../api/products.api';
+import { createProduct } from '../api/products.api';
 
 export default function ProyeccionGrado() {
   const navigate = useNavigate();

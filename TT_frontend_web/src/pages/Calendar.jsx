@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, startOfWeek, addDays, setMonth, setYear, addMonths, subMonths, isSameDay, isSameMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Navigation from './Navigation/Navigation';  
-import { getAllDates } from '../../../api/calendar_dates.api';
+import { getAllDates } from '../api/calendar_dates.api';
 import LoadingAnimation from '../components/LoadingAnimation';
 
 const CalendarWithDetails = () => {
