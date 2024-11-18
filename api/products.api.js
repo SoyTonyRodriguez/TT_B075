@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Initial set-up
 const TasksAPI = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
 })
 
 // create projection method
