@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Initial set-up
 const accountsAPI = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL,
+    baseURL: 'https://tt-b075.onrender.com/api/v1/'
 })
 
 // getall dates
