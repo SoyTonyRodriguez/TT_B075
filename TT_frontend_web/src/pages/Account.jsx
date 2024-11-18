@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import perfilImage from '../img/perfi.png';
 import Navigation from './Navigation/Navigation';
-import { updateAccount } from '../../../api/accounts.api';
+import { updateAccount } from '../api/accounts.api';
 import LoadingAnimation from "../components/LoadingAnimation";
 
 function Account() {

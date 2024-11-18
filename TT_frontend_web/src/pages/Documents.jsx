@@ -7,8 +7,8 @@ import LoadingAnimation from "../components/LoadingAnimation";
 import { TbXboxXFilled, TbReplace } from "react-icons/tb";
 import LoadingSpinner from '../components/LoadingSpinner';
 
-import { uploadDocument, getDocuments, deleteDocument, replaceDocument, getDocument } from '../../../api/documents.api';
-import { getProduct } from '../../../api/products.api'; // Importa la función que obtiene las proyecciones
+import { uploadDocument, getDocuments, deleteDocument, replaceDocument, getDocument } from '../api/documents.api';
+import { getProduct } from '../api/products.api'; // Importa la función que obtiene las proyecciones
 
 import { jwtDecode } from 'jwt-decode';
 

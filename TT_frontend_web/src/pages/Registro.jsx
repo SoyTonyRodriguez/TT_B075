@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-import { createAccount } from '../../../api/accounts.api';
+import { createAccount } from '../api/accounts.api';
 import LoadingAnimation from "../components/LoadingAnimation";  // Importa tu componente de animación
 
 

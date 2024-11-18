@@ -226,7 +226,6 @@ CORS_ALLOWED_ORIGINS = [
   'http://0.0.0.0:8000',
   'http://0.0.0.0:8081',
   'https://tt-b075.onrender.com',
-  'https://tt-b075-git-developmen-fcdf18-antonio-rodriguez-flores-projects.vercel.app/',
 ]
 
 ALLOWED_HOSTS = ["*"]
