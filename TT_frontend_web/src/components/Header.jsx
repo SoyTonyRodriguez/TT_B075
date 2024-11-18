@@ -105,7 +105,7 @@ function Header() {
                         </div>
                     )}
 
-                    {/* Mostrar menú de cierre de sesión cuando se haga clic en el icono del perfil */}
+                    {/* Este boton no sirve JAJAJAJAJAJAJAJA */}
                     {isAuthenticated && isMenuOpen && (
                         <motion.div 
                             whileHover={{ scale: 1.05, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)" }}
@@ -131,12 +131,11 @@ function Header() {
                     </div>
 
                     {/* Menú principal para pantallas grandes */}
-                    <nav className="flex-1 hidden md:flex justify-center gap-8 items-center text-center">
+                    <nav className="flex justify-center items-center gap-4 text-center">
                         <AnimatedLink to="/welcome">Inicio</AnimatedLink>
                         <AnimatedLink to="/ConocerMas">Más información</AnimatedLink>
                         <AnimatedLink to="/Nosotros">Nosotros</AnimatedLink>
                     </nav>
-
                     {/* Botón de usuario / Login para pantallas grandes */}
                     <div className="hidden md:flex items-center space-x-4">
                         {isAuthenticated && (
@@ -193,7 +192,7 @@ function Header() {
                         Nosotros
                     </Link>
 
-                    {/* Botón de cerrar sesión mejorado en menú móvil */}
+                    {/* Botón de cerrar sesión en menú móvil */}
                     {isAuthenticated && (
                         <motion.div 
                             whileHover={{ scale: 1.05, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)" }}
