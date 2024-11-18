@@ -3,7 +3,7 @@ import { IoChevronBackOutline, IoChevronForwardOutline, IoSchoolOutline, IoStarO
 import { useNavigate } from 'react-router-dom';
 import Navigation from './Navigation/Navigation';
 import LoadingAnimation from "../components/LoadingAnimation";
-import { createProjection } from '../../../api/projections.api';
+import { createProjection } from '../api/projections.api';
 
 function ProjectionFirstTime() {
   const [loading, setLoading] = useState(false);
