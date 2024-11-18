@@ -219,12 +219,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Put the url from frontend here
 CORS_ALLOWED_ORIGINS = [
   "http://localhost:5173",
+  'http://localhost:4173',
   "http://localhost:8081",
   'http://192.168.100.97:8000',
   'http://192.168.100.97:8081',
   'http://0.0.0.0:8000',
   'http://0.0.0.0:8081',
   'https://tt-b075.onrender.com',
+  'https://tt-b075-git-developmen-fcdf18-antonio-rodriguez-flores-projects.vercel.app/',
 ]
 
 ALLOWED_HOSTS = ["*"]
