@@ -1,7 +1,6 @@
 import axios from "axios";
 
 // Initial set-up
-// Obtén la base URL desde las variables de entorno
 const accountsAPI = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
