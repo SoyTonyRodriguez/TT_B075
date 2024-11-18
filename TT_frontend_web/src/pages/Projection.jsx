@@ -69,7 +69,7 @@ function ProyeccionSeguimiento() {
 
 
   return (
-    <div className="min-h-screen bg-cover bg-center relative">
+    <div className="min-h-screen bg-cover bg-center pb-12">
       {/* Navegación fija */}
       <Navigation />
       <hr className="border-t-2 border-black my-4" />
