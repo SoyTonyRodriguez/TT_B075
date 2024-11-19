@@ -5,6 +5,7 @@ const TasksAPI = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 })
 
+
 // upload document method
 export const uploadDocument = (document) => {
     const token = localStorage.getItem('token');

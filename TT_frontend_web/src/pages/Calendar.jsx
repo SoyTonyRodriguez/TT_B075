@@ -250,8 +250,7 @@ const CalendarWithDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center">
-      {/* navegación fija */}
+    <div className="min-h-screen bg-cover bg-center pb-12">
       <Navigation />
 
       <hr className="border-t-2 border-black my-4" />
@@ -271,7 +270,6 @@ const CalendarWithDetails = () => {
           Final
         </button>
       </div>
-
 
       {/* Contenido del Calendario */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

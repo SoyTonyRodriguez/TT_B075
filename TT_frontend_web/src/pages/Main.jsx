@@ -21,7 +21,7 @@ function MainContent() {
     <main className="min-h-screen bg-cover bg-center">
       <div className="container mx-auto p-8">
         <div className="text-center">
-          <h1 className="text-5xl font-bold mb-6">BIENVENIDO</h1>
+          <h1 className="text-5xl font-bold mb-6">Bienvenido</h1>
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 mb-12">

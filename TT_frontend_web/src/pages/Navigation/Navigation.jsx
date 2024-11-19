@@ -242,7 +242,7 @@ function Navigation() {
             onMouseLeave={() => setHoveredButton(null)} // Ocultar texto cuando se retira el cursor
           >
             {hoveredButton === 'projection' && (
-              <span className="bg-black text-white px-2 py-1 rounded-md mr-2">
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
                 Proyección y seguimiento
               </span>
             )}
@@ -263,7 +263,7 @@ function Navigation() {
             onMouseLeave={() => setHoveredButton(null)}
           >
             {hoveredButton === 'documents' && (
-              <span className="bg-black text-white px-2 py-1 rounded-md mr-2">
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
                 Mis documentos
               </span>
             )}
@@ -284,7 +284,7 @@ function Navigation() {
             onMouseLeave={() => setHoveredButton(null)}
           >
             {hoveredButton === 'calendar' && (
-              <span className="bg-black text-white px-2 py-1 rounded-md mr-2">
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
                 Calendario
               </span>
             )}
@@ -305,7 +305,7 @@ function Navigation() {
             onMouseLeave={() => setHoveredButton(null)}
           >
             {hoveredButton === 'links' && (
-              <span className="bg-black text-white px-2 py-1 rounded-md mr-2">
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
                 Enlaces y bases
               </span>
             )}
@@ -326,7 +326,7 @@ function Navigation() {
             onMouseLeave={() => setHoveredButton(null)}
           >
             {hoveredButton === 'account' && (
-              <span className="bg-black text-white px-2 py-1 rounded-md mr-2">
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
                 Mi cuenta
               </span>
             )}
