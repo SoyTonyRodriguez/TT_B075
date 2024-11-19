@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StatusBar, Image, ImageBackground, TouchableOpacity, ScrollView } from "react-native"; 
+import { View, Text, StatusBar, Image, ImageBackground, TouchableOpacity, ScrollView } from "react-native"; 
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import { getAccount } from "../api/accounts.api"; // Importa tu función de API
@@ -23,6 +23,7 @@ const HomeScreen = () => {
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('');
   const [phone, setPhone] = useState('');
+  const [unitsProjection, setUnitsProjection] = useState(0);
 
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
   const [loading, setLoading] = useState(true); // Estado de carga
@@ -37,7 +38,6 @@ const HomeScreen = () => {
         Toast.show({ type: 'success', text1: 'Bienvenido!', visibilityTime: 1000 });
 
         const storedConditions = await AsyncStorage.getItem('conditions');
-
         const storedConditionsMax = await AsyncStorage.getItem('conditions_max');
         
         const token = await AsyncStorage.getItem('token');
@@ -72,7 +72,7 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (userId ) {
+    if (userId) {
       const fetchAccountDetails = async () => {
         try {
           const response = await getAccount(userId);
@@ -84,14 +84,16 @@ const HomeScreen = () => {
             const email = response.data.email || 'Sin email';
             const category = response.data.category || 'Sin categoría';
             const projection_id = response.data.projection_id || 'Sin proyección';
+            const unitsProjection = response.data.units_projection || 0;
       
             setUserName(firstName);
             setFullName(fullName);
             setEmail(email);
             setCategory(category);
+            setUnitsProjection(unitsProjection);
       
             // Guarda en AsyncStorage
-            const accountDetails = { userName: firstName, fullName, email, category, projection_id };
+            const accountDetails = { userName: firstName, fullName, email, category, projection_id, unitsProjection };
             await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
           } else {
             console.warn('La API no devolvió datos de usuario válidos.');
@@ -110,6 +112,29 @@ const HomeScreen = () => {
       fetchAccountDetails();
     }
   }, [userId, userName]);    
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (userId) {
+        const fetchAccountDetails = async () => {
+          try {
+            const response = await getAccount(userId);
+            
+            if (response && response.data) {
+              console.log('Detalles de la cuenta actualizados:', response.data);
+              const unitsProjection = response.data.units_projection || 0;
+              setUnitsProjection(unitsProjection);
+            }
+          } catch (error) {
+            console.error('Error al actualizar los detalles de la cuenta:', error);
+          }
+        };
+        fetchAccountDetails();
+      }
+    }, 5000); // Actualiza cada 5 segundos
+
+    return () => clearInterval(interval);
+  }, [userId]);
   
   const fetchConditions = async () => {
     try {
@@ -159,6 +184,12 @@ const HomeScreen = () => {
         <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
           <Text style={tw`text-2xl font-bold text-black`}>Bienvenido {`${userName}`}</Text>
           <Ionicons name="home" size={40} color="black" style={tw`ml-2`} />
+        </View>
+
+        {/* Unidades de Promoción */}
+        <View style={tw`px-4 mb-5 flex-row items-center`}>
+          <Ionicons name="star-outline" size={30} color="#ffd700" style={tw`mr-2`} />
+          <Text style={tw`text-lg text-black`}>Total de unidades de promoción: {unitsProjection}</Text>
         </View>
 
         {/* Contenedor de imágenes */}
@@ -228,7 +259,6 @@ const HomeScreen = () => {
             </View>
           </TouchableOpacity>
         </ScrollView>
-        
         
         {/* Toast container */}
         <CustomToast />

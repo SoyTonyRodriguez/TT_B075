@@ -6,6 +6,7 @@ const accountsAPI = axios.create({
 })
 
 
+
 // getDocuments from account method
 export const getConditionsMax = () => {
     const token = localStorage.getItem('token');
