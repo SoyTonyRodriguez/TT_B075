@@ -33,6 +33,11 @@ class DocumentsAdmin(models.Model):
     )
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de subida")
 
+    class Meta:
+        verbose_name = "Documento oficial"
+        verbose_name_plural = "Documentos oficiales"
+        
+
     def __str__(self):
         return self.title
 

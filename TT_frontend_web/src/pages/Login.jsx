@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 
 
 // new path:
-import { login as apiLogin, getAccount } from '../../../api/accounts.api'; // Llamada a la API
+import { login as apiLogin, getAccount } from '../api/accounts.api'; // Llamada a la API
 
 import LoadingAnimation from "../components/LoadingAnimation";  
 
