@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { createTask, getTasks, updateTask, deleteTask } from "../../../api/tasks.api";
-import { getProduct, updateProduct, deleteProduct } from '../../../api/products.api';
+import { createTask, getTasks, updateTask, deleteTask } from "../api/tasks.api";
+import { getProduct, updateProduct, deleteProduct } from '../api/products.api';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 import { Toaster, toast } from 'react-hot-toast';
@@ -11,7 +11,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { IoTime } from "react-icons/io5";
 import { TbXboxXFilled } from "react-icons/tb";
 import { AiOutlinePaperClip } from 'react-icons/ai'; // Importar el icono de clip
-import { get_Check_Products } from '../../../api/check_products.api';
+import { get_Check_Products } from '../api/check_products.api';
 
 import { Link } from 'react-router-dom';
 

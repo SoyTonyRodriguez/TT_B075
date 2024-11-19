@@ -9,8 +9,11 @@ import CustomToast from '../components/CustomToast'; // Toast personalizado
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 import {jwtDecode} from 'jwt-decode';
+import { ProgressBar } from 'react-native-paper'; // Usa una librería de barra de progreso
+
 import { getTasks, createTask, deleteTask, updateTask } from '../api/tasks.api';
-import { getProduct } from '../api/products.api';
+import { getProduct, updateProduct, deleteProduct } from '../api/products.api';
+import { get_Check_Products } from '../api/check_products.api';
 //import DraggableFlatList from 'react-native-draggable-flatlist';
 
 const KanbanBoard = () => {
@@ -33,6 +36,8 @@ const KanbanBoard = () => {
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
 
   const [userId, setUserId] = useState(''); // Accede al token y userId del contexto
+
+  const [expandedProjectionId, setExpandedProjectionId] = useState(null);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -99,6 +104,146 @@ const KanbanBoard = () => {
       fetchData(); // Llama a la función si existe un `userId`
     }
   }, [userId]); // Se ejecuta cada vez que `userId` cambia
+  
+  const safeParseJSON = (jsonString) => {
+    try {
+        // Reemplazar comillas simples con comillas dobles si es necesario
+        const fixedString = jsonString.replace(/'/g, '"');
+        return JSON.parse(fixedString);
+    } catch (error) {
+        console.error("Error parsing JSON:", error);
+        return []; // Devuelve un array vacío si el JSON no es válido
+    }
+  };
+
+  const calculateProgress = (projectionId) => {
+    const projectionTasks = tasks.filter((task) => task.projection_id === projectionId);
+    const doneTasks = projectionTasks.filter((task) => task.status === 'done');
+
+    const progress = projectionTasks.length
+      ? (doneTasks.length / projectionTasks.length) * 100
+      : 0;
+
+    const projection = projections.find((proj) => proj.id === projectionId);
+    
+    const projectionDocuments = Array.isArray(projection.documents_uploaded)
+    ? projection.documents_uploaded // Ya es un array, úsalo directamente
+    : safeParseJSON(projection.documents_uploaded || '[]');
+
+    const documentsUploadedCount = projectionDocuments.length;
+    const documentsRequiredCount = projection.documents_number || 0;
+
+    return {
+      progress: documentsUploadedCount < documentsRequiredCount
+        ? Math.min(progress, 100)
+        : Math.round(progress),
+      documentsUploadedCount,
+      documentsRequiredCount,
+      tasksCount: projectionTasks.length,
+      doneTasksCount: doneTasks.length,
+    };
+  };
+
+  const toggleExpand = (projectionId) => {
+    setExpandedProjectionId(expandedProjectionId === projectionId ? null : projectionId);
+  };
+
+  const updateProjectionProgress = async (projectionId) => {
+    const { progress } = calculateProgress(projectionId);
+    try {
+      await updateProduct(projectionId, { progress });
+      setProjections((prev) =>
+        prev.map((proj) => (proj.id === projectionId ? { ...proj, progress } : proj))
+      );
+    } catch (error) {
+      console.error('Error updating projection progress:', error);
+    }
+  };
+
+  const ProjectionCard = ({ projection }) => {
+    const {
+      progress,
+      documentsUploadedCount,
+      documentsRequiredCount,
+      tasksCount,
+      doneTasksCount,
+    } = calculateProgress(projection.id);
+
+    const confirmDelete = () => {
+      Alert.alert(
+        "Confirmar eliminación",
+        "¿Estás seguro de que deseas eliminar este producto y todas las tareas asociadas?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Eliminar", style: "destructive", onPress: () => handleDeleteProduct(projection.id) },
+        ],
+        { cancelable: true }
+      );
+    };
+
+    return (
+      <View style={[tw`bg-white p-4 mb-4 rounded-xl shadow-lg`, { borderColor: projection.color || '#ccc', borderWidth: 2 }]}>        
+        <View style={tw`flex-row justify-between items-center mb-2`}>
+          {/* Nombre de la actividad */}
+          <Text
+            style={tw`text-lg font-bold text-gray-800 flex-1`}
+            numberOfLines={1} // Limita a una línea y agrega ellipsis
+          >
+            {projection.activity}
+          </Text>
+          <Text style={tw`text-sm text-gray-500`}>({progress}%)</Text>
+        </View>
+
+        {/* Barra de progreso */}
+        <ProgressBar
+          progress={progress / 100}
+          color={progress === 100 ? 'green' : 'blue'}
+          style={tw`h-3 rounded-lg`}
+        />
+
+        <View style={tw`flex-row justify-between mt-2`}>
+          <Text style={tw`text-xs text-gray-600`}>Documentos: {documentsUploadedCount}/{documentsRequiredCount}</Text>
+          <Text style={tw`text-xs text-gray-600`}>Tareas: {doneTasksCount}/{tasksCount}</Text>
+        </View>
+        <TouchableOpacity onPress={() => toggleExpand(projection.id)}>
+            <Text style={tw`text-blue-500 text-sm`}>
+              {expandedProjectionId === projection.id ? 'Ocultar documentos' : 'Mostrar documentos'}
+            </Text>
+          </TouchableOpacity>
+        {expandedProjectionId === projection.id && (
+          <View style={tw`mt-4`}>
+            <Text style={tw`text-sm text-gray-700 font-bold`}>Documentos requeridos:</Text>
+            <View style={tw`mt-2`}>
+              {(projection.documents_required || '').split('\n').map((doc, index) => (
+                <Text key={index} style={tw`text-xs text-gray-700`}>
+                  - {doc.trim()}
+                </Text>
+              ))}
+            </View>
+
+            {documentsUploadedCount < documentsRequiredCount && (
+              <TouchableOpacity
+                onPress={() => {
+                  Alert.alert('Subir documento', 'Redirige al módulo de documentos.');
+                }}
+                style={tw`bg-blue-500 mt-4 px-4 py-2 rounded-lg`}>
+                <Text style={tw`text-white text-center text-sm`}>Subir Documentos</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+                {/* Botón para eliminar el producto */}
+        <TouchableOpacity
+          onPress={confirmDelete}
+          style={tw`bg-red-500 px-4 py-2 rounded-lg mt-4`}
+        >
+          <Text style={tw`text-white font-semibold text-center`}>Eliminar Producto</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
 
   const openEditModal = (task) => {
     setTaskToEdit(task);
@@ -112,15 +257,72 @@ const KanbanBoard = () => {
 
   const handleUpdateTask = async () => {
     try {
-      setLoadingMessage("Actualizando tarea..."); // Mensaje de carga
+      setLoadingMessage("Actualizando tarea...");
       setIsTaskLoading(true);
+  
+      // Validar que no se pueda marcar como 100% si faltan documentos
+      if (taskToEdit.status === 'done' && taskToEdit.projection_id) {
+        const projection = projections.find(
+          (proj) => proj.id === taskToEdit.projection_id
+        );
+  
+        if (projection) {
+          const documentsUploaded = safeParseJSON(projection.documents_uploaded || "[]");
+          const documentsRequired = projection.documents_number || 0;
+  
+          const projectionTasks = tasks.map((task) =>
+            task.id === taskToEdit.id ? { ...task, ...taskToEdit } : task
+          ).filter((task) => task.projection_id === taskToEdit.projection_id);
+  
+          const doneTasks = projectionTasks.filter((task) => task.status === "done");
+          const progress =
+            projectionTasks.length > 0
+              ? (doneTasks.length / projectionTasks.length) * 100
+              : 0;
+  
+          if (progress === 100 && documentsUploaded.length < documentsRequired) {
+            Toast.show({
+              type: "error",
+              text1: "Error",
+              text2: "No puedes completar esta proyección sin subir todos los documentos requeridos.",
+              visibilityTime: 2000,
+            });
+            setIsTaskLoading(false); // Termina la carga si no cumple la validación
+            return;
+          }
+        }
+      }
+  
+      // Actualiza la tarea en la API
       await updateTask(taskToEdit.id, taskToEdit);
-      setTasks(tasks.map((task) => (task.id === taskToEdit.id ? taskToEdit : task)));
-      Toast.show({ type: 'success', text1: 'Tarea actualizada', visibilityTime: 1000});
+  
+      // Actualiza localmente la lista de tareas
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskToEdit.id ? { ...task, ...taskToEdit } : task
+        )
+      );
+  
+      // Recalcula y actualiza el progreso si pertenece a una proyección
+      if (taskToEdit.projection_id) {
+        await updateProjectionProgress(taskToEdit.projection_id);
+      }
+  
+      Toast.show({
+        type: "success",
+        text1: "Tarea actualizada",
+        visibilityTime: 1000,
+      });
+  
       closeEditModal();
     } catch (error) {
-      console.error('Error updating task:', error);
-      Toast.show({ type: 'error', text1: 'Error', text2: 'No se pudo actualizar la tarea.', visibilityTime: 1000 });
+      console.error("Error updating task:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "No se pudo actualizar la tarea.",
+        visibilityTime: 1000,
+      });
     } finally {
       setIsTaskLoading(false);
     }
@@ -152,61 +354,208 @@ const KanbanBoard = () => {
 
   const handleCreateTask = async () => {
     if (!newTask.title || !newTask.description || !newTask.projection_id) {
-      Alert.alert('Error', 'Todos los campos son obligatorios.');
+      Alert.alert("Error", "Todos los campos son obligatorios.");
       return;
     }
-
+  
     try {
-      setLoadingMessage("Creando tarea..."); // Mensaje de carga
+      setLoadingMessage("Creando tarea...");
       setIsTaskLoading(true);
+  
+      // Crear la tarea en la API
       const response = await createTask(newTask);
-      setTasks([...tasks, response.data]);
+      const createdTask = response.data;
+  
+      // Actualizar las tareas localmente
+      const updatedTasks = [...tasks, createdTask];
+      setTasks(updatedTasks);
+  
+      // Recalcular y actualizar el progreso en la base de datos
+      if (createdTask.projection_id) {
+        const projectionTasks = updatedTasks.filter(
+          (task) => task.projection_id === createdTask.projection_id
+        );
+  
+        const doneTasks = projectionTasks.filter((task) => task.status === "done");
+  
+        const progress =
+          projectionTasks.length > 0
+            ? (doneTasks.length / projectionTasks.length) * 100
+            : 0;
+  
+        const projection = projections.find(
+          (proj) => proj.id === createdTask.projection_id
+        );
+  
+        const documentsUploaded = safeParseJSON(projection.documents_uploaded || "[]");
+        const documentsRequired = projection.documents_number || 0;
+  
+        const adjustedProgress =
+          documentsUploaded.length < documentsRequired
+            ? Math.min(progress, 99)
+            : Math.round(progress);
+  
+        await updateProduct(createdTask.projection_id, { progress: adjustedProgress });
+  
+        // Actualizar las proyecciones localmente
+        setProjections((prevProjections) =>
+          prevProjections.map((proj) =>
+            proj.id === createdTask.projection_id
+              ? { ...proj, progress: adjustedProgress }
+              : proj
+          )
+        );
+      }
+  
+      // Resetear el estado de la nueva tarea
       setNewTask({
-        title: '',
-        description: '',
-        priority: '',
-        status: 'todo',
-        projection_id: '',
+        title: "",
+        description: "",
+        priority: "",
+        status: "todo",
+        projection_id: "",
       });
+  
       setIsModalOpen(false);
-      Toast.show({type: 'success', text1: 'Tarea Creada', visibilityTime: 1000});
+  
+      Toast.show({ type: "success", text1: "Tarea Creada", visibilityTime: 1000 });
     } catch (error) {
-      console.error('Error creando tarea:', error);
-      Alert.alert('Error', 'No se pudo crear la tarea.');
+      console.error("Error creando tarea:", error);
+      Alert.alert("Error", "No se pudo crear la tarea.");
     } finally {
       setIsTaskLoading(false);
     }
   };
+  
 
   const handleDeleteTask = async (taskId) => {
-    // Almacena las tareas actuales para revertir si la API falla
-    const previousTasks = [...tasks];
-  
-    // Elimina la tarea localmente de inmediato
-    const updatedTasks = tasks.filter(task => task.id !== taskId);
-    setTasks(updatedTasks);
+    const taskToDelete = tasks.find((task) => task.id === taskId);
+    const previousTasks = [...tasks]; // Almacenar las tareas actuales por si hay un error
   
     try {
-      // Intenta eliminar la tarea desde la API
+      // Actualizar tareas localmente eliminando la tarea
+      const updatedTasks = tasks.filter((task) => task.id !== taskId);
+      setTasks(updatedTasks);
+  
+      // Llamar a la API para eliminar la tarea
       await deleteTask(taskId);
   
-      // Muestra un mensaje de éxito
-      Toast.show({ type: 'success', text1: 'Tarea eliminada', visibilityTime: 1000 });
-    } catch (error) {
-      console.error('Error eliminando tarea:', error);
+      // Si la tarea pertenece a una proyección, recalcular el progreso
+      if (taskToDelete.projection_id) {
+        const projectionTasks = updatedTasks.filter(
+          (task) => task.projection_id === taskToDelete.projection_id
+        );
   
-      // Restaura las tareas originales en caso de error
+        const doneTasks = projectionTasks.filter((task) => task.status === "done");
+  
+        const progress =
+          projectionTasks.length > 0
+            ? (doneTasks.length / projectionTasks.length) * 100
+            : 0;
+  
+        const projection = projections.find(
+          (proj) => proj.id === taskToDelete.projection_id
+        );
+  
+        const documentsUploaded = safeParseJSON(projection.documents_uploaded || "[]");
+        const documentsRequired = projection.documents_number || 0;
+  
+        const adjustedProgress =
+          documentsUploaded.length < documentsRequired
+            ? Math.min(progress, 99)
+            : Math.round(progress);
+  
+        await updateProduct(taskToDelete.projection_id, { progress: adjustedProgress });
+  
+        // Actualizar las proyecciones localmente
+        setProjections((prevProjections) =>
+          prevProjections.map((proj) =>
+            proj.id === taskToDelete.projection_id
+              ? { ...proj, progress: adjustedProgress }
+              : proj
+          )
+        );
+      }
+  
+      Toast.show({
+        type: "success",
+        text1: "Tarea eliminada",
+        visibilityTime: 1000,
+      });
+    } catch (error) {
+      console.error("Error eliminando tarea:", error);
+  
+      // Revertir cambios locales en caso de error
       setTasks(previousTasks);
   
-      // Muestra un mensaje de error
       Toast.show({
-        type: 'error', text1: 'Error', text2: 'No se pudo eliminar la tarea. Inténtalo de nuevo.'});
+        type: "error",
+        text1: "Error",
+        text2: "No se pudo eliminar la tarea. Inténtalo de nuevo.",
+        visibilityTime: 1000,
+      });
     }
   };
 
   const handleEditTaskChange = (name, value) => {
     setTaskToEdit({ ...taskToEdit, [name]: value });
   };
+
+  const handleDeleteProduct = async (productId) => {
+    const productToDelete = projections.find((proj) => proj.id === productId);
+    const previousProjections = [...projections]; // Almacenar las proyecciones actuales por si hay un error
+
+    try {
+        setLoadingMessage("Eliminando producto...");
+        setIsTaskLoading(true);
+
+        // Eliminar localmente la proyección antes de llamar a la API
+        const updatedProjections = projections.filter((proj) => proj.id !== productId);
+        setProjections(updatedProjections);
+
+        // Llamar a la API para eliminar el producto
+        await deleteProduct(productId);
+
+        // Eliminar tareas asociadas con el producto eliminado
+        const updatedTasks = tasks.filter((task) => task.projection_id !== productId);
+        setTasks(updatedTasks);
+
+        // Actualiza los datos de Check Products
+        const responseProductCheck = await get_Check_Products(userId);
+
+        let accountDetails = await AsyncStorage.getItem('accountDetails');
+        accountDetails = accountDetails ? JSON.parse(accountDetails) : {};
+
+        if (responseProductCheck.data.total_up === 0) {
+            accountDetails.units_projection = '0';
+        } else {
+            accountDetails.units_projection = responseProductCheck.data.total_up;
+        }
+
+        await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+
+        Toast.show({
+            type: "success",
+            text1: "Producto eliminado",
+            text2: "El producto y sus tareas asociadas han sido eliminados.",
+            visibilityTime: 2000,
+        });
+    } catch (error) {
+        console.error("Error eliminando producto:", error);
+
+        // Revertir los cambios locales en caso de error
+        setProjections(previousProjections);
+
+        Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "No se pudo eliminar el producto. Inténtalo de nuevo.",
+            visibilityTime: 2000,
+        });
+    } finally {
+        setIsTaskLoading(false);
+    }
+};
 
   const toggleSection = (section) => {
     setActiveSection((prevSection) => (prevSection === section ? null : section));
@@ -347,6 +696,20 @@ const KanbanBoard = () => {
             ))}
           </View>
         )}
+
+      {/* Sección Progresos */}
+      <TouchableOpacity onPress={() => toggleSection('progress')}>
+        <View style={tw`bg-blue-900 p-4 mt-5 rounded-xl`}>
+          <Text style={tw`text-lg font-semibold text-white`}>PROGRESOS</Text>
+        </View>
+      </TouchableOpacity>
+      {activeSection === 'progress' && (
+        <View style={tw`bg-white p-4 rounded-xl mt-2`}>
+          {projections.map((projection) => (
+            <ProjectionCard key={projection.id} projection={projection} />
+          ))}
+        </View>
+      )}
 
         {/* Botón para crear nueva tarea */}
         <TouchableOpacity
