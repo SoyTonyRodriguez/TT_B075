@@ -6,10 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
-import { createProduct } from '../../../api/products.api';
-import { get_Check_Products } from '../../../api/check_products.api';
-import { getProjection } from '../../../api/projections.api';
-import { getAccount } from '../../../api/accounts.api';
+import { createProduct } from '../api/products.api';
+import { get_Check_Products } from '../api/check_products.api';
+import { getProjection } from '../api/projections.api';
 
 function UnidadesPromocion() {
   const navigate = useNavigate();
