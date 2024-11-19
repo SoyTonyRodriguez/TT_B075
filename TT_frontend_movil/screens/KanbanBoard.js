@@ -502,64 +502,60 @@ const KanbanBoard = () => {
   };
 
   const handleDeleteProduct = async (productId) => {
-    const previousProjections = [...projections]; // Copia actual de las proyecciones
-    const previousTasks = [...tasks]; // Copia actual de las tareas
-  
+    const productToDelete = projections.find((proj) => proj.id === productId);
+    const previousProjections = [...projections]; // Almacenar las proyecciones actuales por si hay un error
+
     try {
-      // Actualiza localmente las proyecciones antes de llamar a la API
-      setProjections((prevProjections) => {
-        const updatedProjections = prevProjections.filter((proj) => proj.id !== productId);
-        console.log("Proyecciones actualizadas localmente:", updatedProjections);
-        return updatedProjections;
-      });
-  
-      // Llamar a la API para eliminar el producto
-      const response = await deleteProduct(productId);
-      console.log("Respuesta del backend al eliminar producto:", response.data);
-  
-      // Actualiza las tareas asociadas localmente
-      setTasks((prevTasks) => {
-        const updatedTasks = prevTasks.filter((task) => task.projection_id !== productId);
-        console.log("Tareas actualizadas localmente:", updatedTasks);
-        return updatedTasks;
-      });
-  
-      // Actualiza los datos de Check Products desde la API
-      const responseProductCheck = await get_Check_Products(userId);
-      const accountDetails = JSON.parse((await AsyncStorage.getItem('accountDetails')) || '{}');
-  
-      if (responseProductCheck.data.total_up === 0) {
-        accountDetails.units_projection = '0';
-      } else {
-        accountDetails.units_projection = responseProductCheck.data.total_up;
-      }
-  
-      await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
-      console.log("Detalles de cuenta actualizados en AsyncStorage:", accountDetails);
-  
-      // Notifica éxito
-      Toast.show({
-        type: "success",
-        text1: "Producto eliminado",
-        text2: "El producto y sus tareas asociadas han sido eliminados.",
-        visibilityTime: 2000,
-      });
+        setLoadingMessage("Eliminando producto...");
+        setIsTaskLoading(true);
+
+        // Eliminar localmente la proyección antes de llamar a la API
+        const updatedProjections = projections.filter((proj) => proj.id !== productId);
+        setProjections(updatedProjections);
+
+        // Llamar a la API para eliminar el producto
+        await deleteProduct(productId);
+
+        // Eliminar tareas asociadas con el producto eliminado
+        const updatedTasks = tasks.filter((task) => task.projection_id !== productId);
+        setTasks(updatedTasks);
+
+        // Actualiza los datos de Check Products
+        const responseProductCheck = await get_Check_Products(userId);
+
+        let accountDetails = await AsyncStorage.getItem('accountDetails');
+        accountDetails = accountDetails ? JSON.parse(accountDetails) : {};
+
+        if (responseProductCheck.data.total_up === 0) {
+            accountDetails.units_projection = '0';
+        } else {
+            accountDetails.units_projection = responseProductCheck.data.total_up;
+        }
+
+        await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+
+        Toast.show({
+            type: "success",
+            text1: "Producto eliminado",
+            text2: "El producto y sus tareas asociadas han sido eliminados.",
+            visibilityTime: 2000,
+        });
     } catch (error) {
-      console.error("Error eliminando producto:", error.response ? error.response.data : error.message);
-  
-      // Revertir cambios locales en caso de error
-      setProjections(previousProjections);
-      setTasks(previousTasks);
-  
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "No se pudo eliminar el producto. Inténtalo de nuevo.",
-        visibilityTime: 2000,
-      });
+        console.error("Error eliminando producto:", error);
+
+        // Revertir los cambios locales en caso de error
+        setProjections(previousProjections);
+
+        Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "No se pudo eliminar el producto. Inténtalo de nuevo.",
+            visibilityTime: 2000,
+        });
+    } finally {
+        setIsTaskLoading(false);
     }
-  };
-  
+};
 
   const toggleSection = (section) => {
     setActiveSection((prevSection) => (prevSection === section ? null : section));
