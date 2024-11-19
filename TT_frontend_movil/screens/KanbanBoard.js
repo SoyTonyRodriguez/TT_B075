@@ -169,6 +169,18 @@ const KanbanBoard = () => {
       doneTasksCount,
     } = calculateProgress(projection.id);
 
+    const confirmDelete = () => {
+      Alert.alert(
+        "Confirmar eliminación",
+        "¿Estás seguro de que deseas eliminar este producto y todas las tareas asociadas?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Eliminar", style: "destructive", onPress: () => handleDeleteProduct(projection.id) },
+        ],
+        { cancelable: true }
+      );
+    };
+
     return (
       <View style={[tw`bg-white p-4 mb-4 rounded-xl shadow-lg`, { borderColor: projection.color || '#ccc', borderWidth: 2 }]}>        
         <View style={tw`flex-row justify-between items-center mb-2`}>
@@ -220,6 +232,14 @@ const KanbanBoard = () => {
             )}
           </View>
         )}
+
+                {/* Botón para eliminar el producto */}
+        <TouchableOpacity
+          onPress={confirmDelete}
+          style={tw`bg-red-500 px-4 py-2 rounded-lg mt-4`}
+        >
+          <Text style={tw`text-white font-semibold text-center`}>Eliminar Producto</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -480,6 +500,66 @@ const KanbanBoard = () => {
   const handleEditTaskChange = (name, value) => {
     setTaskToEdit({ ...taskToEdit, [name]: value });
   };
+
+  const handleDeleteProduct = async (productId) => {
+    const previousProjections = [...projections]; // Copia actual de las proyecciones
+    const previousTasks = [...tasks]; // Copia actual de las tareas
+  
+    try {
+      // Actualiza localmente las proyecciones antes de llamar a la API
+      setProjections((prevProjections) => {
+        const updatedProjections = prevProjections.filter((proj) => proj.id !== productId);
+        console.log("Proyecciones actualizadas localmente:", updatedProjections);
+        return updatedProjections;
+      });
+  
+      // Llamar a la API para eliminar el producto
+      const response = await deleteProduct(productId);
+      console.log("Respuesta del backend al eliminar producto:", response.data);
+  
+      // Actualiza las tareas asociadas localmente
+      setTasks((prevTasks) => {
+        const updatedTasks = prevTasks.filter((task) => task.projection_id !== productId);
+        console.log("Tareas actualizadas localmente:", updatedTasks);
+        return updatedTasks;
+      });
+  
+      // Actualiza los datos de Check Products desde la API
+      const responseProductCheck = await get_Check_Products(userId);
+      const accountDetails = JSON.parse((await AsyncStorage.getItem('accountDetails')) || '{}');
+  
+      if (responseProductCheck.data.total_up === 0) {
+        accountDetails.units_projection = '0';
+      } else {
+        accountDetails.units_projection = responseProductCheck.data.total_up;
+      }
+  
+      await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+      console.log("Detalles de cuenta actualizados en AsyncStorage:", accountDetails);
+  
+      // Notifica éxito
+      Toast.show({
+        type: "success",
+        text1: "Producto eliminado",
+        text2: "El producto y sus tareas asociadas han sido eliminados.",
+        visibilityTime: 2000,
+      });
+    } catch (error) {
+      console.error("Error eliminando producto:", error.response ? error.response.data : error.message);
+  
+      // Revertir cambios locales en caso de error
+      setProjections(previousProjections);
+      setTasks(previousTasks);
+  
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "No se pudo eliminar el producto. Inténtalo de nuevo.",
+        visibilityTime: 2000,
+      });
+    }
+  };
+  
 
   const toggleSection = (section) => {
     setActiveSection((prevSection) => (prevSection === section ? null : section));
