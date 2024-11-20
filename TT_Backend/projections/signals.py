@@ -3,7 +3,8 @@ from django.dispatch import receiver
 from projections.models import Projection
 from accounts.models import Accounts
 from products.models import Products
-
+from documents.models import Document
+from check_products.models import ProductCheck
 # Variable global para almacenar el projection_id anterior
 old_projection_id = None
 
@@ -24,7 +25,16 @@ def remove_projection_from_account(sender, instance, **kwargs):
     try:
         account = Accounts.objects.get(id=instance.account_id)
         account.projection_id = ""  # Limpiamos el campo projection_id
+        account.units_projection = 0 # Limpiamos el campo units_projection
         account.save()
+
+            # Eliminar product_check relacionado al account_id
+        product_check = ProductCheck.objects.filter(account_id=instance.account_id)
+        product_check.delete()
+
+        # Eliminar documentos relacionados al account_id
+        documents = Document.objects.filter(account_id=instance.account_id)
+        documents.delete()
     except Accounts.DoesNotExist:
         print(f"Account con ID {instance.account_id} no existe.")
 
@@ -64,3 +74,15 @@ def remove_product_from_projections(sender, instance, **kwargs):
         if instance.id in projection.products:
             projection.products.remove(instance.id)
             projection.save()
+
+@receiver(post_delete, sender=Projection)
+def delete_related_products(sender, instance, **kwargs):
+    related_products = Products.objects.filter(projection_id=instance.id)
+    for product in related_products:
+        product.delete()
+
+@receiver(post_delete, sender=Projection)
+def delete_related_products(sender, instance, **kwargs):
+    related_products = Products.objects.filter(projection_id=instance.id)
+    for product in related_products:
+        product.delete()

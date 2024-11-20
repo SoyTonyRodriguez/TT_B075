@@ -141,11 +141,13 @@ function UnidadesPromocion() {
 
   // Función para normalizar la categoría del usuario
   const normalizeCategory = (category) => {
-    const words = category.toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
+    const removeAccents = (str) =>
+      str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Elimina acentos.
+    
+    const words = removeAccents(category).toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
     words.pop(); // Elimina la última palabra.
     return words.join('_'); // Une las palabras restantes con '_'.
   };
-
 
   const normalizeFuction = (functionField) => {
     const mappings = {
@@ -729,7 +731,7 @@ function UnidadesPromocion() {
 
     }
     // -_-_-_-_-_-_-_-_-_-_-_-_-_-_ FIN DE VALIDACIONES -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
-        
+    
     // return;
     // Calcular la longitud de los documentos requeridos
     const documentsList = documents_required.split('\n').map(doc => doc.trim()).filter(doc => doc);

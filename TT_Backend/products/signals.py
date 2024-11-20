@@ -56,9 +56,10 @@ def update_product_check(sender, instance, created, **kwargs):
         product_check.save()
 
 @receiver(post_save, sender=Products)
-def update_product_projection(sender, instance, created, **kwargs):
+def update_product_projection_type(sender, instance, created, **kwargs):
     # Si el producto es creado, revisa la longitud de products en Projection
     if created:
+        print(f"Signal triggered for {instance.id}")  # Verificar si la señal se activa
         try:
             projection = Projection.objects.get(id=instance.projection_id)
             # Si products está vacío, asigna el valor deseado a type
@@ -71,6 +72,13 @@ def update_product_projection(sender, instance, created, **kwargs):
             # projection.save()
         except Projection.DoesNotExist:
             print(f"Projection con ID {instance.projection_id} no existe.")
+            
+# @receiver(post_delete, sender=Projection)
+# def delete_related_products(sender, instance, **kwargs):
+#     from products.models import Product  # Importa aquí para evitar dependencias circulares
+#     related_products = Product.objects.filter(projection_id=instance.id)
+#     for product in related_products:
+#         product.delete()
 
 @receiver(pre_save, sender=Products)
 def store_old_projection(sender, instance, **kwargs):
