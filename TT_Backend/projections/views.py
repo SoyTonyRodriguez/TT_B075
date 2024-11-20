@@ -47,16 +47,16 @@ class EditProjectionView(RetrieveUpdateAPIView):
         serializer.save()
 
 class DeleteProjectionView(DestroyAPIView):
-    permission_classes = (IsAuthenticated,)
+    # Permitir acceso sin autenticación
+    permission_classes = []  # O usar (AllowAny,) si necesitas una clase de permiso explícita
     serializer_class = RegisterProjectionSerializer
     lookup_field = 'id'
 
     def get_queryset(self):
-        # Only return projections that belong to the authenticated user
-        return Projection.objects.filter(account_id=self.request.user.id)
-    
+        # Devolver todas las proyecciones sin restricciones
+        return Projection.objects.all()
+
     def perform_destroy(self, instance):
-        # Check if the projection belongs to the authenticated user
-        if instance.account_id != self.request.user.id:
-            raise PermissionDenied("You do not have permission to delete this projection.")
+        # Simplemente elimina la proyección
+        print(f"Deleting projection: {instance.id}")
         instance.delete()
