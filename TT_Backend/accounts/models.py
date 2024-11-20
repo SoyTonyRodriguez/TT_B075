@@ -52,8 +52,8 @@ class Accounts(AbstractBaseUser):
   REQUIRED_FIELDS = []
 
   class Meta:
-    verbose_name = _('account')
-    verbose_name_plural = _('accounts')
+    verbose_name = _('Cuenta')
+    verbose_name_plural = _('Cuentas')
     db_table = 'accounts'  # This sets the table name to 'accounts'
 
   def __str__(self):

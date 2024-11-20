@@ -5,7 +5,7 @@ import Navigation from './Navigation/Navigation';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { jwtDecode } from "jwt-decode";
 
-import { getProjection } from '../../../api/projections.api';
+import { getProjection } from '../api/projections.api';
 
 
 function NewProjection() {

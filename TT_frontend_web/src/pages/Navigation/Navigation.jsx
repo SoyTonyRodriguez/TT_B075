@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; 
 import { Link, useLocation } from 'react-router-dom';
 import { 
   IoLinkOutline, 
@@ -15,7 +15,9 @@ function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [icon, setIcon] = useState(null); 
-
+  const menuButtonRef = useRef(null);
+  const [menuPosition, setMenuPosition] = useState(0);
+  const [hoveredButton, setHoveredButton] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -78,6 +80,14 @@ function Navigation() {
     }
   }, [location]);
 
+  useEffect(() => {
+    // Calcular la posición del menú cuando se abre
+    if (menuButtonRef.current) {
+      const buttonRect = menuButtonRef.current.getBoundingClientRect();
+      setMenuPosition(buttonRect.bottom + 8); 
+    }
+  }, [menuOpen]);
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -85,15 +95,14 @@ function Navigation() {
   // Variantes para la animación de los botones
   const buttonVariants = {
     hover: {
-      scale: 1.1, // Escalado al hacer hover
-      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)", // Sombra sutil
+      scale: 1.1,
       transition: {
         duration: 0.3,
         ease: 'easeInOut',
       },
     },
     tap: {
-      scale: 0.95, // Animación al hacer clic
+      scale: 0.95,
     },
   };
 
@@ -208,7 +217,7 @@ function Navigation() {
 
       {/* Menú hamburguesa para pantallas pequeñas */}
       <div className="lg:hidden flex items-center">
-        <button onClick={toggleMenu}>
+        <button onClick={toggleMenu} ref={menuButtonRef}>
           {menuOpen ? (
             <IoCloseOutline size={30} className="text-blue-500" />
           ) : (
@@ -219,14 +228,25 @@ function Navigation() {
 
       {/* Menú desplegable flotante hacia la derecha cuando el menú hamburguesa está abierto */}
       {menuOpen && (
-        <div className="absolute top-0 right-0 mt-12 mr-4 bg-transparent flex flex-col items-end space-y-2 z-50 lg:hidden">
+        <div 
+          className="fixed right-4 bg-transparent flex flex-col items-end space-y-4 z-50" 
+          style={{ top: `${menuPosition}px` }} // Posición dinámica calculada
+        >
           {/* Proyección y seguimiento */}
           <motion.div 
+            className="flex items-center" // Flex para alinear el texto y el botón horizontalmente
             variants={buttonVariants} 
             whileHover="hover" 
             whileTap="tap"
+            onMouseEnter={() => setHoveredButton('projection')} // Mostrar texto al hacer hover
+            onMouseLeave={() => setHoveredButton(null)} // Ocultar texto cuando se retira el cursor
           >
-            <Link to="/projection" className={`${getButtonClass('/projection')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+            {hoveredButton === 'projection' && (
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
+                Proyección y seguimiento
+              </span>
+            )}
+            <Link to="/projection" className={`${getButtonClass('/projection')} p-2 rounded-full shadow-none w-16 h-16 flex items-center justify-center`}>
               <motion.div variants={iconVariants} whileHover="hover">
                 <IoEyeOutline size={30} />
               </motion.div>
@@ -235,11 +255,19 @@ function Navigation() {
 
           {/* Mis documentos */}
           <motion.div 
+            className="flex items-center" 
             variants={buttonVariants} 
             whileHover="hover" 
             whileTap="tap"
+            onMouseEnter={() => setHoveredButton('documents')} 
+            onMouseLeave={() => setHoveredButton(null)}
           >
-            <Link to="/documents" className={`${getButtonClass('/documents')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+            {hoveredButton === 'documents' && (
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
+                Mis documentos
+              </span>
+            )}
+            <Link to="/documents" className={`${getButtonClass('/documents')} p-2 rounded-full shadow-none w-16 h-16 flex items-center justify-center`}>
               <motion.div variants={iconVariants} whileHover="hover">
                 <IoDocumentTextOutline size={30} />
               </motion.div>
@@ -248,11 +276,19 @@ function Navigation() {
 
           {/* Calendario */}
           <motion.div 
+            className="flex items-center" 
             variants={buttonVariants} 
             whileHover="hover" 
             whileTap="tap"
+            onMouseEnter={() => setHoveredButton('calendar')} 
+            onMouseLeave={() => setHoveredButton(null)}
           >
-            <Link to="/calendar" className={`${getButtonClass('/calendar')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+            {hoveredButton === 'calendar' && (
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
+                Calendario
+              </span>
+            )}
+            <Link to="/calendar" className={`${getButtonClass('/calendar')} p-2 rounded-full shadow-none w-16 h-16 flex items-center justify-center`}>
               <motion.div variants={iconVariants} whileHover="hover">
                 <IoCalendarOutline size={30} />
               </motion.div>
@@ -261,11 +297,19 @@ function Navigation() {
 
           {/* Enlaces y bases */}
           <motion.div 
+            className="flex items-center" 
             variants={buttonVariants} 
             whileHover="hover" 
             whileTap="tap"
+            onMouseEnter={() => setHoveredButton('links')} 
+            onMouseLeave={() => setHoveredButton(null)}
           >
-            <Link to="/links" className={`${getButtonClass('/links')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+            {hoveredButton === 'links' && (
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
+                Enlaces y bases
+              </span>
+            )}
+            <Link to="/links" className={`${getButtonClass('/links')} p-2 rounded-full shadow-none w-16 h-16 flex items-center justify-center`}>
               <motion.div variants={iconVariants} whileHover="hover">
                 <IoLinkOutline size={30} />
               </motion.div>
@@ -274,11 +318,19 @@ function Navigation() {
 
           {/* Mi cuenta */}
           <motion.div 
+            className="flex items-center" 
             variants={buttonVariants} 
             whileHover="hover" 
             whileTap="tap"
+            onMouseEnter={() => setHoveredButton('account')} 
+            onMouseLeave={() => setHoveredButton(null)}
           >
-            <Link to="/account" className={`${getButtonClass('/account')} p-2 rounded-full shadow-lg w-16 h-16 flex items-center justify-center`}>
+            {hoveredButton === 'account' && (
+              <span className="bg-black text-white px-2 py-1 rounded-md mr-2 w-[120px] text-center">
+                Mi cuenta
+              </span>
+            )}
+            <Link to="/account" className={`${getButtonClass('/account')} p-2 rounded-full shadow-none w-16 h-16 flex items-center justify-center`}>
               <motion.div variants={iconVariants} whileHover="hover">
                 <IoPersonOutline size={30} />
               </motion.div>
@@ -291,5 +343,3 @@ function Navigation() {
 }
 
 export default Navigation;
-
-

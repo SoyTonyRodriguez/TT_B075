@@ -6,11 +6,8 @@ import Navigation from './Navigation/Navigation';
 
 function ProyeccionSeguimiento() {
   const [hoveredButton, setHoveredButton] = useState(null); 
-
-
     // Store data account
   const [projection_id, setProjectionId] = useState('');
-
   // Loading state
   const [loading, setLoading] = useState(true); 
 
@@ -72,17 +69,17 @@ function ProyeccionSeguimiento() {
 
 
   return (
-    <div className="min-h-screen bg-cover bg-center relative">
+    <div className="min-h-screen bg-cover bg-center pb-12">
       {/* Navegación fija */}
       <Navigation />
-
       <hr className="border-t-2 border-black my-4" />
 
-      {/* Contenido Principal */}
-      <div className="container mx-auto mt-8">
-        <div className="flex justify-center space-x-8">
+      {/* Contenido principal */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="flex flex-wrap justify-center gap-8">
+          {/* Botón Crear Proyección */}
           <motion.div
-            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }} // Animación al hover
+            whileHover={{ scale: 1.05, boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)" }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
             <Link
@@ -92,12 +89,13 @@ function ProyeccionSeguimiento() {
               className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
             >
               <IoCreateOutline className="mb-4 w-20 h-20" />
-              <p className="text-center text-lg font-semibold">Crear proyección</p>
+              <p className="text-center text-lg font-semibold">Crear Proyección</p>
             </Link>
           </motion.div>
 
+          {/* Botón Ver Proyección */}
           <motion.div
-            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }} // Animación al hover
+            whileHover={{ scale: 1.05, boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)" }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
             <Link
@@ -109,12 +107,13 @@ function ProyeccionSeguimiento() {
               } text-white p-8 rounded-lg shadow-lg transition-transform transform w-56 h-56 flex flex-col items-center justify-center`}
             >
               <IoGlassesOutline className="mb-4 w-20 h-20" />
-              <p className="text-center text-lg font-semibold">Ver mi proyección</p>
+              <p className="text-center text-lg font-semibold">Ver mi Proyección</p>
             </Link>
           </motion.div>
 
+          {/* Botón Guía */}
           <motion.div
-            whileHover={{ scale: 1, boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)" }} // Animación al hover
+            whileHover={{ scale: 1.05, boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)" }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
             <Link
@@ -129,14 +128,14 @@ function ProyeccionSeguimiento() {
           </motion.div>
         </div>
 
-        {/* Descripción de cada función */}
+        {/* Descripción de cada botón */}
         {hoveredButton && (
           <motion.div
-            className="mt-4 text-center text-white bg-black bg-opacity-70 p-4 rounded-lg"
-            initial={{ opacity: 0, y: 20 }}    // Empieza invisible y desplazado
-            animate={{ opacity: 1, y: 0 }}     // Aparece y se posiciona
-            exit={{ opacity: 0, y: 20 }}       // Desaparece y se desplaza hacia abajo
-            transition={{ duration: 0.4 }}     // Duración de la animación
+            className="mt-8 text-center text-white bg-black bg-opacity-70 p-4 rounded-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.4 }}
           >
             <p className="text-lg">{renderDescription()}</p>
           </motion.div>

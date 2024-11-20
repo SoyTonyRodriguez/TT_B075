@@ -7,8 +7,8 @@ import LoadingAnimation from "../components/LoadingAnimation";
 import { TbXboxXFilled, TbReplace } from "react-icons/tb";
 import LoadingSpinner from '../components/LoadingSpinner';
 
-import { uploadDocument, getDocuments, deleteDocument, replaceDocument, getDocument } from '../../../api/documents.api';
-import { getProduct } from '../../../api/products.api'; // Importa la función que obtiene las proyecciones
+import { uploadDocument, getDocuments, deleteDocument, replaceDocument, getDocument } from '../api/documents.api';
+import { getProduct } from '../api/products.api'; // Importa la función que obtiene las proyecciones
 
 import { jwtDecode } from 'jwt-decode';
 
@@ -25,6 +25,7 @@ function Documents() {
 
   const [projections, setProjections] = useState([]); // Estado para las proyecciones
   const [selectedProjection, setSelectedProjection] = useState(''); // Proyección seleccionada por el usuario
+  const [activity_name, setActivityName] = useState(''); // Nombre de la actividad seleccionada
 
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,7 +71,7 @@ function Documents() {
         size: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
         date: new Date(doc.upload_date).toLocaleDateString(),
         type: doc.file_type === 'application/pdf' ? 'pdf' : 'image',
-        projection: projectionsMap[doc.projection_id]?.activity || 'Sin proyección', // Obtenemos la proyección
+        projection: doc.activity || 'Sin proyección', // Obtenemos la proyección
       }));
 
       setFileData(documents);
@@ -304,7 +305,18 @@ function Documents() {
     if (!selectedProjection) {
       setErrorMessage("Por favor selecciona una actividad para poder subir un nuevo documento.");
       return;
-    }    
+    }
+
+    // Encuentra la proyección seleccionada
+    const selectedProjectionData = projections.find(
+      (projection) => projection.id === selectedProjection
+    );
+    setActivityName(selectedProjectionData.activity); // Guarda el nombre de la actividad
+
+    if (!selectedProjectionData) {
+      setErrorMessage("Proyección no encontrada.");
+      return;
+    }
 
     for (const file of files) {
       const fileType = file.type;
@@ -318,7 +330,7 @@ function Documents() {
           validFiles.push({
             name: file.name,
             size: file.size,
-            type: 'application/pdf',
+            type: "application/pdf",
             file: file,
           });
         } else {
@@ -330,7 +342,7 @@ function Documents() {
           validFiles.push({
             name: file.name,
             size: file.size,
-            type: 'image/jpeg',
+            type: "image/jpeg",
             file: file,
           });
         } else {
@@ -344,31 +356,33 @@ function Documents() {
 
       // Subir archivo al backend
       const formData = new FormData();
-      formData.append('account_id', accountId);
-      formData.append('file_name', file.name);
-      formData.append('file_type', fileType);
-      formData.append('size', file.size);
-      formData.append('projection_id', selectedProjection); // Se envía la proyección seleccionada
-      formData.append('file', base64Content);
-      console.log('formData:', formData.get('file'));
+      formData.append("account_id", accountId);
+      formData.append("file_name", file.name);
+      formData.append("file_type", fileType);
+      formData.append("size", file.size);
+      formData.append("projection_id", selectedProjection); // Proyección seleccionada
+      formData.append("activity", selectedProjectionData.activity); // Agrega el campo activity
+      formData.append("file", base64Content);
+
+      console.log("formData:", formData);
 
       try {
         setIsDocumentLoading(true);
         const response = await uploadDocument(formData);
-        console.log('Archivo subido con éxito', response.data);
+        console.log("Archivo subido con éxito", response.data);
 
         setErrorMessage("");
 
         await fetchDocumentsAndProjections(); // Actualizar la lista de documentos
-
       } catch (error) {
-        console.error('Error al subir el archivo:', error);
+        console.error("Error al subir el archivo:", error);
         setErrorMessage("Error al subir el archivo.");
       } finally {
         setIsDocumentLoading(false);
       }
     }
   };
+
 
   // Función para exportar documentos en ZIP
   const handleExportZip = async () => {
@@ -530,6 +544,7 @@ function Documents() {
             <div className="text-center p-4 text-gray-500">No tienes documentos cargados</div>
           ) : (
             filteredFileData.map((file, index) => (
+              
               <div
                 key={index}
                 className={`grid grid-cols-5 items-center p-3 rounded-lg shadow-sm bg-blue-400 hover:bg-blue-500 transition-all`}
@@ -544,6 +559,7 @@ function Documents() {
                     {file.name}
                   </span>
                 </div>
+                {console.log(file)}
                 <div className="text-center text-white">{file.size}</div>
                 <div className="text-center text-white">{file.date}</div>
                 <div className="text-center text-white">{file.projection}</div> {/* Mostrar el nombre de la proyección */}

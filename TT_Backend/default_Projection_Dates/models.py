@@ -16,8 +16,8 @@ class DefaultProjectionDates(models.Model):
     )
 
     class Meta:
-        verbose_name = _('admin-default projection date')
-        verbose_name_plural = _('admin-default projection dates')
+        verbose_name = _('Fecha de proyección por defecto')
+        verbose_name_plural = _('Fechas de proyección por defecto')
         db_table = 'admin-default_projection_dates'
 
     def __str__(self):

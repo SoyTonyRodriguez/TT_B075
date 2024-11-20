@@ -16,8 +16,13 @@ import os
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Ruta para PDFs en el frontend web
+FRONTEND_WEB_PDFS_PATH = os.path.normpath(os.path.join(BASE_DIR, '../TT_frontend_web/public/pdfs/'))
+
+# Ruta para PDFs en el frontend móvil
+FRONTEND_MOBILE_PDFS_PATH = os.path.normpath(os.path.join(BASE_DIR, '../TT_frontend_movil/assets/pdfs/'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -26,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-xgfgrzmo%+$(c!f-2exu&s9x_bre07ue@=7$y2tlyw8@!@*&=&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -57,6 +62,7 @@ INSTALLED_APPS = [
     'conditions_categories',
     'check_products',
     'conditions_max',
+    'documents_admin',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -139,15 +145,21 @@ MIGRATION_MODULES = {
 #  }
 #}
 
-# Cluster conection
+# Configuración de entorno
+env = environ.Env()
+# Lee el archivo .env
+environ.Env.read_env(os.path.join(BASE_DIR, 'mongo.env'))
+
+# Configuración de la base de datos
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'TT_DB',  # The name of your MongoDB database
+        'NAME': env('MONGO_NAME'),  # Nombre de la base de datos
         'CLIENT': {
-            'host': 'mongodb+srv://rodriguezfloresantonioo:<db_password>@clustertt.txd45.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTT',
-            'username': 'rodriguezfloresantonioo',  # Replace with your MongoDB username
-            'password': 'FXue6Nm47gbDniW3',  # Replace with your MongoDB password
+            'host': env('MONGO_HOST'),  # Host de MongoDB
+            'username': env('MONGO_USERNAME'),  # Usuario de MongoDB
+            'password': env('MONGO_PASSWORD'),  # Contraseña de MongoDB
+            'authSource': env('MONGO_AUTH_DB'),  # Base de autenticación
         }
     }
 }
@@ -186,7 +198,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'UTC'
 
@@ -200,7 +212,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Directorio donde se almacenarán
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'  # Asegúrate de que tenga el slash inicial y final
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -210,12 +223,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Put the url from frontend here
 CORS_ALLOWED_ORIGINS = [
   "http://localhost:5173",
+  'http://localhost:4173',
   "http://localhost:8081",
   'http://192.168.100.97:8000',
   'http://192.168.100.97:8081',
   'http://0.0.0.0:8000',
   'http://0.0.0.0:8081',
-
+  'https://tt-b075.onrender.com',
 ]
 
 ALLOWED_HOSTS = ["*"]

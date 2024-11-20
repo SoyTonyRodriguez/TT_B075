@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-import { createAccount } from '../../../api/accounts.api';
+import { createAccount } from '../api/accounts.api';
 import LoadingAnimation from "../components/LoadingAnimation";  // Importa tu componente de animación
 
 
@@ -65,92 +65,94 @@ const Registro = () => {
   const password = watch('password');  
   
     return (
-        <div className="flex flex-col w-3/5 mx-auto p-10 bg-black bg-opacity-40 rounded-3xl shadow-lg mt-10 mb-10">
-            <h2 className="text-left text-white text-2xl mb-4">Nuevo Usuario</h2>
-            <div className="mx-auto container justify-between items-center bg-white h-0.5 mb-6"></div>
-            <form className="w-full" onSubmit={onSubmit}>
-    <div className="flex flex-row justify-between items-center mb-6">
-        <div className="flex flex-col flex-1 mr-6">
-            {/* Campos de entrada */}
-            <div className="mb-4">
-                <label className="block font-raleway text-white mb-1">Nombre Completo</label>
-                <input 
-                    type="text" 
-                    placeholder="Ingresa tu nombre completo" 
-                    {...register('name', { required: true })}
-                    className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
-                />
-                {errors.name && <span className="text-red-500">Este campo es obligatorio</span>}
-            </div>
+      <div className="flex flex-col w-11/12 sm:w-4/5 md:w-3/5 mx-auto p-6 sm:p-10 bg-black bg-opacity-40 rounded-3xl shadow-lg mt-10 mb-10">
+        <h2 className="text-left text-white text-2xl mb-4">Nuevo Usuario</h2>
+        <div className="mx-auto container justify-between items-center bg-white h-0.5 mb-6"></div>
+        <form className="w-full" onSubmit={onSubmit}>
+          <div className="flex flex-row justify-between items-center mb-6">
+            <div className="flex flex-col flex-1 sm:mr-6">
+              {/* Campos de entrada */}
+              <div className="mb-4">
+                  <label className="block font-raleway text-white mb-1">Nombre Completo</label>
+                  <input 
+                      type="text" 
+                      placeholder="Ingresa tu nombre completo" 
+                      {...register('name', { required: true })}
+                      className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
+                  />
+                  {errors.name && <span className="text-red-500">Este campo es obligatorio</span>}
+              </div>
 
-            <div className="mb-4">
-                <label className="block font-raleway text-white mb-1">Email</label>
-                <input 
-                    type="email" 
-                    placeholder="Ingresa tu correo electrónico" 
-                    {...register('email', { required: true })}
-                    className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
-                />
-                {errors.email && <span className="text-red-500">Este campo es obligatorio</span>}
-            </div>
+              <div className="mb-4">
+                  <label className="block font-raleway text-white mb-1">Email</label>
+                  <input 
+                      type="email" 
+                      placeholder="Ingresa tu correo electrónico" 
+                      {...register('email', { required: true })}
+                      className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
+                  />
+                  {errors.email && <span className="text-red-500">Este campo es obligatorio</span>}
+              </div>
 
-            <div className="mb-4">
-                <label className="block font-raleway text-white mb-1">Selecciona tu categoría</label>
-                <select 
-                    {...register('category', { required: true })}
-                    className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
-                >
-                    <option value="Técnico Docente de Asignatura A">Técnico Docente de Asignatura A</option>
-                    <option value="Técnico Docente de Asignatura B">Técnico Docente de Asignatura B</option>
-                    <option value="Técnico Docente Auxiliar A">Técnico Docente Auxiliar A</option>
-                    <option value="Técnico Docente Auxiliar B">Técnico Docente Auxiliar B</option>
-                    <option value="Técnico Docente Auxiliar C">Técnico Docente Auxiliar C</option>
-                    <option value="Técnico Docente Asociado A">Técnico Docente Asociado A</option>
-                    <option value="Técnico Docente Asociado B">Técnico Docente Asociado B</option>
-                    <option value="Técnico Docente Asociado C">Técnico Docente Asociado C</option>
-                    <option value="Técnico Docente Titular A">Técnico Docente Titular A</option>
-                    <option value="Profesor de Asignatura A">Profesor de Asignatura A</option>
-                    <option value="Profesor Asistente A">Profesor Asistente A</option>
-                    <option value="Profesor Asistente B">Profesor Asistente B</option>
-                    <option value="Profesor Asistente C">Profesor Asistente C</option>
-                    <option value="Profesor Asociado A">Profesor Asociado A</option>
-                    <option value="Profesor Asociado B">Profesor Asociado B</option>
-                    <option value="Profesor Asociado C">Profesor Asociado C</option>
-                    <option value="Profesor Titular A">Profesor Titular A</option>
-                    <option value="Profesor Titular B">Profesor Titular B</option>
-                </select>
-                {errors.category && <span className="text-red-500">Este campo es obligatorio</span>}
-            </div>
+              <div className="mb-4">
+                  <label className="block font-raleway text-white mb-1">Selecciona tu categoría</label>
+                  <select 
+                      {...register('category', { required: true })}
+                      className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
+                      defaultValue="" 
+                  >
+                      <option value="" disabled>Elige tu categoría</option>
+                      <option value="Técnico Docente de Asignatura A">Técnico Docente de Asignatura A</option>
+                      <option value="Técnico Docente de Asignatura B">Técnico Docente de Asignatura B</option>
+                      <option value="Técnico Docente Auxiliar A">Técnico Docente Auxiliar A</option>
+                      <option value="Técnico Docente Auxiliar B">Técnico Docente Auxiliar B</option>
+                      <option value="Técnico Docente Auxiliar C">Técnico Docente Auxiliar C</option>
+                      <option value="Técnico Docente Asociado A">Técnico Docente Asociado A</option>
+                      <option value="Técnico Docente Asociado B">Técnico Docente Asociado B</option>
+                      <option value="Técnico Docente Asociado C">Técnico Docente Asociado C</option>
+                      <option value="Técnico Docente Titular A">Técnico Docente Titular A</option>
+                      <option value="Profesor de Asignatura A">Profesor de Asignatura A</option>
+                      <option value="Profesor Asistente A">Profesor Asistente A</option>
+                      <option value="Profesor Asistente B">Profesor Asistente B</option>
+                      <option value="Profesor Asistente C">Profesor Asistente C</option>
+                      <option value="Profesor Asociado A">Profesor Asociado A</option>
+                      <option value="Profesor Asociado B">Profesor Asociado B</option>
+                      <option value="Profesor Asociado C">Profesor Asociado C</option>
+                      <option value="Profesor Titular A">Profesor Titular A</option>
+                      <option value="Profesor Titular B">Profesor Titular B</option>
+                  </select>
+                  {errors.category && <span className="text-red-500">Este campo es obligatorio</span>}
+              </div>
 
-            <div className="mb-4">
-                <label className="block font-raleway text-white mb-1">Contraseña</label>
-                <input 
-                    type="password" 
-                    placeholder="Crea tu contraseña" 
-                    {...register('password', { required: true })}
-                    className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
-                />
-                {errors.password && <span className="text-red-500">Este campo es obligatorio</span>}
-            </div>
+              <div className="mb-4">
+                  <label className="block font-raleway text-white mb-1">Contraseña</label>
+                  <input 
+                      type="password" 
+                      placeholder="Crea tu contraseña" 
+                      {...register('password', { required: true })}
+                      className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
+                  />
+                  {errors.password && <span className="text-red-500">Este campo es obligatorio</span>}
+              </div>
 
-            <div className="mb-4">
-                <label className="block font-raleway text-white mb-1">Confirma tu contraseña</label>
-                <input 
-                    type="password"
-                    placeholder="Vuelve a escribir tu contraseña"
-                    {...register('confirmar_password', {
-                        required: true,
-                        validate: value => value === password || 'Las contraseñas no coinciden',
-                    })}
-                    className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
-                />
-                {errors.confirmar_password && <span className="text-red-500">{errors.confirmar_password.message}</span>}
-            </div>
-        </div>
-        <div className="flex justify-center items-center flex-1 overflow-hidden">
+              <div className="mb-4">
+                  <label className="block font-raleway text-white mb-1">Confirma tu contraseña</label>
+                  <input 
+                      type="password"
+                      placeholder="Vuelve a escribir tu contraseña"
+                      {...register('confirmar_password', {
+                          required: true,
+                          validate: value => value === password || 'Las contraseñas no coinciden',
+                      })}
+                      className="w-full p-2 mt-1 rounded border border-gray-300 text-base"
+                  />
+                  {errors.confirmar_password && <span className="text-red-500">{errors.confirmar_password.message}</span>}
+              </div>
+          </div>
+          <div className="flex justify-center items-center flex-1 hidden sm:block">
             <img src={perfilImage} alt="Imagen de perfil" className="w-full h-full object-cover" />
-        </div>
-    </div>
+          </div>
+      </div>
 
     <p className="text-white text-lg text-center mb-6">
         <button onClick={() => setShowModal(true)} className="text-blue-400 hover:underline">Conoce los requisitos para participar en el proceso de promoción docente</button>

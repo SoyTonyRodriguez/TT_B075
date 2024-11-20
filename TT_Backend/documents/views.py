@@ -30,6 +30,7 @@ class DocumentUploadAPIView(APIView):
             size = request.data['size']
             account_id = request.data['account_id']
             projection_id = request.data['projection_id']
+            activity = request.data['activity']
 
             # Decodificar archivo Base64
             binary_file = base64.b64decode(request.data['file'])
@@ -42,6 +43,7 @@ class DocumentUploadAPIView(APIView):
                 account_id=account_id,
                 projection_id=projection_id,
                 file=binary_file,
+                activity=activity
             )
 
             # Reconectar la señal

@@ -5,8 +5,9 @@ import { motion } from 'framer-motion';
 import LoadingAnimation from "../components/LoadingAnimation";  
 
 import { jwtDecode } from "jwt-decode";
-import { getConditions } from '../../../api/conditions.api';
-import { getConditionsMax } from '../../../api/conditions_max.api';
+import { getConditions } from '../api/conditions.api';
+import { getConditionsMax } from '../api/conditions_max.api';
+
 
 function MainContent() {
   const [userId, setUserId] = useState(null);
