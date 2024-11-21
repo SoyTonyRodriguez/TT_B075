@@ -101,7 +101,10 @@ function Account() {
       setLoading(false); // Desactivar el indicador de carga
     }
   };
-  
+
+  if (loading) {
+    return <LoadingAnimation />;
+  }
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];

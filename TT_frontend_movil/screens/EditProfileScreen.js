@@ -20,7 +20,9 @@ const EditProfileScreen = ({ navigation }) => {
           setCategory(category);
         }
       } catch (error) {
-        console.error("Error accessing or parsing account details from AsyncStorage:", error);
+        console.error("Error accessing or parsing account details from localStorage:", error);
+        // You can clear invalid data if necessary
+        localStorage.removeItem('accountDetails');
       }
     };
     loadAccountData();

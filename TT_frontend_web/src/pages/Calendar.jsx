@@ -168,6 +168,19 @@ const CalendarWithDetails = () => {
     let days = [];
     let day = startDate;
   
+    // Función para verificar si un día está dentro del rango de una actividad
+    const isWithinActivityRange = (day, activity) => {
+      const start = adjustToLocaleDate(activity.start_date);
+      const end = adjustToLocaleDate(activity.end_date);
+      return day >= start && day <= end;
+    };
+  
+    // Función para verificar si es el día de inicio de la actividad
+    const isActivityStartDay = (day, activity) => {
+      const start = adjustToLocaleDate(activity.start_date);
+      return isSameDay(day, start); // Verifica si el día es el inicio de la actividad
+    };
+  
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         const formattedDate = format(day, dateFormat);
