@@ -35,10 +35,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
-HUNTER_API_KEY = os.getenv('HUNTER_API_KEY')  # Asegúrate de que esté correctamente cargada
-print(f"HUNTER_API_KEY: {HUNTER_API_KEY}")  # Imprime la clave para verificar si se está cargando bien
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -238,13 +234,4 @@ CORS_ORIGIN_ALLOW = True
 CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL='accounts.Accounts'
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'  # Servidor SMTP de Outlook
-EMAIL_PORT = 25  # Puerto para TLS
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False  # No habilitar SSL para este puerto
-EMAIL_HOST_USER = 'casaos022@gmail.com'
-EMAIL_HOST_PASSWORD = 'ublfdxnabahfofnu'  # Contraseña de aplicación generada
-DEFAULT_FROM_EMAIL = 'casaos022@gmail.com'
 

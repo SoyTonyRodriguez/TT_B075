@@ -26,7 +26,6 @@ function Account() {
       const storedAccountData = localStorage.getItem('accountDetails');
       if (storedAccountData) {
         const { userName, fullName, email, category } = JSON.parse(storedAccountData);
-        const { userName, fullName, email, category } = JSON.parse(storedAccountData);
         setUserName(userName);
         setFullName(fullName);
         setEmail(email);
@@ -77,32 +76,31 @@ function Account() {
       setLoading(true); // Activar el indicador de carga
       const response = await updateAccount(userId, token, updatedData); // Llamada a la API para actualizar la cuenta
       console.log('Respuesta del servidor:', response);
-  
-      // Actualizar el localStorage con los datos actualizados
-      const updatedAccountDetails = {
-        userName: userName,  // Puedes ajustar esto si es necesario
+
+      // Actualizar `localStorage` con los datos actualizados
+      const storedAccountData = JSON.parse(localStorage.getItem('accountDetails')) || {};
+      const updatedAccountData = {
+        ...storedAccountData, // Mantener datos existentes
+        userName: userName,   // Actualizar con nuevos valores
         fullName: fullName,
         email: email,
         category: category,
       };
-      localStorage.setItem('accountDetails', JSON.stringify(updatedAccountDetails));
-  
-      // Actualizar los estados del componente
-      setUserName(userName);
-      setFullName(fullName);
-      setEmail(email);
-      setCategory(category);
-  
-      setIsEditing(false);  // Desactivar modo edición
-      // Si deseas mantenerte en la misma página para ver los cambios inmediatamente, puedes comentar la siguiente línea
-      // navigate('/home');  // Redirigir a otra página existente, como la pantalla de inicio
+      localStorage.setItem('accountDetails', JSON.stringify(updatedAccountData));
+      console.log('Datos actualizados en localStorage:', updatedAccountData);
+
+      setIsEditing(false); // Desactivar modo edición
+      navigate('/home'); // Redirigir a otra página existente, como la pantalla de inicio
     } catch (error) {
       console.error('Error actualizando la cuenta:', error.response ? error.response.data : error.message);
     } finally {
       setLoading(false); // Desactivar el indicador de carga
     }
   };
-  
+
+  if (loading) {
+    return <LoadingAnimation />;
+  }
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
