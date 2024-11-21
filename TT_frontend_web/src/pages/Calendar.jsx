@@ -11,7 +11,6 @@ const CalendarWithDetails = () => {
   const [activities, setActivities] = useState([]);
   const [activityDetails, setActivityDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const currentYear = new Date().getFullYear();
   const minYear = currentYear - 2;
   const maxYear = currentYear + 2;
@@ -206,6 +205,7 @@ const CalendarWithDetails = () => {
                   : activityOnDay
                     ? "bg-green-200" // Sombreado para los días de duración
                     : "text-black"}`}
+
             key={day}
             onClick={() => onDateClick(cloneDay)}
           >
@@ -224,6 +224,7 @@ const CalendarWithDetails = () => {
   
     return <div>{rows}</div>;
   };
+
 
   const renderSelectedDateDetails = () => {
     if (!selectedDate) return <p className="text-center">Haz clic sobre alguna fecha en específico para más detalles</p>;
