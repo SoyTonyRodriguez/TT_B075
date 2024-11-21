@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'check_products',
     'conditions_max',
     'documents_admin',
+    'anymail',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -148,7 +149,7 @@ MIGRATION_MODULES = {
 # Configuración de entorno
 env = environ.Env()
 # Lee el archivo .env
-environ.Env.read_env(os.path.join(BASE_DIR, 'mongo.env'))
+#environ.Env.read_env(os.path.join(BASE_DIR, 'mongo.env'))
 
 # Configuración de la base de datos
 DATABASES = {
@@ -239,12 +240,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL='accounts.Accounts'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'  # Servidor SMTP de Outlook
-EMAIL_PORT = 25  # Puerto para TLS
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False  # No habilitar SSL para este puerto
-EMAIL_HOST_USER = 'casaos022@gmail.com'
-EMAIL_HOST_PASSWORD = 'ublfdxnabahfofnu'  # Contraseña de aplicación generada
-DEFAULT_FROM_EMAIL = 'casaos022@gmail.com'
+ANYMAIL = {
+    'MAILGUN_API_KEY': 'fe7ae685e2d38ea1bd450545263448ac-6df690bb-03bca173',
+    'MAILGUN_SENDER_DOMAIN': 'sandboxed880d43792f4ab3aac647cd8846099d.mailgun.org',
+}
+EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@sandboxed880d43792f4ab3aac647cd8846099d.mailgun.org'
 

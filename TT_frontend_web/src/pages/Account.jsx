@@ -26,7 +26,6 @@ function Account() {
       const storedAccountData = localStorage.getItem('accountDetails');
       if (storedAccountData) {
         const { userName, fullName, email, category } = JSON.parse(storedAccountData);
-        const { userName, fullName, email, category } = JSON.parse(storedAccountData);
         setUserName(userName);
         setFullName(fullName);
         setEmail(email);
