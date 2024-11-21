@@ -175,19 +175,24 @@ const Documents = () => {
               body, html {
                 margin: 0;
                 padding: 0;
-                overflow: hidden;
                 height: 100%;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: transparent;
               }
               .pdf-container {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                height: 100vh;
+                height: auto;
               }
               embed {
-                width: 100%;
-                height: 100%;
-                display: block;
+                width: auto;
+                height: auto;
+                max-width: 100%;
+                max-height: 100%;
               }
             </style>
           </head>
@@ -203,12 +208,12 @@ const Documents = () => {
         <WebView
           originWhitelist={['*']}
           source={{ html: pdfHtml }}
-          style={{ flex: 1 }}
+          style={{ flex: 1, backgroundColor: 'white' }}
           onError={(error) => console.log('Error en WebView:', error)}
         />
       );
     } else if (type.startsWith('image/')) {
-      // Mostrar imagenes (jpg/jpeg) en el componente Image
+      // Mostrar imágenes (jpg/jpeg) en el componente Image
       const imageUrl = `data:${type};base64,${data}`;
       return (
         <Image
