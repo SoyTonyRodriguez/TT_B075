@@ -36,7 +36,7 @@ const KanbanBoard = () => {
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
 
   const [userId, setUserId] = useState(''); // Accede al token y userId del contexto
-
+  const [unitsProjection, setUnitsProjection] = useState(0);
   const [expandedProjectionId, setExpandedProjectionId] = useState(null);
 
   useEffect(() => {
@@ -55,6 +55,21 @@ const KanbanBoard = () => {
     fetchToken();
 
   }, [userId]);
+
+  useEffect(() => {
+    const fetchUnitsProjection = async () => {
+      try {
+        const accountDetails = await AsyncStorage.getItem('accountDetails');
+        if (accountDetails) {
+          const parsedDetails = JSON.parse(accountDetails);
+          setUnitsProjection(parsedDetails.unitsProjection || 0);
+        }
+      } catch (error) {
+        console.error('Error al obtener unidades de promoción:', error);
+      }
+    };
+    fetchUnitsProjection();
+  }, []);
 
   useEffect(() => {
     setLoadingMessage("Cargando tareas"); // Mensaje de carga
@@ -652,6 +667,12 @@ const KanbanBoard = () => {
       <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
         <Text style={tw`text-2xl font-bold text-black`}>Mi proyección</Text>
         <Ionicons name="glasses-outline" size={40} color="#000" style={tw`ml-2`} />
+      </View>
+
+      {/* Unidades de Promoción */}
+      <View style={tw`px-4 mb-5 flex-row items-center`}>
+        <Ionicons name="star-outline" size={30} color="#ffd700" style={tw`mr-2`} />
+        <Text style={tw`text-lg text-black`}>Total de unidades de promoción: {unitsProjection}</Text>
       </View>
 
       <ScrollView style={tw`p-5 mb-15`}>

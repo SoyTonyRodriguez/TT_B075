@@ -4,20 +4,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import tw from 'twrnc'; 
-import { createProjection } from '../api/projections.api';
 
 const ProjectionScreen = () => {
   const navigation = useNavigation();
   const [projection_id, setProjectionId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [unitsProjection, setUnitsProjection] = useState(0); // Estado para unidades de promoción
 
   useEffect(() => {
     const fetchStoredAccountData = async () => {
       try {
         const storedAccountData = await AsyncStorage.getItem('accountDetails');
         if (storedAccountData) {
-          const { projection_id } = JSON.parse(storedAccountData);
+          const { projection_id, unitsProjection } = JSON.parse(storedAccountData);
           setProjectionId(projection_id);
+          setUnitsProjection(unitsProjection); // Set units projection
         }
       } catch (error) {
         console.error('Error fetching account details:', error);
@@ -48,6 +49,12 @@ const ProjectionScreen = () => {
       <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
         <Text style={tw`text-2xl font-bold text-black`}>Proyección y seguimiento</Text>
         <Ionicons name="eye-outline" size={40} color="#000" style={tw`ml-2`} />
+      </View>
+
+      {/* Unidades de Promoción */}
+      <View style={tw`px-4 mb-5 flex-row items-center`}>
+        <Ionicons name="star-outline" size={30} color="#ffd700" style={tw`mr-2`} />
+        <Text style={tw`text-lg text-black`}>Total de unidades de promoción: {unitsProjection}</Text>
       </View>
 
       {/* Contenido de la pantalla */}
@@ -104,5 +111,3 @@ const ProjectionScreen = () => {
 };
 
 export default ProjectionScreen;
-
-
