@@ -13,7 +13,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation(); 
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState(null);
-  const [unitsPromotion, setUnitsPromotion] = useState(67); // Valor inicial de las U.P. acumuladas
+  const [unitsPromotion, setUnitsPromotion] = useState(''); // Valor inicial de las U.P. acumuladas
   const [showUnits, setShowUnits] = useState(false); // Estado para mostrar/ocultar las U.P.
 
   // Load account data from localStorage on component mount
