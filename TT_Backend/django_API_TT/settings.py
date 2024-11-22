@@ -235,3 +235,17 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL='accounts.Accounts'
 
+# Initialise environment variables
+env = environ.Env()
+
+# Specify the path to the .env file
+env_file = os.path.join(os.path.dirname(__file__), 'email.env')
+
+environ.Env.read_env(env_file)  # Reads the .env file
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Cambia según tu proveedor
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
