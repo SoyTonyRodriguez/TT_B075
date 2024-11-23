@@ -31,6 +31,7 @@ const EditProfileScreen = ({ navigation }) => {
         if (storedAccountData) {
           const { userName, fullName, email, category } = JSON.parse(storedAccountData);
           setUserName(userName);
+
           setFullName(fullName);
           setEmail(email);
           setCategory(category);
@@ -181,7 +182,6 @@ const EditProfileScreen = ({ navigation }) => {
           <Text style={tw`text-white font-bold text-base`}>Guardar cambios</Text>
         </TouchableOpacity>
       </ScrollView>
-      
     </ImageBackground>
   );
 };
