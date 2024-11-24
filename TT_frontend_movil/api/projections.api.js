@@ -31,3 +31,14 @@ export const getProjection = async (account_id) => {
         },
     });
 }
+
+export const deleteProjection = async (projection_id) => {
+    const token = await AsyncStorage.getItem('token');
+    const cleanToken = token.replace(/["]/g, '').trim();
+
+    return TasksAPI.delete(`projections/${projection_id}/delete/`, {
+        headers: {
+            Authorization: `Bearer ${cleanToken}`,
+        }
+    });
+}
