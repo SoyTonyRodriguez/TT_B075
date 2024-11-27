@@ -7,4 +7,3 @@ const accountsAPI = axios.create({
 
 // getall dates
 export const getAllDates = () => accountsAPI.get(`calendar_date/`);
-

@@ -31,9 +31,13 @@ FRONTEND_MOBILE_PDFS_PATH = os.path.normpath(os.path.join(BASE_DIR, '../TT_front
 SECRET_KEY = 'django-insecure-xgfgrzmo%+$(c!f-2exu&s9x_bre07ue@=7$y2tlyw8@!@*&=&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
+
+
+# See/Download pdfs in web and movil
+X_FRAME_OPTIONS = 'ALLOWALL'
 
 # Application definition
 
@@ -59,6 +63,7 @@ INSTALLED_APPS = [
     'check_products',
     'conditions_max',
     'documents_admin',
+    'anymail',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -88,6 +93,7 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -96,6 +102,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+WHITENOISE_ALLOW_ALL_ORIGINS = True  # Permitir acceso desde cualquier frontend
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'django_API_TT.urls'
 
@@ -249,3 +257,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
