@@ -1,21 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 
-const PDF_FILES = {
-  convocatoria: require('../assets/pdfs/Convocatoria.pdf'),
-  reglamento: require('../assets/pdfs/Reglamento.pdf'),
-  cronograma: require('../assets/pdfs/Cronograma.pdf'),
-  valoracion: require('../assets/pdfs/Valoracion.pdf'),
-  gaceta: require('../assets/pdfs/Gaceta.pdf'),
-};
-
-
 export default function OfficialLinksScreen({ navigation }) {
-  const openPDF = (pdfKey) => {
-    const pdfResource = PDF_FILES[pdfKey]; // Carga el recurso del PDF
-    navigation.navigate('PDFViewer', { pdfResource });
+  // Función para abrir un enlace específico
+  const openPDF = (url) => {
+    Linking.openURL(url).catch((err) => console.error('Error al abrir el enlace:', err));
   };
 
   return (
@@ -31,10 +22,10 @@ export default function OfficialLinksScreen({ navigation }) {
         </View>
 
         {/* Botones para abrir los PDFs */}
-        <View style={tw`flex-1 flex-row flex-wrap justify-evenly items-center py-10`}>
+        <View style={tw`flex-1 flex-row flex-wrap justify-evenly items-center py-5`}>
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-20`}
-            onPress={() => openPDF('convocatoria')}
+            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Convocatoria.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Convocatoria 2024</Text>
@@ -42,7 +33,7 @@ export default function OfficialLinksScreen({ navigation }) {
 
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-20`}
-            onPress={() => openPDF('reglamento')}
+            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Reglamento.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Reglamento promoción</Text>
@@ -50,7 +41,7 @@ export default function OfficialLinksScreen({ navigation }) {
 
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-20`}
-            onPress={() => openPDF('cronograma')}
+            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Cronograma.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Cronograma 2024</Text>
@@ -58,18 +49,18 @@ export default function OfficialLinksScreen({ navigation }) {
 
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-20`}
-            onPress={() => openPDF('valoracion')}
+            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Valoracion.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Valoración de actividades</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mt-10`}
-            onPress={() => openPDF('gaceta')}
+            style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-8`}
+            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Gaceta.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
-            <Text style={tw`mt-2 text-white text-center text-lg`}>Gaceta Politécnica No. 1511</Text>
+            <Text style={tw`mt-2 text-white text-center text-base`}>Gaceta Politécnica No. 1511</Text>
           </TouchableOpacity>
         </View>
       </View>
