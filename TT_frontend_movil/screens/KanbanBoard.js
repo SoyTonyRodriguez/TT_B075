@@ -36,7 +36,7 @@ const KanbanBoard = () => {
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
 
   const [userId, setUserId] = useState(''); // Accede al token y userId del contexto
-  const [unitsProjection, setUnitsProjection] = useState(0);
+
   const [expandedProjectionId, setExpandedProjectionId] = useState(null);
 
   useEffect(() => {
@@ -55,21 +55,6 @@ const KanbanBoard = () => {
     fetchToken();
 
   }, [userId]);
-
-  useEffect(() => {
-    const fetchUnitsProjection = async () => {
-      try {
-        const accountDetails = await AsyncStorage.getItem('accountDetails');
-        if (accountDetails) {
-          const parsedDetails = JSON.parse(accountDetails);
-          setUnitsProjection(parsedDetails.unitsProjection || 0);
-        }
-      } catch (error) {
-        console.error('Error al obtener unidades de promoción:', error);
-      }
-    };
-    fetchUnitsProjection();
-  }, []);
 
   useEffect(() => {
     setLoadingMessage("Cargando tareas"); // Mensaje de carga
@@ -669,13 +654,7 @@ const KanbanBoard = () => {
         <Ionicons name="glasses-outline" size={40} color="#000" style={tw`ml-2`} />
       </View>
 
-      {/* Unidades de Promoción */}
-      <View style={tw`px-4 mb-5 flex-row items-center`}>
-        <Ionicons name="star-outline" size={30} color="#ffd700" style={tw`mr-2`} />
-        <Text style={tw`text-lg text-black`}>Total de unidades de promoción: {unitsProjection}</Text>
-      </View>
-
-      <ScrollView style={tw`p-5 mb-15`}>
+      <ScrollView style={tw`p-5`}>
         {/* Sección To-Do */}
         <TouchableOpacity onPress={() => toggleSection('todo')}>
           <View style={tw`bg-blue-900 p-4 rounded-xl`}>
@@ -731,15 +710,18 @@ const KanbanBoard = () => {
           ))}
         </View>
       )}
-
+      </ScrollView>
+      
+      <View style={tw`p-5`}>
         {/* Botón para crear nueva tarea */}
         <TouchableOpacity
           onPress={openModal}
-          style={tw`bg-blue-500 text-white px-4 py-2 rounded-lg mt-8`}
+          style={tw`bg-blue-500 text-white px-4 py-4 rounded-lg mt-1`}
         >
-          <Text style={tw`text-center text-white font-semibold`}>Crear Nueva Tarea</Text>
+          <Text style={tw`text-base text-center text-white font-semibold`}>Crear nueva tarea</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
+      
 
       {/* Modal para crear tarea */}
       {isModalOpen && (
