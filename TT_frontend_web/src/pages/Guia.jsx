@@ -1,123 +1,129 @@
 import React, { useState } from 'react';
 import Navigation from './Navigation/Navigation'; 
 
-function CreateProjection() {
-  const [activityName, setActivityName] = useState('');
-  const [priority, setPriority] = useState('Media');
-  const [uipValue, setUipValue] = useState(7);
+function GuidePage() {
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  const handleActivityChange = (e) => setActivityName(e.target.value);
-  const handlePriorityChange = (e) => setPriority(e.target.value);
-  const handleUipChange = (e) => setUipValue(e.target.value);
+  // Actualizamos las rutas a las imágenes según tu estructura
+  const images = [
+    {
+      src: '/src/img/Grado.png', // Ruta relativa desde src
+      title: 'Promoción por obtención de grado', // Título de la imagen
+      description: 'Este proceso se da cuando el docente busca promoverse al obtener un grado académico superior. Se requiere presentar documentación que acredite la obtención del grado y cumplir con los requisitos establecidos por la normativa interna.', // Descripción detallada de la imagen
+    },
+    {
+      src: '/src/img/UP.png', // Ruta relativa desde src
+      title: 'Promoción por acumulación de Unidades de Promoción', // Título de la imagen
+      description: 'Descripción detallada de la imagen 2. Añade información relevante para que los usuarios comprendan.',
+    },
+    {
+      src: '/src/img/Funcion.png', // Ruta relativa desde src
+      title: 'Función',
+      description: 'Esta opción despliega las funciones según los diferentes rubros establecidos para la acumulación de unidades de promoción. Selecciona la función que deseas realizar según tus intereses y campos de desarrollo.',
+    },
+    {
+      src: '/src/img/Actividad.png', // Ruta relativa desde src
+      title: 'Actividad',
+      description: 'Esta lista varía según la función que sea seleccionada, cada una tendrá diferentes parámetros que debes de tomar en cuenta para añadirlas a tu proyección. Contiene las actividades que puedes realizar para acumular unidades de promociónn.',
+    },
+    {
+      src: '/src/img/Limite.png', // Ruta relativa desde src
+      title: 'Límite',
+      description: 'Durante cada período este aviso contendrá la información referente a las fechas en las que se llevará a cabo la acumulación de unidades, puedes consultarla siempre que accedas al módulo de creación de proyección para no perder de vista tus objetivos y tu tiempo disponible.',
+    },
+    {
+      src: '/src/img/Acumuladas.png', // Ruta relativa desde src
+      title: 'Unidades Acumuladas',
+      description: 'Todo el tiempo que estés dentro de la plataforma podrás visualizar las unidades que has acumulado, esto te permitirá tener un control de tu progreso y saber cuántas unidades te faltan para cumplir con los requisitos establecidos.',
+    },
+        {
+      src: '/src/img/UPS_A.png', // Ruta relativa desde src
+      title: 'Unidades a obtener',
+      description: 'Para cada actividad podrás visualizar esta lista, corresponde a los diferentes valores en U.P que te puede aportar según tu rol de participación o responsabilidad en la actividad. Asegúrate de seleccionar la que más se ajuste a tu participación.',
+    },
+    {
+      src: '/src/img/MAX.png', // Ruta relativa desde src
+      title: 'Máximo permitido',
+      description: 'En ciertas actividades existe un límite permito con respectoi a las unidades que puedes acumular, asegúrate de no exceder este límite para que puedas acumular las unidades de manera correcta y no tengas problemas al momento de validar tu proyección.',
+    },
+    {
+      src: '/src/img/Hrs.png', // Ruta relativa desde src
+      title: 'Horas de trabajo',
+      description: 'Para las actividades que implican un tiempo de trabajo, se te solicitará que ingreses el número de horas que dedicarás a la actividad. Asegúrate de ingresar un valor correcto para que puedas acumular las unidades de manera correcta. Este valor será calculado de acuerdo al reglamento, recuerda que puede cambiar según los criterios de la mesa evaludora .',
+    },
+  ];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Proyección agregada:', { activityName, priority, uipValue });
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedImage(null);
   };
 
   return (
+    
     <div className="min-h-screen bg-cover bg-center">
-      {/* navegación fija */}
+      {/* Navegación fija */}
       <Navigation />
 
       <hr className="border-t-2 border-black my-4" />
 
-      {/* Main Content */}
-        <h1 className="text-3xl font-bold text-center mb-6 text-black">¿Crear proyección?</h1>
+      {/* Título principal */}
+      <h1 className="text-3xl font-bold text-center mb-6 text-black">
+        ¿Crear proyección?
+      </h1>
+      <div className="container mx-auto mt-8 mb-8 flex items-center justify-between bg-black bg-opacity-40 p-6 rounded-lg shadow-lg">
+      <p className="text-lg text-white leading-relaxed text-center justify-center">
+                    Al comenzar la creación de una proyección se te presentarán dos opciones, por unidades de promoción y por obtención de grado académico. Selecciona la opción que más se ajuste a tus necesidades y comienza a acumular unidades de promoción.
+                    Para la opción por acumulación de unidades de promoción, se te presentarán diferentes campos y opciones que debes completar, algunas de ellas son las siguientes, en caso de que tengas duda sobre su significado puedes consultar este apartado para 
+                    conocer más detalles de su funcionamiento.
+                  </p>
+      </div>
+      {/* Sección de imágenes */}
+      <div className="max-w-7xl mx-auto grid grid-cols-6 sm:grid-cols-2 md:grid-cols-3 gap-x-[120px] gap-y-[50px]">
+  {images.map((image, index) => (
+    <div
+      key={index}
+      className="bg-gray-700 p-4 rounded-xl shadow-lg flex flex-col items-center"
+    >
+      <img
+        src={image.src}
+        alt={image.title}
+        className="w-full h-[200px] object-cover rounded-lg mb-3"
+        onClick={() => handleImageClick(image)} // Mostrar información al hacer clic en la imagen
+      />
+      <p className="text-center mt-2 font-semibold text-white">{image.title}</p>
+      {/* Botón dinámico */}
+      <button
+        className="bg-green-500 px-3 py-1 rounded-full mt-2 text-white text-sm flex items-center hover:bg-green-700 transition-colors hover:scale-105"
+        onClick={() => handleImageClick(image)} // Mostrar información al hacer clic en el botón
+      >
+        Ver más
+      </button>
+    </div>
+  ))}
+</div>
 
-        {/* Instructional Text Section */}
-        <div className="max-w-4xl mx-auto text-center text-black">
-          <p className="text-2xl mb-6 leading-relaxed">
-            Crear una proyección te permitirá establecer y controlar todas aquellas actividades que te propongas cumplir en un
-            periodo de 2 años, tomando en cuenta todas las condiciones que aquí condensamos de una manera más ligera y directa,
-            así como la disposición del calendario de la convocatoria para que no olvides ninguna fecha.
-          </p>
-          <p className="text-2xl mb-6 leading-relaxed">
-            Para crear una proyección, luego de hacer clic sobre la opción con el mismo nombre podrás disponer de las actividades
-            disponibles para acumular puntos. Con opciones para crear, asignar descripción y prioridad, así como una fecha
-            aproximada para su cumplimiento ¡Podrás mantener un panorama completo sobre tus propósitos y progreso!
-          </p>
-        </div>
 
-        {/* Form Section */}
-        <div className="max-w-2xl mx-auto bg-white p-6 shadow-lg rounded-lg mt-6 space-y-8">
-          {/* Activity Name */}
-          <div className="flex items-center justify-between">
-            <div className="w-1/2">
-              <label className="block text-gray-700 font-bold mb-2">Nombre de la actividad</label>
-              <select
-                value={activityName}
-                onChange={handleActivityChange}
-                className="w-full p-2 border rounded-lg bg-gray-50"
-              >
-                <option value="" disabled>Selecciona una actividad</option>
-                <option value="Actividad 1">Actividad 1</option>
-                <option value="Actividad 2">Actividad 2</option>
-                <option value="Actividad 3">Actividad 3</option>
-              </select>
-            </div>
-            <p className="ml-6 text-gray-600 leading-relaxed">
-              Dentro de la creación de proyección se encuentra este cuadro en el cual puedes seleccionar la actividad que vas a agregar
-              a tu proyección.
-            </p>
-          </div>
 
-          {/* Priority */}
-          <div className="flex items-center justify-between">
-            <div className="w-1/2">
-              <label className="block text-gray-700 font-bold mb-2">Prioridad</label>
-              <select
-                value={priority}
-                onChange={handlePriorityChange}
-                className="w-full p-2 border rounded-lg bg-gray-50"
-              >
-                <option value="Alta">Alta</option>
-                <option value="Media">Media</option>
-                <option value="Baja">Baja</option>
-              </select>
-            </div>
-            <p className="ml-6 text-gray-600 leading-relaxed">
-              La prioridad que selecciones para cada actividad le dará una idea de la importancia que esta tenga para tu proceso.
-            </p>
-          </div>
-
-          {/* UIP Approximate */}
-          <div className="flex items-center justify-between">
-            <div className="w-1/2">
-              <label className="block text-gray-700 font-bold mb-2">UIP aproximadas a obtener</label>
-              <input
-                type="number"
-                value={uipValue}
-                onChange={handleUipChange}
-                className="w-full p-2 border rounded-lg bg-gray-50"
-              />
-            </div>
-            <p className="ml-6 text-gray-600 leading-relaxed">
-              Una vez terminada la configuración de tu actividad, podrás ver el aproximado de unidades de promoción.
-            </p>
-          </div>
-
-          {/* Add Button */}
-          <div className="flex justify-center">
+      {/* Modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">{selectedImage.title}</h2>
+            <p className="text-gray-600 mb-6">{selectedImage.description}</p>
             <button
-              type="submit"
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white p-3 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+              onClick={handleCloseModal}
             >
-              Agregar
+              Cerrar
             </button>
           </div>
         </div>
-
-        {/* Closing Instructional Text */}
-        <div className="max-w-3xl mx-auto mt-8 text-center text-white">
-          <p className="text-lg leading-relaxed">
-            Conforme creas y agregas tareas podrás visualizar a un lado de la pantalla la cantidad de actividades que te has
-            propuesto y el acumulado de unidades de promoción.
-          </p>
-        </div>
-      </div>
+      )}
+    </div>
   );
 }
 
-export default CreateProjection;
+export default GuidePage;

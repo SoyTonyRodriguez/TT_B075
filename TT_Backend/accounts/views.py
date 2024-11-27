@@ -7,6 +7,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .email_utils import enviar_correo_bienvenida
+from smtplib import SMTP
+from email.mime.text import MIMEText
+from django.http import JsonResponse
+from django.conf import settings
 
 # Create your views here.
 class AccountsView(viewsets.ModelViewSet):
@@ -15,15 +20,23 @@ class AccountsView(viewsets.ModelViewSet):
   queryset = Accounts.objects.all()
 
 class RegisterAccountsView(APIView):
-  parser_classes = [JSONParser, MultiPartParser, FormParser]
-  permission_classes = [AllowAny]  # Allow access to all users
-  
-  def post(self, request):
-    print(request.data)
-    serializer = RegisterSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    return Response(serializer.data)
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    permission_classes = [AllowAny]  # Permitir acceso a todos los usuarios
+
+    def post(self, request):
+        print(request.data)
+        
+        # Serialización y validación
+        serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Guardar el usuario y obtener la instancia creada
+        user = serializer.save()
+        
+        # Enviar correo de bienvenida usando el correo del usuario
+        enviar_correo_bienvenida(user.email)
+        
+        return Response(serializer.data)
 
 class AccountView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -53,3 +66,25 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 class CustomTokenRefreshView(TokenRefreshView):
     serializer_class = CustomTokenRefreshSerializer
+
+from django.core.mail import send_mail
+from django.http import JsonResponse
+
+def prueba_envio_correo(request):
+    try:
+        # Configurar el mensaje MIME
+        msg = MIMEText("Este es un correo enviado desde Django usando Outlook SMTP.")
+        msg['Subject'] = "Correo de Prueba"
+        msg['From'] = settings.EMAIL_HOST_USER
+        msg['To'] = "destinatario@ejemplo.com"
+
+        # Conexión SMTP manual
+        with SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
+            server.ehlo()  # Identificación con el servidor
+            server.starttls()  # Iniciar TLS
+            server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+            server.sendmail(settings.EMAIL_HOST_USER, ["destinatario@ejemplo.com"], msg.as_string())
+
+        return JsonResponse({'mensaje': 'Correo enviado exitosamente'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)})

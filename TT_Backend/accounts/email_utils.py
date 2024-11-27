@@ -1,24 +1,14 @@
-import smtplib
-from email.mime.text import MIMEText
-from django.conf import settings
+from django.core.mail import send_mail
 
-def enviar_correo_bienvenida(email_destinatario):
-    subject = '¡Bienvenido a nuestra plataforma!'
-    message = 'Gracias por registrarte. Esperamos que disfrutes de nuestros servicios.'
+def enviar_correo_bienvenida(destinatario_email):
+    asunto = "Bienvenido a nuestra plataforma"
+    mensaje = """
+    ¡Hola!
 
-    # Crear el mensaje MIME
-    msg = MIMEText(message)
-    msg['Subject'] = subject
-    msg['From'] = settings.EMAIL_HOST_USER
-    msg['To'] = email_destinatario
+    Gracias por registrarte en nuestra plataforma. Este es un correo de prueba enviado desde el dominio sandbox de Mailgun.
 
-    try:
-        # Conectarse al servidor SMTP de SendGrid
-        with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
-            server.ehlo()
-            server.starttls()  # Iniciar TLS sin argumentos
-            server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-            server.sendmail(settings.DEFAULT_FROM_EMAIL, email_destinatario, msg.as_string())
-        print("Correo enviado exitosamente.")
-    except Exception as e:
-        print(f"Error al enviar correo: {e}")
+    Saludos,
+    El Equipo.
+    """
+    remitente = "noreply@sandboxed880d43792f4ab3aac647cd8846099d.mailgun.org"
+    send_mail(asunto, mensaje, remitente, [destinatario_email], fail_silently=False)
