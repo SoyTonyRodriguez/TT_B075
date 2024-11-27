@@ -31,7 +31,7 @@ FRONTEND_MOBILE_PDFS_PATH = os.path.normpath(os.path.join(BASE_DIR, '../TT_front
 SECRET_KEY = 'django-insecure-xgfgrzmo%+$(c!f-2exu&s9x_bre07ue@=7$y2tlyw8@!@*&=&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
