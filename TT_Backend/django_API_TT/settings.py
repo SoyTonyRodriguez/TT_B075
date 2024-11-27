@@ -236,6 +236,7 @@ CORS_ALLOWED_ORIGINS = [
   'https://tt-b075.onrender.com',
 ]
 
+# Allow all origins
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_ALLOW = True

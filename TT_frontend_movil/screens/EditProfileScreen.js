@@ -207,32 +207,7 @@ const EditProfileScreen = ({ navigation }) => {
         {/* Categoría */}
         <Text style={tw`text-base font-bold text-black`}>Categoría</Text>
         <View style={tw`border border-gray-700 rounded-lg mb-3`}>
-          <Picker
-            selectedValue={category}
-            onValueChange={(itemValue) => setCategory(itemValue)}
-            style={tw`text-black`}
-          >
-            <Picker.Item label="Selecciona una categoría" value="" />
-            <Picker.Item label="Técnico Docente de Asignatura A" value="Técnico Docente de Asignatura A" />
-            <Picker.Item label="Técnico Docente de Asignatura B" value="Técnico Docente de Asignatura B" />
-            <Picker.Item label="Técnico Docente Auxiliar A" value="Técnico Docente Auxiliar A" />
-            <Picker.Item label="Técnico Docente Auxiliar B" value="Técnico Docente Auxiliar B" />
-            <Picker.Item label="Técnico Docente Auxiliar C" value="Técnico Docente Auxiliar C" />
-            <Picker.Item label="Técnico Docente Asociado A" value="Técnico Docente Asociado A" />
-            <Picker.Item label="Técnico Docente Asociado B" value="Técnico Docente Asociado B" />
-            <Picker.Item label="Técnico Docente Asociado C" value="Técnico Docente Asociado C" />
-            <Picker.Item label="Técnico Docente Titular A" value="Técnico Docente Titular A" />
-            <Picker.Item label="Profesor de Asignatura A" value="Profesor de Asignatura A" />
-            <Picker.Item label="Profesor Asistente A" value="Profesor Asistente A" />
-            <Picker.Item label="Profesor Asistente B" value="Profesor Asistente B" />
-            <Picker.Item label="Profesor Asistente C" value="Profesor Asistente C" />
-            <Picker.Item label="Profesor Asociado A" value="Profesor Asociado A" />
-            <Picker.Item label="Profesor Asociado B" value="Profesor Asociado B" />
-            <Picker.Item label="Profesor Asociado C" value="Profesor Asociado C" />
-            <Picker.Item label="Profesor Titular A" value="Profesor Titular A" />
-            <Picker.Item label="Profesor Titular B" value="Profesor Titular B" />
-          </Picker>
-        </View>
+        <Picker
             selectedValue={initialCategory}
             onValueChange={(value) => setCategory(value)}
             style={tw`text-black`}
