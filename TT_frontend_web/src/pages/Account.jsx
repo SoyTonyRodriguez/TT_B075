@@ -4,6 +4,7 @@ import perfilImage from '../img/perfi.png';
 import Navigation from './Navigation/Navigation';
 import { updateAccount } from '../api/accounts.api';
 import LoadingAnimation from "../components/LoadingAnimation";
+import { deleteProjection } from '../api/projections.api';
 
 function Account() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -55,46 +56,73 @@ function Account() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-
+  
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
-
+  
     if (!token) {
       console.error('Token no encontrado');
       return;
     }
-
+  
     const decodedToken = decodeToken(token);
     const userId = decodedToken.user_id;
+  
+    // Verificar si la categoría fue modificada
+    if (category !== JSON.parse(localStorage.getItem('accountDetails')).category) {
+      const confirmation = window.confirm(
+        "Al cambiar la categoría, se borrarán todas sus tareas, documentos y productos. ¿Desea continuar?"
+      );
+      if (!confirmation) {
+        return; // Detener el flujo si el usuario no confirma
+      }
+  
+      // Llamar al endpoint para borrar las proyecciones
+      try {
+        const accountDetails = JSON.parse(localStorage.getItem('accountDetails')) || {};
+        setLoading(true); // Activar el indicador de carga
+        await deleteProjection(JSON.parse(localStorage.getItem('accountDetails')).projection_id);
+        console.log("Proyecciones borradas exitosamente.");
 
+        accountDetails.units_projection = 0;
+        accountDetails.projection_id = null;
+        localStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+      } catch (error) {
+        console.error(
+          "Error al borrar las proyecciones:",
+          error.response ? error.response.data : error.message
+        );
+        return; // Detener el flujo en caso de error
+      } finally {
+        setLoading(false); // Desactivar el indicador de carga
+      }
+    }
+  
     const updatedData = {
       name: fullName,
       email: email,
       category: category,
     };
-
+  
     try {
       setLoading(true); // Activar el indicador de carga
       const response = await updateAccount(userId, token, updatedData); // Llamada a la API para actualizar la cuenta
       console.log('Respuesta del servidor:', response);
   
-      // Actualizar el localStorage con los datos actualizados
-      const updatedAccountDetails = {
-        userName: userName,  // Puedes ajustar esto si es necesario
+      // Actualizar `localStorage` con los datos actualizados
+      const storedAccountData = JSON.parse(localStorage.getItem('accountDetails')) || {};
+      const updatedAccountData = {
+        ...storedAccountData, // Mantener datos existentes
+        userName: userName,   // Actualizar con nuevos valores
         fullName: fullName,
         email: email,
         category: category,
       };
-      localStorage.setItem('accountDetails', JSON.stringify(updatedAccountDetails));
+      
+      localStorage.setItem('accountDetails', JSON.stringify(updatedAccountData));
+      console.log('Datos actualizados en localStorage:', updatedAccountData);
   
-      // Actualizar los estados del componente
-      setUserName(userName);
-      setFullName(fullName);
-      setEmail(email);
-      setCategory(category);
-  
-      setIsEditing(false);  // Desactivar modo edición
-      // Si deseas mantenerte en la misma página para ver los cambios inmediatamente, puedes comentar la siguiente línea
-      // navigate('/home');  // Redirigir a otra página existente, como la pantalla de inicio
+      setIsEditing(false); // Desactivar modo edición
+      navigate('/home'); // Redirigir a otra página existente, como la pantalla de inicio
     } catch (error) {
       console.error('Error actualizando la cuenta:', error.response ? error.response.data : error.message);
     } finally {

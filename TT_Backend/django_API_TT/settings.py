@@ -31,11 +31,14 @@ FRONTEND_MOBILE_PDFS_PATH = os.path.normpath(os.path.join(BASE_DIR, '../TT_front
 SECRET_KEY = 'django-insecure-xgfgrzmo%+$(c!f-2exu&s9x_bre07ue@=7$y2tlyw8@!@*&=&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
-HUNTER_API_KEY = os.getenv('HUNTER_API_KEY')  # Asegúrate de que esté correctamente cargada
-print(f"HUNTER_API_KEY: {HUNTER_API_KEY}")  # Imprime la clave para verificar si se está cargando bien
+
+
+# See/Download pdfs in web and movil
+X_FRAME_OPTIONS = 'ALLOWALL'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -90,6 +93,7 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,6 +102,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+WHITENOISE_ALLOW_ALL_ORIGINS = True  # Permitir acceso desde cualquier frontend
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'django_API_TT.urls'
 
@@ -237,13 +243,18 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL='accounts.Accounts'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'  # Servidor SMTP de Outlook
-EMAIL_PORT = 25  # Puerto para TLS
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False  # No habilitar SSL para este puerto
-EMAIL_HOST_USER = 'casaos022@gmail.com'
-EMAIL_HOST_PASSWORD = 'ublfdxnabahfofnu'  # Contraseña de aplicación generada
-DEFAULT_FROM_EMAIL = 'casaos022@gmail.com'
+# Initialise environment variables
+env = environ.Env()
 
+# Specify the path to the .env file
+env_file = os.path.join(os.path.dirname(__file__), 'email.env')
+
+environ.Env.read_env(env_file)  # Reads the .env file
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Cambia según tu proveedor
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 

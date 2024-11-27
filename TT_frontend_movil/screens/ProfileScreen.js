@@ -13,7 +13,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation(); 
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState(null);
-  const [unitsPromotion, setUnitsPromotion] = useState(67); // Valor inicial de las U.P. acumuladas
+  const [unitsPromotion, setUnitsPromotion] = useState(''); // Valor inicial de las U.P. acumuladas
   const [showUnits, setShowUnits] = useState(false); // Estado para mostrar/ocultar las U.P.
 
   // Load account data from localStorage on component mount
@@ -59,8 +59,8 @@ const ProfileScreen = () => {
             setUnitsPromotion(unitsProjection);
       
             // Guarda en AsyncStorage
-            const accountDetails = { userName: firstName, unitsProjection };
-            await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+            // const accountDetails = { userName: firstName, unitsProjection };
+            // await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
           } else {
             console.warn('La API no devolvió datos de usuario válidos.');
           }
@@ -85,7 +85,7 @@ const ProfileScreen = () => {
             const response = await getAccount(userId);
             
             if (response && response.data) {
-              console.log('Detalles de la cuenta actualizados:', response.data);
+              // console.log('Detalles de la cuenta actualizados:', response.data);
               const unitsProjection = response.data.units_projection || 0;
               setUnitsPromotion(unitsProjection);
             }

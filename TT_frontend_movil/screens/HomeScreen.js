@@ -121,7 +121,7 @@ const HomeScreen = () => {
             const response = await getAccount(userId);
             
             if (response && response.data) {
-              console.log('Detalles de la cuenta actualizados:', response.data);
+              // console.log('Detalles de la cuenta actualizados:', response.data);
               const unitsProjection = response.data.units_projection || 0;
               setUnitsProjection(unitsProjection);
             }

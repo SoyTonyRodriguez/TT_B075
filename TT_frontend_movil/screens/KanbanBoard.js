@@ -654,7 +654,7 @@ const KanbanBoard = () => {
         <Ionicons name="glasses-outline" size={40} color="#000" style={tw`ml-2`} />
       </View>
 
-      <ScrollView style={tw`p-5 mb-15`}>
+      <ScrollView style={tw`p-5`}>
         {/* Sección To-Do */}
         <TouchableOpacity onPress={() => toggleSection('todo')}>
           <View style={tw`bg-blue-900 p-4 rounded-xl`}>
@@ -710,15 +710,18 @@ const KanbanBoard = () => {
           ))}
         </View>
       )}
-
+      </ScrollView>
+      
+      <View style={tw`p-5`}>
         {/* Botón para crear nueva tarea */}
         <TouchableOpacity
           onPress={openModal}
-          style={tw`bg-blue-500 text-white px-4 py-2 rounded-lg mt-8`}
+          style={tw`bg-blue-500 text-white px-4 py-4 rounded-lg mt-1`}
         >
-          <Text style={tw`text-center text-white font-semibold`}>Crear Nueva Tarea</Text>
+          <Text style={tw`text-base text-center text-white font-semibold`}>Crear nueva tarea</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
+      
 
       {/* Modal para crear tarea */}
       {isModalOpen && (

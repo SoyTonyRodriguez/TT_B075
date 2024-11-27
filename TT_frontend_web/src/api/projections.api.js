@@ -23,3 +23,12 @@ export const getProjection = (account_id) => {
         }
     });
 }
+
+export const deleteProjection = (projection_id) => {
+    const token = localStorage.getItem('token');
+    return TasksAPI.delete(`projections/${projection_id}/delete/`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        }
+    });
+}

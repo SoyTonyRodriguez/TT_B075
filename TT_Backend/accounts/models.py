@@ -42,6 +42,7 @@ class Accounts(AbstractBaseUser):
   date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
   name = models.CharField(_('full name'), max_length=100, blank=False)
   category = models.CharField(max_length=100, blank=False)
+  is_superuser = models.BooleanField(_('superuser status'), default=False)
 
   projection_id = models.CharField(max_length=100, blank=False, default="")
   units_projection = models.IntegerField(default=0)
