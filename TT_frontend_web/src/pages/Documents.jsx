@@ -403,7 +403,7 @@ function Documents() {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/path-to-your-background-image.png')" }}>
+    <div className="min-h-screen bg-cover bg-center">
       <Navigation />
       <hr className="border-t-2 border-black my-4" />
 
@@ -544,7 +544,7 @@ function Documents() {
             <div className="text-center p-4 text-gray-500">No tienes documentos cargados</div>
           ) : (
             filteredFileData.map((file, index) => (
-              
+
               <div
                 key={index}
                 className={`grid grid-cols-5 items-center p-3 rounded-lg shadow-sm bg-blue-400 hover:bg-blue-500 transition-all`}

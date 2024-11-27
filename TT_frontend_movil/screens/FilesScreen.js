@@ -33,11 +33,11 @@ const Documents = () => {
   const [isProjectionModalOpen, setIsProjectionModalOpen] = useState(false); // Estado del modal de proyecciones
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false); // Modal para opciones de documento
   const [selectedDocumentId, setSelectedDocumentId] = useState(null); // ID del documento seleccionado
-
+  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [documentLoading, setDocumentLoading] = useState(false); // Estado de carga del documento
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(true); // Estado de carga inicial
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
 
@@ -170,33 +170,44 @@ const Documents = () => {
       // Incrustar el PDF en un HTML para WebView
       const pdfHtml = `
         <html>
-          <head>
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-                height: 100%;
-              }
-              .pdf-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-              }
-              embed {
-                width: 100%;
-                height: 100%;
-                display: block;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="pdf-container">
-              <embed src="data:application/pdf;base64,${data}" type="application/pdf" />
-            </div>
-          </body>
-        </html>
+  <head>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #000000; 
+      }
+      .pdf-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff; 
+        
+      }
+      embed {
+        width: 100%;
+        height: auto;
+        max-height: 100%;
+        max-width: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pdf-container">
+      <embed src="data:application/pdf;base64,${data}" type="application/pdf" />
+    </div>
+  </body>
+</html>
+
       `;
   
       return (
@@ -262,6 +273,8 @@ const Documents = () => {
     setFileTypeFilter('');
     setDateFilter('');
   };
+
+  
 
   // Función de búsqueda y filtrado
   const applyFilters = () => {
@@ -543,6 +556,16 @@ const Documents = () => {
     setIsOptionsModalOpen(true);
   };
 
+  const openModal = (document) => {
+    setSelectedDocument(document);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setSelectedDocument(null);
+    setIsModalVisible(false);
+  };
+
   return (
     <ImageBackground 
       source={require('../assets/images/fondo.jpg')} 
@@ -559,10 +582,10 @@ const Documents = () => {
         <Ionicons name="document-outline" size={40} color="#000" style={tw`ml-2`} />
       </View>
 
-      <View style={tw`p-6`}>
+      <View style={tw`p-3`}>
         {/* Barra de búsqueda */}
         <View style={tw`mb-6`}>
-          <View style={tw`flex-row items-center border-b border-gray-300`}>
+          <View style={tw`flex-row items-center border-b border-gray-900`}>
             <Ionicons name="search" size={24} color="#000" />
             <TextInput
               placeholder="Buscar en mis documentos"
@@ -573,10 +596,10 @@ const Documents = () => {
           </View>
         </View>  
 
-        {/* Filtros */}
-        <View style={tw`flex-row justify-around mb-6 relative z-20`}>
+        {/* Filtros */} 
+        <View style={tw`flex-row justify-around mb-6 relative`}>
           {/* Filtro por Tipo */}
-          <View style={{ position: 'relative', zIndex: 10 }}>
+          <View style={{ position: 'relative' }}>
             <TouchableOpacity 
               onPress={toggleFileTypeDropdown} 
               style={tw`bg-gray-200 p-3 rounded-lg flex-row items-center`}
@@ -586,7 +609,7 @@ const Documents = () => {
             </TouchableOpacity>
 
             {showFileTypeDropdown && (
-              <View style={[tw`absolute top-16 left-0 z-50 bg-white shadow-lg p-4 rounded-lg`]}>
+              <View style={[tw`absolute top-14 left-0 bg-white shadow-lg p-4 rounded-lg`, { zIndex: 100 }]}>
                 <TouchableOpacity 
                   onPress={() => handleFileTypeFilter('pdf')} 
                   style={tw`p-2`}
@@ -599,15 +622,15 @@ const Documents = () => {
                 >
                   <Text>JPG/JPEG</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={closeDropdowns} style={tw`p-2 text-red-500`}>
-                  <Text>Cancelar</Text>
+                <TouchableOpacity onPress={closeDropdowns} style={tw`p-2`}>
+                  <Text style={tw`text-red-500`}>Cancelar</Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
 
           {/* Filtro por Fecha */}
-          <View style={{ position: 'relative', zIndex: 10 }}>
+          <View style={{ position: 'relative' }}>
             <TouchableOpacity 
               onPress={toggleDateDropdown} 
               style={tw`bg-gray-200 p-3 rounded-lg flex-row items-center`}
@@ -617,7 +640,7 @@ const Documents = () => {
             </TouchableOpacity>
 
             {showDateDropdown && (
-              <View style={[tw`absolute top-16 left-0 z-50 bg-white shadow-lg p-4 rounded-lg`]}>
+              <View style={[tw`absolute top-14 left-0 bg-white shadow-lg p-4 rounded-lg`, { zIndex: 100 }]}>
                 <TouchableOpacity 
                   onPress={() => handleDateFilter('today')} 
                   style={tw`p-2`}
@@ -642,8 +665,8 @@ const Documents = () => {
                 >
                   <Text>Este año</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={closeDropdowns} style={tw`p-2 text-red-500`}>
-                  <Text>Cancelar</Text>
+                <TouchableOpacity onPress={closeDropdowns} style={tw`p-2`}>
+                  <Text style={tw`text-red-500`}>Cancelar</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -673,59 +696,205 @@ const Documents = () => {
           <Ionicons name="chevron-down" size={20} color="gray" />
         </TouchableOpacity>
 
-        {/* Lista de documentos */}
-        <View style={tw`bg-white p-4 rounded-lg shadow-lg`}>
-          {errorMessage ? (
-            <Text style={tw`text-red-500 mb-4`}>{errorMessage}</Text>
-          ) : null}
-
-          {/* Encabezado de la lista */}
-          <View style={tw`flex-row py-2 border-b border-gray-300`}>
-            {["Archivos"].map((header) => (
-              <View key={header} style={tw`flex-1 items-center`}>
-                <Text style={tw`font-bold text-sm`}>{header}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Renderizar los documentos filtrados */}
+        <ScrollView contentContainerStyle={tw`pb-85`}>
+          {/* Lista de documentos */}
           <View style={tw`bg-white p-4 rounded-lg shadow-lg`}>
-            {filteredFileData.length === 0 ? (
-              <Text style={tw`text-center text-gray-500 mt-4`}>No se encontraron documentos</Text>
-            ) : (
-              <FlatList
-                data={filteredFileData}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item, index }) => (
-                  <TouchableOpacity
-                  onPress={() => handleDocumentClick(item.id)}
-                  onLongPress={() => openOptionsModal(item.id)} 
-                  style={[
-                      tw`flex-row items-center py-3 border-b border-gray-300`,
-                      selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`,
-                    ]}
-                  >
-                    <Ionicons name={item.type === 'pdf' ? 'document' : 'image'} size={24} color={item.type === 'pdf' ? 'red' : 'blue'} style={tw`mr-3`} />
-      
-                  {/* Contenedor del nombre y proyección */}
-                  <View style={tw`flex-1`}>
-                    {/* Nombre del documento */}
-                    <Text numberOfLines={1} ellipsizeMode="tail" style={tw`text-lg font-semibold`}>
-                      {item.name}
-                    </Text>
-                    
-                    {/* Proyección debajo del nombre */}
-                    <Text style={tw`text-gray-500 text-sm`}>{item.projection}</Text>
-                  </View>
-                  
-                  {/* Icono de tres puntos para detalles */}
-                 
-                </TouchableOpacity>
-                )}
-              />
-            )}
+            {errorMessage ? (
+              <Text style={tw`text-red-500 mb-4`}>{errorMessage}</Text>
+            ) : null}
+
+            {/* Encabezado de la lista */}
+            <View style={tw`flex-row py-2 border-b border-gray-300`}>
+              {["Archivos"].map((header) => (
+                <View key={header} style={tw`flex-1 items-center`}>
+                  <Text style={tw`font-bold text-sm`}>{header}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Renderizar los documentos filtrados con FlatList */}
+            <View style={tw`bg-white p-4 rounded-lg shadow-lg`}>
+              {filteredFileData.length === 0 ? (
+                <Text style={tw`text-center text-gray-500 mt-4`}>No se encontraron documentos</Text>
+              ) : (
+                <FlatList
+                  data={filteredFileData}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item, index }) => (
+                    <TouchableOpacity
+                      onPress={() => handleDocumentClick(item.id)}
+                      onLongPress={() => openOptionsModal(item.id)}
+                      style={[
+                        tw`flex-row items-center py-3 border-b border-gray-300`,
+                        selectedFileIndex === index ? tw`bg-blue-500 text-white` : tw`bg-white`,
+                      ]}
+                    >
+                      <Ionicons
+                        name={item.type === 'pdf' ? 'document' : 'image'}
+                        size={24}
+                        color={item.type === 'pdf' ? 'red' : 'blue'}
+                        style={tw`mr-3`}
+                      />
+
+                      {/* Contenedor del nombre y proyección */}
+                      <View style={tw`flex-row items-center justify-between`}>
+                        {/* Contenedor del nombre del documento y proyección */}
+                        <View style={tw`flex-1`}>
+                          {/* Nombre del documento */}
+                          <Text numberOfLines={1} ellipsizeMode="tail" style={tw`text-lg font-semibold`}>
+                            {item.name}
+                          </Text>
+
+                          {/* Proyección debajo del nombre */}
+                          <Text style={tw`text-gray-500 text-sm`}>{item.projection}</Text>
+                        </View>
+
+                        {/* Botón de opciones */}
+                        <TouchableOpacity
+                          onPress={() => openModal(item)}
+                          style={tw`p-7`}
+                        >
+                          <Ionicons name="ellipsis-vertical" size={20} color="black" />
+                        </TouchableOpacity>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  nestedScrollEnabled={true} // Permite que FlatList funcione dentro de ScrollView
+                />
+              )}
+            </View>
           </View>
-        </View>
+
+          {/* Modal */}
+          <Modal
+            visible={isModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={closeModal}
+          >
+            <View style={tw`flex-1 justify-end bg-black bg-opacity-50`}>
+              <View style={tw`bg-gray-900 rounded-t-lg p-4`}>
+                {selectedDocument && (
+                  <>
+                    <Text style={tw`text-gray-200 text-lg font-bold mb-4`}>
+                      {selectedDocument.name}
+                    </Text>
+
+                    {/* Opciones del modal */}
+                    <TouchableOpacity
+                      onPress={() => setIsDetailsModalOpen(true)} 
+                      style={tw`flex-row items-center py-3 border-b border-gray-700`}
+                    >
+                      <Ionicons
+                        name="information-circle"
+                        size={24}
+                        color="gray"
+                        style={tw`mr-3`}
+                      />
+                      <Text style={tw`text-gray-300 text-base`}>Detalles</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={handleReplaceDocument}
+                      style={tw`flex-row items-center py-3 border-b border-gray-700`}
+                    >
+                      <Ionicons
+                        name="create"
+                        size={24}
+                        color="gray"
+                        style={tw`mr-3`}
+                      />
+                      <Text style={tw`text-gray-300 text-base`}>Modificar</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={handleDeleteDocument}
+                      style={tw`flex-row items-center py-3 border-b border-gray-700`}
+                    >
+                      <Ionicons
+                        name="trash"
+                        size={24}
+                        color="gray"
+                        style={tw`mr-3`}
+                      />
+                      <Text style={tw`text-gray-300 text-base`}>Eliminar</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={closeModal}
+                      style={tw`flex-row items-center py-3`}
+                    >
+                      <Ionicons
+                        name="close-circle"
+                        size={24}
+                        color="red"
+                        style={tw`mr-3`}
+                      />
+                      <Text style={tw`text-red-500 text-base`}>Cancelar</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            </View>
+          </Modal>
+          <Modal
+          visible={isDetailsModalOpen}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setIsDetailsModalOpen(false)}
+        >
+          <View style={tw`flex-1 justify-end items-center bg-black bg-opacity-70`}>
+            <View style={tw`w-full bg-gray-900 p-6 rounded-t-lg`}>
+              <Text style={tw`text-xl font-bold text-white mb-4 text-center`}>
+                Detalles del documento
+              </Text>
+
+              {/* Información del documento*/}
+              <View style={tw`mb-4`}>
+                <View style={tw`flex-row items-center mb-2`}>
+                  <Ionicons name="document-outline" size={24} color="#ffffff" />
+                  <View style={tw`ml-4`}>
+                    <Text style={tw`text-lg font-semibold text-gray-300`}>Nombre:</Text>
+                    <Text style={tw`text-base text-white`}>{selectedDocument?.name}</Text>
+                  </View>
+                </View>
+
+                <View style={tw`flex-row items-center mb-2`}>
+                  <Ionicons name="archive-outline" size={24} color="#ffffff" />
+                  <View style={tw`ml-4`}>
+                    <Text style={tw`text-lg font-semibold text-gray-300`}>Tamaño:</Text>
+                    <Text style={tw`text-base text-white`}>{selectedDocument?.size}</Text>
+                  </View>
+                </View>
+
+                <View style={tw`flex-row items-center mb-2`}>
+                  <Ionicons name="calendar-outline" size={24} color="#ffffff" />
+                  <View style={tw`ml-4`}>
+                    <Text style={tw`text-lg font-semibold text-gray-300`}>Fecha:</Text>
+                    <Text style={tw`text-base text-white`}>{selectedDocument?.date}</Text>
+                  </View>
+                </View>
+
+                <View style={tw`flex-row items-center mb-2`}>
+                  <Ionicons name="eye-outline" size={24} color="#ffffff" />
+                  <View style={tw`ml-4`}>
+                    <Text style={tw`text-lg font-semibold text-gray-300`}>Proyección:</Text>
+                    <Text style={tw`text-base text-white`}>{selectedDocument?.projection || 'Sin proyección'}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Botón de cerrar*/}
+              <TouchableOpacity
+                onPress={() => setIsDetailsModalOpen(false)}
+                style={tw`bg-red-500 p-3 rounded-lg mt-4`}
+              >
+                <Text style={tw`text-white text-center text-lg`}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        </ScrollView>
       </View>
 
       {/* Modal para visualizar documentos */}
@@ -766,34 +935,57 @@ const Documents = () => {
         </View>
 
         {/* Modal de detalles del documento */}
-        <Modal visible={isDetailsModalOpen} transparent={true} animationType="slide" onRequestClose={() => setIsDetailsModalOpen(false)}>
-          <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
-            <View style={tw`w-3/4 bg-white p-6 rounded-lg shadow-lg w-90`}>
-              <Text style={tw`text-xl font-bold mb-4 text-center`}>Detalles del documento</Text>
-              
-              <View style={tw`mb-2`}>
-                <Text style={tw`text-lg font-semibold`}>Nombre:</Text>
-                <Text style={tw`text-base`}>{selectedDocument?.name}</Text>
+        <Modal
+          visible={isDetailsModalOpen}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setIsDetailsModalOpen(false)}
+        >
+          <View style={tw`flex-1 justify-end items-center bg-black bg-opacity-70`}>
+            <View style={tw`w-full bg-gray-900 p-6 rounded-t-lg`}>
+              <Text style={tw`text-xl font-bold text-white mb-4 text-center`}>
+                Detalles del documento
+              </Text>
+
+              {/* Información del documento*/}
+              <View style={tw`mb-4`}>
+                <View style={tw`flex-row items-center mb-2`}>
+                  <Ionicons name="document-outline" size={24} color="#ffffff" />
+                  <View style={tw`ml-4`}>
+                    <Text style={tw`text-lg font-semibold text-gray-300`}>Nombre:</Text>
+                    <Text style={tw`text-base text-white`}>{selectedDocument?.name}</Text>
+                  </View>
+                </View>
+
+                <View style={tw`flex-row items-center mb-2`}>
+                  <Ionicons name="archive-outline" size={24} color="#ffffff" />
+                  <View style={tw`ml-4`}>
+                    <Text style={tw`text-lg font-semibold text-gray-300`}>Tamaño:</Text>
+                    <Text style={tw`text-base text-white`}>{selectedDocument?.size}</Text>
+                  </View>
+                </View>
+
+                <View style={tw`flex-row items-center mb-2`}>
+                  <Ionicons name="calendar-outline" size={24} color="#ffffff" />
+                  <View style={tw`ml-4`}>
+                    <Text style={tw`text-lg font-semibold text-gray-300`}>Fecha:</Text>
+                    <Text style={tw`text-base text-white`}>{selectedDocument?.date}</Text>
+                  </View>
+                </View>
+
+                <View style={tw`flex-row items-center mb-2`}>
+                  <Ionicons name="eye-outline" size={24} color="#ffffff" />
+                  <View style={tw`ml-4`}>
+                    <Text style={tw`text-lg font-semibold text-gray-300`}>Proyección:</Text>
+                    <Text style={tw`text-base text-white`}>{selectedDocument?.projection || 'Sin proyección'}</Text>
+                  </View>
+                </View>
               </View>
 
-              <View style={tw`mb-2`}>
-                <Text style={tw`text-lg font-semibold`}>Tamaño:</Text>
-                <Text style={tw`text-base`}>{selectedDocument?.size}</Text>
-              </View>
-
-              <View style={tw`mb-2`}>
-                <Text style={tw`text-lg font-semibold`}>Fecha:</Text>
-                <Text style={tw`text-base`}>{selectedDocument?.date}</Text>
-              </View>
-
-              <View style={tw`mb-2`}>
-                <Text style={tw`text-lg font-semibold`}>Proyección:</Text>
-                <Text style={tw`text-base`}>{selectedDocument?.projection || 'Sin proyección'}</Text>
-              </View>
-
+              {/* Botón de cerrar*/}
               <TouchableOpacity
                 onPress={() => setIsDetailsModalOpen(false)}
-                style={tw`bg-red-500 p-3 mt-4 rounded-lg`}
+                style={tw`bg-red-500 p-3 rounded-lg mt-4`}
               >
                 <Text style={tw`text-white text-center text-lg`}>Cerrar</Text>
               </TouchableOpacity>
@@ -838,38 +1030,6 @@ const Documents = () => {
           </View>
         </View>
       </Modal>
-
-        {/* Modal para opciones de documento */}
-        <Modal
-          visible={isOptionsModalOpen}
-          animationType="slide"
-          onRequestClose={() => setIsOptionsModalOpen(false)}
-        >
-          <View style={tw`flex-1 p-6`}>
-            <Text style={tw`text-xl font-bold mb-4`}>Opciones del Documento</Text>
-
-            <TouchableOpacity
-              onPress={handleDeleteDocument}
-              style={tw`bg-red-500 p-4 rounded-lg mb-4`}
-            >
-              <Text style={tw`text-white text-center`}>Eliminar Documento</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleReplaceDocument}
-              style={tw`bg-blue-500 p-4 rounded-lg`}
-            >
-              <Text style={tw`text-white text-center`}>Reemplazar Documento</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setIsOptionsModalOpen(false)}
-              style={tw`mt-6 p-3 bg-gray-300 rounded-lg`}
-            >
-              <Text style={tw`text-center`}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
 
       {/* Botón flotante de nuevo archivo en la esquina inferior derecha */}
       <TouchableOpacity

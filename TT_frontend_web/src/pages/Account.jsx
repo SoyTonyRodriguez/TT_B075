@@ -117,6 +117,7 @@ function Account() {
         email: email,
         category: category,
       };
+      
       localStorage.setItem('accountDetails', JSON.stringify(updatedAccountData));
       console.log('Datos actualizados en localStorage:', updatedAccountData);
   

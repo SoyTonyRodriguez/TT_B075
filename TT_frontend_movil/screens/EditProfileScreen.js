@@ -55,7 +55,6 @@ const EditProfileScreen = ({ navigation }) => {
         console.log("Datos de la cuenta:", storedAccountData);
         if (storedAccountData) {
           const { fullName, email, category } = JSON.parse(storedAccountData);
-
           setFullName(fullName);
           setEmail(email);
           setCategory(category);
@@ -70,6 +69,7 @@ const EditProfileScreen = ({ navigation }) => {
     };
     loadAccountData();
   }, []);
+
 
   const handleInputChange = (name, value) => {
     setForm({ ...form, [name]: value });
@@ -176,52 +176,38 @@ const EditProfileScreen = ({ navigation }) => {
 
       {/* Contenedor del ícono y título */}
       <View style={tw`flex-row items-center justify-between px-5 mt-12`}>
-        {/* Ícono de regresar */}
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back-outline" size={30} color="black" />
+          <Text style={tw`text-xl font-bold text-black`}>Regresar</Text>
         </TouchableOpacity>
-
-        {/* Título */}
         <Text style={tw`text-3xl font-bold text-center text-black`}>Editar Perfil</Text>
         <View style={tw`w-8`} />
       </View>
 
-      {/* Imagen de perfil o ícono predeterminado */}
-      <View style={tw`items-center mb-8 p-5`}>
-        {profileImage ? (
-          <Image source={profileImage} style={tw`w-30 h-30 rounded-full`} />
-        ) : (
-          <Ionicons name="person-circle-outline" size={120} color="black" />
-        )}
-        <TouchableOpacity 
-          style={tw`absolute bottom-0 right-5 bg-gray-200 p-2 rounded-full`} 
-          onPress={pickImage} // Cambiar imagen al tocar el ícono de la cámara
-        >
-          <Ionicons name="camera-outline" size={20} color="black" />
-        </TouchableOpacity>
-      </View>
-
       <ScrollView contentContainerStyle={tw`p-5`}>
-        {/* Campos de edición del perfil */}
+        {/* Nombre */}
         <Text style={tw`text-base font-bold text-black`}>Nombre</Text>
         <TextInput
           value={fullName} // El estado `fullName` controla el valor del campo
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
+          placeholder="Escribe tu nombre"
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
           onChangeText={(value) => setFullName(value)} // Actualiza el estado al cambiar el texto
         />
 
-        <Text style={tw`text-base font-bold text-black`}>Email</Text>
+        {/* Correo */}
+        <Text style={tw`text-base font-bold text-black`}>Correo</Text>
         <TextInput
           value={email} // El estado `email` controla el valor del campo
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
+          placeholder="Escribe tu correo"
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
           onChangeText={(value) => setEmail(value)} // Actualiza el estado al cambiar el texto
         />
 
+        {/* Categoría */}
         <Text style={tw`text-base font-bold text-black`}>Categoría</Text>
         <View style={tw`border border-gray-700 rounded-lg mb-3`}>
-          <Picker
+        <Picker
             selectedValue={initialCategory}
             onValueChange={(value) => setCategory(value)}
             style={tw`text-black`}
@@ -289,7 +275,7 @@ const EditProfileScreen = ({ navigation }) => {
         </View> */}
 
         {/* Botón para guardar cambios */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={tw`bg-[#003366] py-4 rounded w-full items-center mb-5`}
           onPress={handleSaveChanges}
         >

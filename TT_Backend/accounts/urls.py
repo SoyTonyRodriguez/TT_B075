@@ -1,8 +1,8 @@
 from rest_framework import routers
 from django.urls import path, include
 from accounts import views
-from .views import RegisterAccountsView, CustomTokenObtainPairView, CustomTokenRefreshView, AccountView
-
+from .views import RegisterAccountsView, CustomTokenObtainPairView, CustomTokenRefreshView, AccountView, prueba_envio_correo
+from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # api versioning
@@ -15,5 +15,7 @@ urlpatterns = [
     path('api/v1/login/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/register/', RegisterAccountsView.as_view()),
     path('api/v1/account/<str:id>/', AccountView.as_view(), name='user_detail'),
+    path('prueba-correo/', prueba_envio_correo, name='prueba-correo'),
+
 
 ]

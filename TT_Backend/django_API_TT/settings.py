@@ -36,7 +36,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-
+# See/Download pdfs in web and movil
 X_FRAME_OPTIONS = 'ALLOWALL'
 
 # Application definition
@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'check_products',
     'conditions_max',
     'documents_admin',
+    'anymail',
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -235,6 +236,7 @@ CORS_ALLOWED_ORIGINS = [
   'https://tt-b075.onrender.com',
 ]
 
+# Allow all origins
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_ALLOW = True
@@ -256,3 +258,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
