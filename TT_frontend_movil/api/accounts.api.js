@@ -22,3 +22,14 @@ export const getAccount = async (id) => {
       },
     });
   };  
+
+// updateAccount method
+export const updateAccount = async (id, updatedData) => {
+  const token = await AsyncStorage.getItem('token');
+  const cleanToken = token.replace(/["]/g, '').trim();
+  return accountsAPI.patch(`account/${id}/`, updatedData, {
+      headers: {
+          Authorization: `Bearer ${cleanToken}`,  // Enviar el token JWT en las cabeceras
+      },
+  });
+};
