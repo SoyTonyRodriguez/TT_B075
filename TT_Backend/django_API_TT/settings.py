@@ -62,8 +62,7 @@ INSTALLED_APPS = [
     'conditions_categories',
     'check_products',
     'conditions_max',
-    'documents_admin',
-    'anymail',
+    'documents_admin'
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
