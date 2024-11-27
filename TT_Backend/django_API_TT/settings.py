@@ -98,6 +98,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 WHITENOISE_ALLOW_ALL_ORIGINS = True  # Permitir acceso desde cualquier frontend
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'django_API_TT.urls'
 
