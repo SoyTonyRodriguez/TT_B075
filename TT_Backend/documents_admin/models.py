@@ -60,16 +60,16 @@ class DocumentsAdmin(models.Model):
         super().save(*args, **kwargs)
 
         # Copiar el archivo al frontend web
-        web_frontend_directory = settings.FRONTEND_WEB_PDFS_PATH
-        os.makedirs(web_frontend_directory, exist_ok=True)
-        web_frontend_path = os.path.join(web_frontend_directory, self.file.name)
-        shutil.copy(self.file.path, web_frontend_path)
+        # web_frontend_directory = settings.FRONTEND_WEB_PDFS_PATH
+        # os.makedirs(web_frontend_directory, exist_ok=True)
+        # web_frontend_path = os.path.join(web_frontend_directory, self.file.name)
+        # shutil.copy(self.file.path, web_frontend_path)
 
-        # Copiar el archivo al frontend móvil
-        mobile_frontend_directory = settings.FRONTEND_MOBILE_PDFS_PATH
-        os.makedirs(mobile_frontend_directory, exist_ok=True)
-        mobile_frontend_path = os.path.join(mobile_frontend_directory, self.file.name)
-        shutil.copy(self.file.path, mobile_frontend_path)
+        # # Copiar el archivo al frontend móvil
+        # mobile_frontend_directory = settings.FRONTEND_MOBILE_PDFS_PATH
+        # os.makedirs(mobile_frontend_directory, exist_ok=True)
+        # mobile_frontend_path = os.path.join(mobile_frontend_directory, self.file.name)
+        # shutil.copy(self.file.path, mobile_frontend_path)
 
     def delete(self, *args, **kwargs):
         """
