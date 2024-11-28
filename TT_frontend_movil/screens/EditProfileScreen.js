@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ImageBackground, ScrollView, Image, Alert} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ImageBackground, ScrollView, Image, Modal, Alert, FlatList} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker'; // Importa Picker
 import * as ImagePicker from 'expo-image-picker'; 
@@ -12,20 +12,17 @@ import { deleteProjection } from '../api/projections.api'; // Importa tu funció
 import { updateAccount } from '../api/accounts.api';
 
 const EditProfileScreen = ({ navigation }) => {
+  // Estados para almacenar los datos del usuario
   const [userId, setUserId] = useState(null);
-
   const [userName, setUserName] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('');
   const [initialCategory, setInitialCategory] = useState(''); // Para comparar si la categoría cambió
-  
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
   const [loading, setLoading] = useState(true); // Estado de carga
-  // const [password, setPassword] = useState('');
+  const [isCategoryModalVisible, setCategoryModalVisible] = useState(false)
 
-  // const [passwordVisible, setPasswordVisible] = useState(false);
-  // const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [form, setForm] = useState({
     name: '',      
     email: '',    
@@ -34,8 +31,30 @@ const EditProfileScreen = ({ navigation }) => {
   });
 
   const [profileImage, setProfileImage] = useState(null);
-  
-  // Load account data from localStorage on component mount
+
+  // Lista de categorías para el selector personalizado (reemplaza Picker)
+  const categories = [
+    "Técnico Docente de Asignatura A",
+    "Técnico Docente de Asignatura B",
+    "Técnico Docente Auxiliar A",
+    "Técnico Docente Auxiliar B",
+    "Técnico Docente Auxiliar C",
+    "Técnico Docente Asociado A",
+    "Técnico Docente Asociado B",
+    "Técnico Docente Asociado C",
+    "Técnico Docente Titular A",
+    "Profesor de Asignatura A",
+    "Profesor Asistente A",
+    "Profesor Asistente B",
+    "Profesor Asistente C",
+    "Profesor Asociado A",
+    "Profesor Asociado B",
+    "Profesor Asociado C",
+    "Profesor Titular A",
+    "Profesor Titular B",
+  ];
+
+  // Carga los datos de la cuenta desde el almacenamiento local al montar el componente
   useEffect(() => {
     const loadAccountData = async () => {
       try {
@@ -50,19 +69,17 @@ const EditProfileScreen = ({ navigation }) => {
             console.error('Token inválido:', error);
           }
         }
-
-        const storedAccountData =  await AsyncStorage.getItem('accountDetails');
+        const storedAccountData = await AsyncStorage.getItem('accountDetails');
         console.log("Datos de la cuenta:", storedAccountData);
         if (storedAccountData) {
           const { fullName, email, category } = JSON.parse(storedAccountData);
           setFullName(fullName);
           setEmail(email);
           setCategory(category);
-          setInitialCategory(category); // Guardar la categoría inicial
+          setInitialCategory(category);// Guardar la categoría inicial
         }
       } catch (error) {
         console.error("Error accessing or parsing account details from localStorage:", error);
-
       } finally {
         setLoading(false);
       }
@@ -70,14 +87,13 @@ const EditProfileScreen = ({ navigation }) => {
     loadAccountData();
   }, []);
 
-
   const handleInputChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
+  // Función para manejar la acción de guardar los cambios
   const handleSaveChanges = async () => {
     const updatedAccountData = { name: fullName, email, category };
-
     try {
       setLoading(true);
       setLoadingMessage("Guardando cambios...");
@@ -88,10 +104,7 @@ const EditProfileScreen = ({ navigation }) => {
           "Confirmación requerida",
           "Al cambiar la categoría, se borrarán todas sus tareas, documentos y productos. ¿Desea continuar?",
           [
-            {
-              text: "Cancelar",
-              style: "cancel",
-            },
+            { text: "Cancelar", style: "cancel" },
             {
               text: "Aceptar",
               onPress: async () => {
@@ -104,17 +117,14 @@ const EditProfileScreen = ({ navigation }) => {
                   const response = await updateAccount(userId, updatedAccountData); // Actualizar la cuenta después de borrar las proyecciones
                   console.log('Respuesta del servidor:', response.data);
 
-                  accountDetails.projection_id = null; // Actualizar el campo `projection_id`
-                  accountDetails.units_projection = 0; // Actualizar el campo `units_projection`
-                  // Guardar los datos actualizados nuevamente en AsyncStorage
+                  // Actualizar AsyncStorage
+                  accountDetails.projection_id = null;
+                  accountDetails.units_projection = 0;
                   await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
 
                 } catch (error) {
                   console.error("Error al borrar proyecciones:", error);
-                  Alert.alert(
-                    "Error",
-                    "No se pudieron borrar las proyecciones. Inténtelo nuevamente más tarde."
-                  );
+                  Alert.alert("Error", "No se pudieron borrar las proyecciones. Inténtelo nuevamente más tarde.");
                 }
               },
             },
@@ -125,9 +135,8 @@ const EditProfileScreen = ({ navigation }) => {
         console.log('Respuesta del servidor:', response.data);
       }
 
-      // Guardar en AsyncStorage
+      // Guardar los datos actualizados en AsyncStorage
       const accountDetailsString = await AsyncStorage.getItem('accountDetails');
-      
       const accountDetails = JSON.parse(accountDetailsString); // Analizar la cadena JSON
       accountDetails.fullName = fullName; // Actualizar el campo `fullName`
       accountDetails.email = email;       // Actualizar el campo `email`
@@ -174,130 +183,74 @@ const EditProfileScreen = ({ navigation }) => {
       {/* Pantalla de carga */}
       {loading && <LoadingScreen message={loadingMessage} />}
 
-      {/* Contenedor del ícono y título */}
-      <View style={tw`flex-row items-center justify-between px-5 mt-12`}>
+      {/* Contenedor del ícono de regresar y título */}
+      <View style={tw`flex-row items-center px-5 mt-12`}>
+        {/* Ícono de regresar */}
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={tw`text-xl font-bold text-black`}>Regresar</Text>
+          <Ionicons name="arrow-back-outline" size={30} color="black" />
         </TouchableOpacity>
-        <Text style={tw`text-3xl font-bold text-center text-black`}>Editar Perfil</Text>
-        <View style={tw`w-8`} />
+        {/* Título "Editar Perfil" */}
+        <Text style={tw`flex-1 text-3xl font-bold text-center text-black`}>Editar Perfil</Text>
       </View>
 
       <ScrollView contentContainerStyle={tw`p-5`}>
-        {/* Nombre */}
+        {/* Campo de Nombre */}
         <Text style={tw`text-base font-bold text-black`}>Nombre</Text>
         <TextInput
-          value={fullName} // El estado `fullName` controla el valor del campo
+          value={fullName}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholder="Escribe tu nombre"
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
-          onChangeText={(value) => setFullName(value)} // Actualiza el estado al cambiar el texto
+          onChangeText={(value) => setFullName(value)}
         />
 
-        {/* Correo */}
+        {/* Campo de Correo */}
         <Text style={tw`text-base font-bold text-black`}>Correo</Text>
         <TextInput
-          value={email} // El estado `email` controla el valor del campo
+          value={email}
           style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
           placeholder="Escribe tu correo"
           placeholderTextColor="rgba(0, 0, 0, 0.8)"
-          onChangeText={(value) => setEmail(value)} // Actualiza el estado al cambiar el texto
+          onChangeText={(value) => setEmail(value)}
         />
 
-        {/* Categoría */}
+        {/* Selector de Categoría */}
         <Text style={tw`text-base font-bold text-black`}>Categoría</Text>
-        <View style={tw`border border-gray-700 rounded-lg mb-3`}>
-          <Picker
-            selectedValue={category}
-            onValueChange={(itemValue) => setCategory(itemValue)}
-            style={tw`text-black`}
-          >
-            <Picker.Item label="Selecciona una categoría" value="" />
-            <Picker.Item label="Técnico Docente de Asignatura A" value="Técnico Docente de Asignatura A" />
-            <Picker.Item label="Técnico Docente de Asignatura B" value="Técnico Docente de Asignatura B" />
-            <Picker.Item label="Técnico Docente Auxiliar A" value="Técnico Docente Auxiliar A" />
-            <Picker.Item label="Técnico Docente Auxiliar B" value="Técnico Docente Auxiliar B" />
-            <Picker.Item label="Técnico Docente Auxiliar C" value="Técnico Docente Auxiliar C" />
-            <Picker.Item label="Técnico Docente Asociado A" value="Técnico Docente Asociado A" />
-            <Picker.Item label="Técnico Docente Asociado B" value="Técnico Docente Asociado B" />
-            <Picker.Item label="Técnico Docente Asociado C" value="Técnico Docente Asociado C" />
-            <Picker.Item label="Técnico Docente Titular A" value="Técnico Docente Titular A" />
-            <Picker.Item label="Profesor de Asignatura A" value="Profesor de Asignatura A" />
-            <Picker.Item label="Profesor Asistente A" value="Profesor Asistente A" />
-            <Picker.Item label="Profesor Asistente B" value="Profesor Asistente B" />
-            <Picker.Item label="Profesor Asistente C" value="Profesor Asistente C" />
-            <Picker.Item label="Profesor Asociado A" value="Profesor Asociado A" />
-            <Picker.Item label="Profesor Asociado B" value="Profesor Asociado B" />
-            <Picker.Item label="Profesor Asociado C" value="Profesor Asociado C" />
-            <Picker.Item label="Profesor Titular A" value="Profesor Titular A" />
-            <Picker.Item label="Profesor Titular B" value="Profesor Titular B" />
-          </Picker>
-        </View>
-            selectedValue={initialCategory}
-            onValueChange={(value) => setCategory(value)}
-            style={tw`text-black`}
-          >
-            <Picker.Item label="Técnico Docente de Asignatura A" value="Técnico Docente de Asignatura A"/>
-            <Picker.Item label="Técnico Docente de Asignatura B" value="Técnico Docente de Asignatura B"/>
-            <Picker.Item label="Técnico Docente Auxiliar A" value="Técnico Docente Auxiliar A"/>
-            <Picker.Item label="Técnico Docente Auxiliar B" value="Técnico Docente Auxiliar B"/>
-            <Picker.Item label="Técnico Docente Auxiliar C" value="Técnico Docente Auxiliar C"/>
-            <Picker.Item label="Técnico Docente Asociado A" value="Técnico Docente Asociado A"/>
-            <Picker.Item label="Técnico Docente Asociado B" value="Técnico Docente Asociado B"/>
-            <Picker.Item label="Técnico Docente Asociado C" value="Técnico Docente Asociado C"/>
-            <Picker.Item label="Técnico Docente Titular A" value="Técnico Docente Titular A"/>
-            <Picker.Item label="Profesor de Asignatura A" value="Profesor de Asignatura A"/>
-            <Picker.Item label="Profesor Asistente A" value="Profesor Asistente A"/>
-            <Picker.Item label="Profesor Asistente B" value="Profesor Asistente B"/>
-            <Picker.Item label="Profesor Asistente C" value="Profesor Asistente C"/>
-            <Picker.Item label="Profesor Asociado A" value="Profesor Asociado A"/>
-            <Picker.Item label="Profesor Asociado B" value="Profesor Asociado B"/>
-            <Picker.Item label="Profesor Asociado C" value="Profesor Asociado C"/>
-            <Picker.Item label="Profesor Titular A" value="Profesor Titular A"/>
-            <Picker.Item label="Profesor Titular B" value="Profesor Titular B"/>
-          </Picker>
-        </View>
+        <TouchableOpacity
+          style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 bg-transparent`}
+          onPress={() => setCategoryModalVisible(true)}
+        >
+          <Text style={tw`text-black`}>{category || "Selecciona una categoría"}</Text>
+        </TouchableOpacity>
 
-        {/* <Text style={tw`text-base font-bold text-black`}>Contraseña</Text>
-        <View style={tw`relative w-full mb-3`}>
-          <TextInput
-            secureTextEntry={!passwordVisible} 
-            style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
-            placeholderTextColor="rgba(0, 0, 0, 0.8)"
-            onChangeText={(value) => handleInputChange('password', value)}
-          />
-          <TouchableOpacity 
-            style={tw`absolute right-4 top-4`} 
-            onPress={() => setPasswordVisible(!passwordVisible)}
-          >
-            <Ionicons 
-              name={passwordVisible ? "eye-off" : "eye"} 
-              size={24} 
-              color="rgba(0, 0, 0, 0.8)" 
-            />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={tw`text-base font-bold text-black`}>Confirmar contraseña</Text>
-        <View style={tw`relative w-full mb-3`}>
-          <TextInput
-            value={form.passwordVisible}
-            secureTextEntry={!passwordVisible} 
-            style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 text-base bg-transparent text-black`}
-            placeholderTextColor="rgba(0, 0, 0, 0.8)"
-            onChangeText={(value) => handleInputChange('confirmPassword', value)}
-          />
-          <TouchableOpacity 
-            style={tw`absolute right-4 top-4`} 
-            onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
-          >
-            <Ionicons 
-              name={passwordVisible ? "eye-off" : "eye"} 
-              size={24} 
-              color="rgba(0, 0, 0, 0.8)" 
-            />
-          </TouchableOpacity>
-        </View> */}
+        {/* Modal para la selección de categoría */}
+        <Modal visible={isCategoryModalVisible} transparent={true} animationType="slide">
+          <View style={tw`flex-1 bg-black/50 justify-center`}>
+            <View style={tw`bg-white p-5 rounded-lg mx-5`}>
+              <FlatList
+                data={categories}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={tw`p-3 border-b border-gray-300`}
+                    onPress={() => {
+                      setCategory(item);
+                      setCategoryModalVisible(false);
+                    }}
+                  >
+                    <Text style={tw`text-black`}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity
+                onPress={() => setCategoryModalVisible(false)}
+                style={tw`mt-5 py-2 px-4 bg-gray-300 rounded-lg`}
+              >
+                <Text style={tw`text-center text-black`}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/* Botón para guardar cambios */}
         <TouchableOpacity
