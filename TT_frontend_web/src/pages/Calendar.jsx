@@ -41,7 +41,7 @@ const CalendarWithDetails = () => {
 
   // Show loading (Mostrar pantalla de carga)
   if (loading) {
-      return <LoadingSpinner />;
+      return <LoadingAnimation />;
   }
 
 

@@ -62,8 +62,7 @@ INSTALLED_APPS = [
     'conditions_categories',
     'check_products',
     'conditions_max',
-    'documents_admin',
-    'anymail',
+    'documents_admin'
 ]
 
 # REST_FRAMEWORK settings (change the authentication for JWT)
@@ -236,6 +235,7 @@ CORS_ALLOWED_ORIGINS = [
   'https://tt-b075.onrender.com',
 ]
 
+# Allow all origins
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_ALLOW = True
