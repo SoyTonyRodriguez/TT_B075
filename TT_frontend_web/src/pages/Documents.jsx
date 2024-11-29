@@ -390,17 +390,29 @@ function Documents() {
       setErrorMessage("No hay archivos para exportar.");
       return;
     }
-
+  
     const zip = new JSZip();
-
-    fileData.forEach((file) => {
-      // Agregamos los archivos al zip con su nombre original
-      zip.file(file.name, file.file);
-    });
-
+  
+    for (const file of fileData) {
+      try {
+        // Obtén los datos binarios del archivo desde el backend
+        const response = await getDocument(file.id);
+        const documentData = response.data.file; // Datos en base64
+        const documentBlob = new Blob([Uint8Array.from(atob(documentData), c => c.charCodeAt(0))]);
+  
+        // Añade el archivo al ZIP
+        zip.file(file.name, documentBlob);
+      } catch (error) {
+        console.error(`Error al obtener el archivo ${file.name}:`, error);
+        setErrorMessage(`Error al obtener el archivo ${file.name}.`);
+      }
+    }
+  
+    // Generar y descargar el archivo ZIP
     const content = await zip.generateAsync({ type: "blob" });
     saveAs(content, "documentos.zip");
   };
+  
 
   return (
     <div className="min-h-screen bg-cover bg-center">
