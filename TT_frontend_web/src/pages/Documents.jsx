@@ -384,7 +384,7 @@ function Documents() {
   };
 
 
-  // Función para exportar documentos en ZIP
+  // Función para exportar documentos en ZI
   const handleExportZip = async () => {
     if (fileData.length === 0) {
       setErrorMessage("No hay archivos para exportar.");
