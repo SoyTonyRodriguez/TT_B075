@@ -8,7 +8,6 @@ import tw from 'twrnc';
 const { height: screenHeight } = Dimensions.get('window');
 
 const ConvocatoriaScreen = () => {
-  // Estados para controlar la visibilidad de cada sección
   const [showRequisitos, setShowRequisitos] = useState(false);
   const [showFechas, setShowFechas] = useState(false);
   const [showCriterios, setShowCriterios] = useState(false);
@@ -27,7 +26,7 @@ const ConvocatoriaScreen = () => {
           </View>
 
           <Text style={tw`text-lg text-black mb-5 text-justify`}>
-            La Promoción Docente busca reconocer y premiar el esfuerzo de los docentes del IPN.
+            El proceso de promoción docente busca reconocer y premiar el esfuerzo de los docentes del IPN.
             Su objetivo es ayudarte a crecer profesionalmente, avanzando en tu carrera académica,
             y mejorar la calidad educativa a través de la actualización constante y la innovación
             en tu enseñanza. En pocas palabras, es una oportunidad para desarrollarte y ser valorado
@@ -51,11 +50,11 @@ const ConvocatoriaScreen = () => {
               resizeMode="contain" 
             />
             <Text style={tw`text-base text-black flex-1 text-justify`}>
-              La Dirección General del IPN emite la convocatoria de promoción cada año antes del primer día hábil de enero
+              La Dirección General del IPN emite la convocatoria de promoción cada año antes de finalizar el mes de enero.
             </Text>
           </View>
 
-          {/* Botón para mostrar/ocultar Requisitos */}
+          {/* Sección Requisitos */}
           <TouchableOpacity style={tw`flex-row items-center justify-between mt-5`} onPress={() => setShowRequisitos(!showRequisitos)}>
             <Text style={tw`text-lg text-blue-500`}>Requisitos</Text>
             <Icon
@@ -64,12 +63,8 @@ const ConvocatoriaScreen = () => {
               color="blue"
             />
           </TouchableOpacity>
-          <Animatable.View
-            animation={showRequisitos ? 'fadeInDown' : 'fadeOutUp'}
-            duration={500}
-            style={tw`${showRequisitos ? 'flex' : 'hidden'} mt-2 pl-3`}
-          >
-            {showRequisitos && (
+          {showRequisitos && (
+            <Animatable.View animation="fadeInDown" duration={500} style={tw`mt-2 pl-3`}>
               <View style={tw`flex-row items-start mt-2`}>
                 <Ionicons name="clipboard-outline" size={24} color="blue" style={tw`mr-2 mt-1`} />
                 <View style={tw`flex-1`}>
@@ -81,10 +76,10 @@ const ConvocatoriaScreen = () => {
                   <Text>6. Presentar documentos probatorios, como constancias de validación o registro de proyectos de investigación.</Text>
                 </View>
               </View>
-            )}
-          </Animatable.View>
+            </Animatable.View>
+          )}
 
-          {/* Botón para mostrar/ocultar Fechas Importantes */}
+          {/* Sección Fechas Importantes */}
           <TouchableOpacity style={tw`flex-row items-center justify-between mt-5`} onPress={() => setShowFechas(!showFechas)}>
             <Text style={tw`text-lg text-blue-500`}>Fechas Importantes</Text>
             <Icon
@@ -93,12 +88,8 @@ const ConvocatoriaScreen = () => {
               color="blue"
             />
           </TouchableOpacity>
-          <Animatable.View
-            animation={showFechas ? 'fadeInDown' : 'fadeOutUp'}
-            duration={500}
-            style={tw`${showFechas ? 'flex' : 'hidden'} mt-2 pl-3`}
-          >
-            {showFechas && (
+          {showFechas && (
+            <Animatable.View animation="fadeInDown" duration={500} style={tw`mt-2 pl-3`}>
               <View style={tw`flex-row items-start mt-2`}>
                 <Ionicons name="calendar-outline" size={24} color="blue" style={tw`mr-2 mt-1`} />
                 <View style={tw`flex-1`}>
@@ -108,10 +99,10 @@ const ConvocatoriaScreen = () => {
                   <Text>• Publicación de reconsideración: 30 de mayo de 2024</Text>
                 </View>
               </View>
-            )}
-          </Animatable.View>
+            </Animatable.View>
+          )}
 
-          {/* Botón para mostrar/ocultar Criterios de Selección */}
+          {/* Sección Criterios de Selección */}
           <TouchableOpacity style={tw`flex-row items-center justify-between mt-5`} onPress={() => setShowCriterios(!showCriterios)}>
             <Text style={tw`text-lg text-blue-500`}>Criterios de Selección</Text>
             <Icon
@@ -120,13 +111,8 @@ const ConvocatoriaScreen = () => {
               color="blue"
             />
           </TouchableOpacity>
-
-          <Animatable.View
-            animation={showCriterios ? 'fadeInDown' : 'fadeOutUp'}
-            duration={500}
-            style={tw`${showCriterios ? 'flex' : 'hidden'} mt-2 pl-3`}
-          >
-            {showCriterios && (
+          {showCriterios && (
+            <Animatable.View animation="fadeInDown" duration={500} style={tw`mt-2 pl-3`}>
               <View style={tw`mt-2`}>
                 <Text style={tw`mt-2`}>
                   1. La promoción del personal académico se realizará conforme a lo establecido en el RCITPAIPN, el RPDIPN y 
@@ -147,20 +133,9 @@ const ConvocatoriaScreen = () => {
                 <Text style={tw`mt-2`}>
                   5. La calificación de los méritos deberá efectuarse por cuerpos colegiados con un criterio explícito.
                 </Text>
-                <Text style={tw`mt-2`}>
-                  6. La integración de la Comisión de Promoción Docente (CPD) y los Jurados Calificadores (JC) se realizará de acuerdo 
-                  a la normatividad aplicable.
-                </Text>
-                <Text style={tw`mt-2`}>
-                  7. Los documentos registrados en el Sistema Institucional del Personal Académico (SIPAC) son responsabilidad única 
-                  del personal académico participante.
-                </Text>
-                <Text style={tw`mt-2`}>
-                  8. La Dirección de Capital Humano será el área encargada de coordinar y organizar las actividades contempladas.
-                </Text>
               </View>
-            )}
-          </Animatable.View>
+            </Animatable.View>
+          )}
         </View>
       </ImageBackground>
     </ScrollView>
