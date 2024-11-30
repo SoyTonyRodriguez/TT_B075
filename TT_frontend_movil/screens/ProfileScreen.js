@@ -77,28 +77,28 @@ const ProfileScreen = () => {
     }
   }, [userId]);    
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (userId) {
-        const fetchAccountDetails = async () => {
-          try {
-            const response = await getAccount(userId);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (userId) {
+  //       const fetchAccountDetails = async () => {
+  //         try {
+  //           const response = await getAccount(userId);
             
-            if (response && response.data) {
-              // console.log('Detalles de la cuenta actualizados:', response.data);
-              const unitsProjection = response.data.units_projection || 0;
-              setUnitsPromotion(unitsProjection);
-            }
-          } catch (error) {
-            console.error('Error al actualizar los detalles de la cuenta:', error);
-          }
-        };
-        fetchAccountDetails();
-      }
-    }, 5000); // Actualiza cada 5 segundos
+  //           if (response && response.data) {
+  //             // console.log('Detalles de la cuenta actualizados:', response.data);
+  //             const unitsProjection = response.data.units_projection || 0;
+  //             setUnitsPromotion(unitsProjection);
+  //           }
+  //         } catch (error) {
+  //           console.error('Error al actualizar los detalles de la cuenta:', error);
+  //         }
+  //       };
+  //       fetchAccountDetails();
+  //     }
+  //   }, 5000); // Actualiza cada 5 segundos
 
-    return () => clearInterval(interval);
-  }, [userId]);
+  //   return () => clearInterval(interval);
+  // }, [userId]);
 
   const handleLogout = () => {
     // Función para mostrar un diálogo de confirmación
