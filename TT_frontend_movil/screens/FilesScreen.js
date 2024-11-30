@@ -498,22 +498,36 @@ const Documents = () => {
       console.log('Archivo seleccionado:', result);
   
       if (!result.canceled) {
-        const fileData = await FileSystem.readAsStringAsync(result.assets[0].uri, {
-          encoding: FileSystem.EncodingType.Base64,
+        const fileUri = result.assets[0].uri;
+        const fileName = result.assets[0].name || 'documento_reemplazo';
+        const fileType = result.assets[0].mimeType || 'application/octet-stream';
+        const fileSize = result.assets[0].size || 0;
+  
+        // Crear un objeto FormData
+        const formData = new FormData();
+  
+        // Agregar el archivo al FormData
+        formData.append('file', {
+          uri: fileUri,
+          name: fileName,
+          type: fileType,
         });
   
-        const document = {
-          file_name: result.assets[0].name || 'documento_reemplazo',
-          file_type: result.assets[0].mimeType || 'application/octet-stream',
-          size: result.assets[0].size || 0,
-          file: fileData,
-        };
+        // Agregar otros campos al FormData
+        formData.append('file_name', fileName);
+        formData.append('file_type', fileType);
+        formData.append('size', fileSize);
+  
+        // Si necesitas agregar más campos, puedes hacerlo aquí
+        // formData.append('projection_id', selectedProjectionData.id);
+        // formData.append('activity', selectedProjectionData.activity);
   
         setLoading(true);
         setLoadingMessage('Reemplazando documento...');
         setIsOptionsModalOpen(false);
   
-        await replaceDocument(selectedDocumentId, document);
+        // Enviar el FormData a la función replaceDocument
+        await replaceDocument(selectedDocumentId, formData);
   
         Toast.show({
           type: 'success',
@@ -540,6 +554,7 @@ const Documents = () => {
       setLoading(false);
     }
   };
+  
 
 
   const openProjectionModal = () => {
@@ -558,8 +573,10 @@ const Documents = () => {
 
   const openModal = (document) => {
     setSelectedDocument(document);
+    setSelectedDocumentId(document.id); // Add this line
     setIsModalVisible(true);
   };
+  
 
   const closeModal = () => {
     setSelectedDocument(null);

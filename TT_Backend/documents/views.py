@@ -62,57 +62,29 @@ class DocumentListCreateAPIView(ListAPIView):
         account_id = self.kwargs['account_id']
         return Document.objects.filter(account_id=account_id)
 
+from rest_framework.parsers import MultiPartParser, FormParser
+
 class DocumentReplace(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = RegisterDocumentSerializer
     lookup_field = 'id'
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
         return Document.objects.filter(account_id=self.request.user.id)
 
-    def perform_update(self, serializer):
+    def update(self, request, *args, **kwargs):
         document = self.get_object()
 
         # Verificar permisos
         if document.account_id != self.request.user.id:
             raise PermissionDenied("No tienes permiso para editar este documento.")
 
-        try:
-            # Obtener los datos del request
-            file_name = self.request.data.get('file_name')
-            file_type = self.request.data.get('file_type')
-            size = self.request.data.get('size')
-            encoded_file = self.request.data.get('file')
+        response = super().update(request, *args, **kwargs)
 
-            if not all([file_name, file_type, size, encoded_file]):
-                raise ValueError("Faltan datos para actualizar el documento.")
+        return Response({"message": "Documento actualizado correctamente."}, status=status.HTTP_200_OK)
 
-            # Decodificar el archivo base64
-            binary_file = base64.b64decode(encoded_file)
 
-            # Desconectar la señal temporalmente si es un POST
-            if self.request.method == 'PATCH':
-                post_save.disconnect(update_product_check, sender=Products)
-
-            # Actualizar los campos del documento
-            serializer.save(
-                file_name=file_name,
-                file_type=file_type,
-                size=size,
-                file=binary_file  # Guardar el archivo como binario en MongoDB
-            )
-            
-            # Reconectar la señal
-            if self.request.method == 'PATCH':
-                post_save.connect(update_product_check, sender=Products)
-
-            return Response({"message": "Documento actualizado correctamente."}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
     
 class DocumentDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
