@@ -559,7 +559,6 @@ function Documents() {
                     {file.name}
                   </span>
                 </div>
-                {console.log(file)}
                 <div className="text-center text-white">{file.size}</div>
                 <div className="text-center text-white">{file.date}</div>
                 <div className="text-center text-white">{file.projection}</div> {/* Mostrar el nombre de la proyección */}
