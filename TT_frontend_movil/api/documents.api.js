@@ -62,7 +62,7 @@ export const replaceDocument = async (document_id, document) => {
     
     return TasksAPI.patch(`document/${document_id}/replace/`, document, {
         headers: {
-            'Content-Type': 'application/json', // Agrega este header
+            'Content-Type': 'multipart/form-data', // Agrega este header
             Authorization: `Bearer ${cleanToken}`,
         },
     });
