@@ -22,8 +22,6 @@ const HomeScreen = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('');
-  const [phone, setPhone] = useState('');
-  const [unitsProjection, setUnitsProjection] = useState(0);
 
   const [loadingMessage, setLoadingMessage] = useState(""); // Mensaje para LoadingScreen
   const [loading, setLoading] = useState(true); // Estado de carga
@@ -90,8 +88,7 @@ const HomeScreen = () => {
             setFullName(fullName);
             setEmail(email);
             setCategory(category);
-            setUnitsProjection(unitsProjection);
-      
+
             // Guarda en AsyncStorage
             const accountDetails = { userName: firstName, fullName, email, category, projection_id, unitsProjection };
             await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
@@ -112,29 +109,6 @@ const HomeScreen = () => {
       fetchAccountDetails();
     }
   }, [userId, userName]);    
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (userId) {
-        const fetchAccountDetails = async () => {
-          try {
-            const response = await getAccount(userId);
-            
-            if (response && response.data) {
-              // console.log('Detalles de la cuenta actualizados:', response.data);
-              const unitsProjection = response.data.units_projection || 0;
-              setUnitsProjection(unitsProjection);
-            }
-          } catch (error) {
-            console.error('Error al actualizar los detalles de la cuenta:', error);
-          }
-        };
-        fetchAccountDetails();
-      }
-    }, 5000); // Actualiza cada 5 segundos
-
-    return () => clearInterval(interval);
-  }, [userId]);
   
   const fetchConditions = async () => {
     try {
@@ -184,12 +158,6 @@ const HomeScreen = () => {
         <View style={tw`flex-row justify-between items-center px-5 mt-10 mb-5`}>
           <Text style={tw`text-2xl font-bold text-black`}>Bienvenido {`${userName}`}</Text>
           <Ionicons name="home" size={40} color="black" style={tw`ml-2`} />
-        </View>
-
-        {/* Unidades de Promoción */}
-        <View style={tw`px-4 mb-5 flex-row items-center`}>
-          <Ionicons name="star-outline" size={30} color="#ffd700" style={tw`mr-2`} />
-          <Text style={tw`text-lg text-black`}>Total de unidades de promoción: {unitsProjection}</Text>
         </View>
 
         {/* Contenedor de imágenes */}

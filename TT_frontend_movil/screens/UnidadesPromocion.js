@@ -188,6 +188,7 @@ import tw from 'twrnc';
           const normalizedCategory = normalizeCategory(accountDetails.category);
           console.log(userId);
           setCategoryNormalized(normalizeCategory(accountDetails.category));
+          console.log(normalizedCategory);
 
           setCategory(normalizedCategory);
           setConditions(JSON.parse(storedConditions));
@@ -197,9 +198,11 @@ import tw from 'twrnc';
       load_data();
     }, []);
 
-    // Función para normalizar la categoría del usuario
     const normalizeCategory = (category) => {
-      const words = category.toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
+      const removeAccents = (str) =>
+        str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Elimina acentos.
+      
+      const words = removeAccents(category).toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
       words.pop(); // Elimina la última palabra.
       return words.join('_'); // Une las palabras restantes con '_'.
     };
