@@ -6,7 +6,6 @@ import Navigation from './Navigation/Navigation';
 import LoadingAnimation from "../components/LoadingAnimation";
 import { TbXboxXFilled, TbReplace } from "react-icons/tb";
 import LoadingSpinner from '../components/LoadingSpinner';
-
 import { uploadDocument, getDocuments, deleteDocument, replaceDocument, getDocument } from '../api/documents.api';
 import { getProduct } from '../api/products.api'; // Importa la función que obtiene las proyecciones
 
@@ -412,7 +411,14 @@ function Documents() {
     const content = await zip.generateAsync({ type: "blob" });
     saveAs(content, "documentos.zip");
   };
-  
+
+  const toggleFileDetails = (index) => {
+    setFileData((prev) =>
+      prev.map((file, i) =>
+        i === index ? { ...file, showDetails: !file.showDetails } : file
+      )
+    );
+  };  
 
   return (
     <div className="min-h-screen bg-cover bg-center">
@@ -452,7 +458,6 @@ function Documents() {
             ))}
           </select>
         </div>
-
 
         <div className="flex justify-center space-x-4 mb-6">
           <div className="relative">
@@ -544,63 +549,136 @@ function Documents() {
           {errorMessage && <div className="mb-4 text-red-500 font-medium">{errorMessage}</div>}
 
           {/* Encabezados de la tabla */}
-          <div className="grid grid-cols-5 text-left font-bold p-2 border-b-2 border-gray-200 text-gray-600">
-            <div>Nombre</div>
-            <div className="text-center">Tamaño</div>
-            <div className="text-center">Subido</div>
-            <div className="text-center">Actividad</div>
-            <div className="text-center">Acciones</div>
+          <div className="p-2 border-b-2 border-gray-200 text-gray-600">
+            {/* Vista para pantallas grandes (md o mayores) */}
+            <div className="hidden md:grid md:grid-cols-5 text-left font-bold">
+              <div>Nombre</div>
+              <div className="text-center">Tamaño</div>
+              <div className="text-center">Subido</div>
+              <div className="text-center">Actividad</div>
+              <div className="text-center">Acciones</div>
+            </div>
+
+            {/* Vista para pantallas pequeñas */}
+            <div className="flex items-center justify-between md:hidden font-bold">
+              <div>Nombre</div>
+              <div className="text-right">Detalles</div>
+            </div>
           </div>
 
           {filteredFileData.length === 0 ? (
-            <div className="text-center p-4 text-gray-500">No tienes documentos cargados</div>
+            <div>No tienes documentos cargados</div>
           ) : (
             filteredFileData.map((file, index) => (
-
               <div
                 key={index}
-                className={`grid grid-cols-5 items-center p-3 rounded-lg shadow-sm bg-blue-400 hover:bg-blue-500 transition-all`}
+                className={`p-3 rounded-lg shadow-sm bg-blue-400 hover:bg-blue-500 transition-all relative`}
               >
-                <div className="flex space-x-3 items-center justify-center">
-                {file.type === 'pdf' ? (
-                  <FaFilePdf className="text-red-500 w-6 h-6 flex-shrink-0 hidden lg:inline" />
-                ) : (
-                  <FaFileImage className="text-white w-6 h-6 flex-shrink-0 hidden lg:inline" />
-                )}
-                  <span className="whitespace-normal break-words text-white font-medium hover:text-yellow-300 cursor-pointer text-center" title={file.name} onClick={() => handleDocumentClick(file.id)}  style={{ textDecoration: 'none', maxWidth: '180px', wordWrap: 'break-word', }}>
-                    {file.name}
-                  </span>
-                </div>
-                <div className="text-center text-white">{file.size}</div>
-                <div className="text-center text-white">{file.date}</div>
-                <div className="text-center text-white">{file.projection}</div> {/* Mostrar el nombre de la proyección */}
-                <div className="flex justify-center space-x-3"> {/* Separar los botones con espacio */}
-                  <div className="flex flex-col items-center">
-                    {/* Botón para eliminar */}
-                    <button
-                      className="text-red-600 hover:text-red-800 p-1 rounded-full bg-white flex justify-center items-center"
-                      onClick={() => handleDeleteDocument(file.id)}
+                {/* Vista para pantallas grandes (md o mayores) */}
+                <div className="hidden md:grid md:grid-cols-5 md:items-center">
+                  {/* Nombre del archivo */}
+                  <div className="flex items-center space-x-3">
+                    {file.type === 'pdf' ? (
+                      <FaFilePdf className="text-red-500 w-6 h-6 flex-shrink-0" />
+                    ) : (
+                      <FaFileImage className="text-white w-6 h-6 flex-shrink-0" />
+                    )}
+                    <span
+                      className="whitespace-normal break-words text-white font-medium hover:text-yellow-300 cursor-pointer text-left"
+                      title={file.name}
+                      onClick={() => handleDocumentClick(file.id)}
+                      style={{ textDecoration: 'none', maxWidth: '180px', wordWrap: 'break-word' }}
                     >
-                      <TbXboxXFilled className="w-6 h-6" />
-                    </button>
-                    <span className="text-sm text-white">Eliminar</span> {/* Texto debajo del botón */}
+                      {file.name}
+                    </span>
                   </div>
 
-                  {/* Botón para reemplazar */}
-                  <div className="flex flex-col items-center">
-                    {/* Botón para reemplazar */}
-                    <label className="text-green-600 hover:text-green-800 p-1 rounded-full bg-white flex justify-center items-center cursor-pointer">
-                      <TbReplace className="w-6 h-6" />
-                      <input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg"
-                        className="hidden"
-                        onChange={(e) => handleReplaceDocument(file.id, e)}
-                      />
-                    </label>
-                    <span className="text-sm text-white">Reemplazar</span> {/* Texto debajo del botón */}
+                  {/* Tamaño del archivo */}
+                  <div className="text-center text-white">{file.size}</div>
+
+                  {/* Fecha de subida */}
+                  <div className="text-center text-white">{file.date}</div>
+
+                  {/* Actividad */}
+                  <div className="text-center text-white">{file.projection}</div>
+
+                  {/* Acciones */}
+                  <div className="flex items-center justify-center space-x-3">
+                    <div className="flex flex-col items-center">
+                      <button
+                        className="text-red-600 hover:text-red-800 p-1 rounded-full bg-white flex justify-center items-center"
+                        onClick={() => handleDeleteDocument(file.id)}
+                      >
+                        <TbXboxXFilled className="w-6 h-6" />
+                      </button>
+                      <span className="text-sm text-white">Eliminar</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="text-green-600 hover:text-green-800 p-1 rounded-full bg-white flex justify-center items-center cursor-pointer">
+                        <TbReplace className="w-6 h-6" />
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg"
+                          className="hidden"
+                          onChange={(e) => handleReplaceDocument(file.id, e)}
+                        />
+                      </label>
+                      <span className="text-sm text-white">Reemplazar</span>
+                    </div>
                   </div>
                 </div>
+
+                {/* Vista para pantallas pequeñas */}
+                <div className="flex items-center justify-between md:hidden">
+                  <div className="flex items-center space-x-3">
+                    {file.type === 'pdf' ? (
+                      <FaFilePdf className="text-red-500 w-6 h-6 flex-shrink-0" />
+                    ) : (
+                      <FaFileImage className="text-white w-6 h-6 flex-shrink-0" />
+                    )}
+                    <span
+                      className="whitespace-normal break-words text-white font-medium hover:text-yellow-300 cursor-pointer text-left"
+                      title={file.name}
+                      onClick={() => handleDocumentClick(file.id)}
+                      style={{ textDecoration: 'none', maxWidth: '180px', wordWrap: 'break-word' }}
+                    >
+                      {file.name}
+                    </span>
+                  </div>
+                  {/* Ícono de tres puntos visible solo en pantallas pequeñas */}
+                  <button
+                    className="text-white text-2xl font-bold hover:text-yellow-300 transition-transform transform duration-300 hover:scale-125"
+                    onClick={() => toggleFileDetails(index)}
+                  >
+                    &#x2026; {/* Tres puntos */}
+                  </button>
+                </div>
+
+                {/* Detalles adicionales para pantallas pequeñas, visibles al hacer clic en los tres puntos */}
+                {file.showDetails && (
+                  <div className="md:hidden mt-2 space-y-2 w-full bg-blue-500 p-4 rounded-lg">
+                    <div className="text-sm text-white">Tamaño: {file.size}</div>
+                    <div className="text-sm text-white">Subido: {file.date}</div>
+                    <div className="text-sm text-white">Actividad: {file.projection}</div>
+                    <div className="flex space-x-3 mt-2">
+                      <button
+                        className="text-red-600 hover:text-red-800 p-1 rounded-full bg-white flex justify-center items-center"
+                        onClick={() => handleDeleteDocument(file.id)}
+                      >
+                        <TbXboxXFilled className="w-6 h-6" />
+                      </button>
+                      <label className="text-green-600 hover:text-green-800 p-1 rounded-full bg-white flex justify-center items-center cursor-pointer">
+                        <TbReplace className="w-6 h-6" />
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg"
+                          className="hidden"
+                          onChange={(e) => handleReplaceDocument(file.id, e)}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           )}
