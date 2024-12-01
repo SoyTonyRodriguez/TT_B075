@@ -574,7 +574,7 @@ function Documents() {
                 key={index}
                 className={`p-3 rounded-lg shadow-sm bg-blue-400 hover:bg-blue-500 transition-all relative`}
               >
-                {/* Vista para pantallas grandes (md o mayores) */}
+                {/* Vista para pantallas grandes */}
                 <div className="hidden md:grid md:grid-cols-5 md:items-center">
                   {/* Nombre del archivo */}
                   <div className="flex items-center space-x-3">
@@ -645,16 +645,16 @@ function Documents() {
                       {file.name}
                     </span>
                   </div>
-                  {/* Ícono de tres puntos visible solo en pantallas pequeñas */}
+                  {/* Detalles pantallas pequeñas */}
                   <button
                     className="text-white text-2xl font-bold hover:text-yellow-300 transition-transform transform duration-300 hover:scale-125"
                     onClick={() => toggleFileDetails(index)}
                   >
-                    &#x2026; {/* Tres puntos */}
+                    &#x2026; 
                   </button>
                 </div>
 
-                {/* Detalles adicionales para pantallas pequeñas, visibles al hacer clic en los tres puntos */}
+                {/* Detalles para pantallas pequeñas */}
                 {file.showDetails && (
                   <div className="md:hidden mt-2 space-y-2 w-full bg-blue-500 p-4 rounded-lg">
                     <div className="text-sm text-white">Tamaño: {file.size}</div>
