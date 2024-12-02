@@ -17,7 +17,7 @@ function nosotros() {
         tipo confiere.
       </p>
       <p className="text-xl text-justify mt-4"> 
-        Este proyecto fue presentado el DD/MM/AAAA como parte de la presentación para su evaluación ante 
+        Este proyecto fue presentado el día 16 de diciembre de 2024 como parte de la presentación para su evaluación ante 
         el grupo de sinodales cuyo dictamen permite el progreso del desarrollo.
       </p>
       <p className=" text-xl text-justify mt-4"> 

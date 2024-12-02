@@ -24,7 +24,7 @@ const ProjectScreen = ({ navigation }) => {
             Como parte de las limitaciones para este proyecto fue el desarrollo principal sobre plataformas y marcos gratuitos, lo que limita y estandariza este sistema dentro de lo que servicios de este tipo confiere.
           </Text>
           <Text style={tw`text-base text-black mb-3 text-justify`}>
-            Este proyecto fue presentado el DD/MM/YYYY como parte de la presentación para su evaluación ante el grupo de sinodales cuyo dictamen permite el progreso del desarrollo.
+            Este proyecto fue presentado el día 16 de diciembre de 2024 como parte de la presentación para su evaluación ante el grupo de sinodales cuyo dictamen permite el progreso del desarrollo.
           </Text>
           <Text style={tw`text-base text-black mb-3 text-justify`}>
             Toda la documentación técnica sobre las herramientas y marcos de trabajo programáticos se encuentran disponibles en el manual técnico de este sistema.
