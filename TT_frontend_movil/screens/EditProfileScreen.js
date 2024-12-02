@@ -94,64 +94,106 @@ const EditProfileScreen = ({ navigation }) => {
   // Función para manejar la acción de guardar los cambios
   const handleSaveChanges = async () => {
     const updatedAccountData = { name: fullName, email, category };
+  
     try {
       setLoading(true);
       setLoadingMessage("Guardando cambios...");
-      console.log("Inicial:", initialCategory);
-      console.log("Actual:", category);
-      if (category !== initialCategory) {
-        Alert.alert(
-          "Confirmación requerida",
-          "Al cambiar la categoría, se borrarán todas sus tareas, documentos y productos. ¿Desea continuar?",
-          [
-            { text: "Cancelar", style: "cancel" },
-            {
-              text: "Aceptar",
-              onPress: async () => {
-                try {
-                  const accountDetailsString = await AsyncStorage.getItem('accountDetails');
-      
-                  const accountDetails = JSON.parse(accountDetailsString); // Analizar la cadena JSON
-                  await deleteProjection(accountDetails.projection_id); // Llamar al endpoint para borrar proyecciones
-                  console.log("Proyecciones borradas exitosamente.");
-                  const response = await updateAccount(userId, updatedAccountData); // Actualizar la cuenta después de borrar las proyecciones
-                  console.log('Respuesta del servidor:', response.data);
-
-                  // Actualizar AsyncStorage
-                  accountDetails.projection_id = null;
-                  accountDetails.units_projection = 0;
-                  await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
-
-                } catch (error) {
-                  console.error("Error al borrar proyecciones:", error);
-                  Alert.alert("Error", "No se pudieron borrar las proyecciones. Inténtelo nuevamente más tarde.");
-                }
-              },
-            },
-          ]
-        );
+  
+      let accountDetailsString = await AsyncStorage.getItem('accountDetails');
+      let accountDetails = null;
+  
+      // Verificar si se obtuvo accountDetails
+      if (accountDetailsString) {
+        accountDetails = JSON.parse(accountDetailsString);
       } else {
-        const response = await updateAccount(userId, updatedAccountData); // Actualizar directamente si no cambió la categoría
-        console.log('Respuesta del servidor:', response.data);
+        console.error("No se encontraron detalles de la cuenta en AsyncStorage.");
+        setLoading(false);
+        Alert.alert("Error", "No se pudieron obtener los detalles de la cuenta. Por favor, inténtelo más tarde.");
+        return;
       }
-
-      // Guardar los datos actualizados en AsyncStorage
-      const accountDetailsString = await AsyncStorage.getItem('accountDetails');
-      const accountDetails = JSON.parse(accountDetailsString); // Analizar la cadena JSON
-      accountDetails.fullName = fullName; // Actualizar el campo `fullName`
-      accountDetails.email = email;       // Actualizar el campo `email`
-      accountDetails.category = category; // Actualizar el campo `category`
-      // Guardar los datos actualizados nuevamente en AsyncStorage
-      await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
-
+  
+      // Si la categoría cambió, se deben borrar las proyecciones y actualizar los detalles
+      if (category !== initialCategory) {
+        const userConfirmed = await new Promise((resolve) => {
+          Alert.alert(
+            "Confirmación requerida",
+            "Al cambiar la categoría, se borrarán todas sus tareas, documentos y productos. ¿Desea continuar?",
+            [
+              { text: "Cancelar", style: "cancel", onPress: () => resolve(false) },
+              {
+                text: "Aceptar",
+                onPress: () => resolve(true),
+              },
+            ]
+          );
+        });
+  
+        if (!userConfirmed) {
+          setLoading(false);
+          return; // Si el usuario no confirma, pues no hacemos nada XD
+        }
+  
+        const projectionId = accountDetails.projection_id;
+  
+        // Se valida si se tiene un ID válido antes de intentar eliminar
+        if (!projectionId) {
+          console.error("ID de proyección inválido o no encontrado:", projectionId);
+          Alert.alert("Error", "No se encontró ninguna proyección para eliminar.");
+          setLoading(false);
+          return;
+        }
+  
+        try {
+          // Intentar borrar la proyección
+          console.log("Intentando borrar proyecciones con ID:", projectionId);
+          await deleteProjection(projectionId); // Llamar al endpoint para borrar proyecciones
+          console.log("Proyecciones borradas exitosamente.");
+  
+          // Actualizar `accountDetails` después de borrar las proyecciones
+          accountDetails.projection_id = null;
+          accountDetails.units_projection = 0;
+  
+          // Guardar la actualización en `AsyncStorage`
+          await AsyncStorage.setItem('accountDetails', JSON.stringify(accountDetails));
+          console.log("Datos de la cuenta actualizados en AsyncStorage después de eliminar proyecciones.");
+        } catch (error) {
+          console.error("Error al borrar proyecciones:", error.message);
+          Alert.alert("Error", "No se pudieron borrar las proyecciones. Inténtelo nuevamente más tarde.");
+          setLoading(false);
+          return; // Detener flujo si no se puede borrar la proyección
+        }
+      }
+  
+      // Actualizar los datos de la cuenta
+      try {
+        console.log("Actualizando los datos de la cuenta...");
+        await updateAccount(userId, updatedAccountData);
+        console.log("Datos de la cuenta actualizados exitosamente.");
+  
+        // Actualizar AsyncStorage con los nuevos datos
+        const updatedAccountDetails = {
+          ...accountDetails, // Mantener los datos existentes
+          fullName,          // Actualizar con los nuevos valores
+          email,
+          category,
+        };
+  
+        // Guardar los datos actualizados nuevamente en `AsyncStorage`
+        await AsyncStorage.setItem('accountDetails', JSON.stringify(updatedAccountDetails));
+        console.log("Datos de la cuenta actualizados en AsyncStorage.");
+      } catch (error) {
+        console.error("Error al actualizar el perfil:", error.message);
+        Alert.alert("Error", "No se pudo actualizar la cuenta. Inténtelo nuevamente.");
+      }
     } catch (error) {
-      console.error('Error al actualizar el perfil:', error);
+      console.error("Error en el proceso de guardar los cambios:", error.message);
     } finally {
       setLoading(false);
     }
-
-    navigation.goBack(); 
+  
+    navigation.goBack(); // Navegar de regreso a la pantalla anterior después de guardar los cambios
   };
+  
 
   // Función para cambiar la imagen de perfil
   const pickImage = async () => {
@@ -190,7 +232,7 @@ const EditProfileScreen = ({ navigation }) => {
           <Ionicons name="arrow-back-outline" size={30} color="black" />
         </TouchableOpacity>
         {/* Título "Editar Perfil" */}
-        <Text style={tw`flex-1 text-3xl font-bold text-center text-black`}>Editar Perfil</Text>
+        <Text style={tw`flex-1 text-3xl font-bold text-center text-black`}>Editar perfil</Text>
       </View>
 
       <ScrollView contentContainerStyle={tw`p-5`}>
