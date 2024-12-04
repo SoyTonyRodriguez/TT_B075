@@ -131,7 +131,7 @@ function KanbanBoard() {
 
     // Create a new task
     const handleCreateTask = useCallback(async () => {
-        if (!newTask.title || !newTask.description || !newTask.projection_id) {
+        if (!newTask.title  || !newTask.projection_id || !newTask.priority) {
             toast.error('Todos los campos son obligatorios.');
             return;
         }
@@ -705,7 +705,7 @@ function KanbanBoard() {
                         {/* Campo de la descripción */}
                         <div className="mb-4">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Descripción
+                            Descripción (Opcional)
                             </label>
                             <textarea
                             name="description"
@@ -814,7 +814,7 @@ function KanbanBoard() {
                     {/* Campo de descripción */}
                     <div className="mb-4">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Descripción
+                        Descripción (Opcional)
                         </label>
                         <textarea
                         name="description"
