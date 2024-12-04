@@ -681,7 +681,7 @@ function KanbanBoard() {
                 </DndProvider>
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <div className="bg-white p-8 rounded-lg shadow-xl w-96">
                         <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
                             Crear nueva tarea
@@ -789,7 +789,7 @@ function KanbanBoard() {
 
 
                 {isEditModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-8 rounded-lg shadow-xl w-96">
                     <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
                         Editar tarea
