@@ -19,7 +19,8 @@ function Links() {
 
   // Abre el modal con el PDF
   const openPdf = (url) => {
-    setPdfUrl(url);
+    const urlConTimestamp = `${url}?t=${new Date().getTime()}`;
+    setPdfUrl(urlConTimestamp);
     setIsOpen(true);
   };
 
@@ -40,11 +41,11 @@ function Links() {
   const renderDescription = () => {
     switch (hoveredButton) {
       case 'convocatoria':
-        return "La convocatoria para la promoción docente del Instituto Politécnico Nacional (IPN) 2024 está dirigida a todo el personal académico que cumpla con los requisitos de acumulación de 100 Unidades de Promoción (U.P.) o la obtención de grado académico. Esta convocatoria detalla los plazos, formatos, y criterios que deben cumplir los docentes para optar por su promoción en distintas categorías académicas.";
+        return "La convocatoria para la promoción docente del Instituto Politécnico Nacional (IPN) está dirigida a todo el personal académico que cumpla con los requisitos de acumulación de 100 Unidades de Promoción (U.P.) o la obtención de grado académico. Esta convocatoria detalla los plazos, formatos, y criterios que deben cumplir los docentes para optar por su promoción en distintas categorías académicas.";
       case 'reglamento':
         return "El Reglamento de Promoción Docente del IPN establece los procedimientos y requisitos para que el personal académico pueda acceder a una promoción por acumulación de U.P. o por obtención de grado académico. Define las funciones en las áreas de docencia, investigación, superación académica y actividades complementarias. Además, describe el proceso a seguir para solicitar reconsideraciones en caso de no ser promovido.";
       case 'cronograma':
-        return "El cronograma de la promoción docente 2024 establece las fechas clave para la recepción de solicitudes, revisión de documentos, publicación de resultados y plazos para solicitar reconsideraciones. La Dirección de Capital Humano se encarga de coordinar el cumplimiento de estos plazos a lo largo del proceso anual.";
+        return "El cronograma de la promoción docente establece las fechas clave para la recepción de solicitudes, revisión de documentos, publicación de resultados y plazos para solicitar reconsideraciones. La Dirección de Capital Humano se encarga de coordinar el cumplimiento de estos plazos a lo largo del proceso anual.";
       case 'valoracionactividades':
         return "El proceso de Promoción por acumulación de 100 Unidades de Promoción (U.P.) en el Instituto Politécnico Nacional (IPN) está diseñado para valorar una amplia variedad de actividades que el personal docente realiza en su labor académica. Estas actividades se dividen en varias áreas clave, cada una con una puntuación específica que contribuye a la acumulación de las 100 U.P. necesarias para la promoción.";
       case 'gaceta':
@@ -75,9 +76,9 @@ function Links() {
               >
                 <IoLinkOutline className="mb-4 w-20 h-20" />
                 <p className="text-center text-lg font-semibold">
-                  {key === 'convocatoria' && 'Convocatoria 2024'}
+                  {key === 'convocatoria' && 'Convocatoria del Año en Curso'}
                   {key === 'reglamento' && 'Reglamento de Promoción Docente'}
-                  {key === 'cronograma' && 'Cronograma del Proceso 2024'}
+                  {key === 'cronograma' && 'Cronograma del Proceso del Año en Curso'}
                   {key === 'valoracionactividades' && 'Valoración de Actividades (100 U.P.)'}
                   {key === 'gaceta' && 'Gaceta Politécnica No. 1511'}
                 </p>
