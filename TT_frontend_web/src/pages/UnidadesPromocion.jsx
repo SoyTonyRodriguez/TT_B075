@@ -592,20 +592,27 @@ function UnidadesPromocion() {
       isValid = false;
     }
   
-    if (showWorkTime && workTime === '') {
-      isValid = false;
-    }
+    // Condición adicional:
+    // Si la actividad es Tutorías y la unidad seleccionada está en tutoringOptions,
+    // no validamos horas.
+    const isTutoringOptionSelected = activity === "Tutorías" && tutoringOptions.has(units);
   
-    if (activitiesWithHours.has(activity) && (hours === '' || hours < hourLimits.min || hours > hourLimits.max)) {
-      setHoursError(`Las horas deben estar entre ${hourLimits.min} y ${hourLimits.max}.`);
-      isValid = false;
-    } else {
-      setHoursError('');
-    }
-    
-    if (calculatedUnits === 0) {
+    // Solo validamos horas si NO estamos en el caso de tutorías especiales
+    if (!isTutoringOptionSelected && activitiesWithHours.has(activity)) {
+      if (hours === '' || hours < hourLimits.min || hours > hourLimits.max) {
+        setHoursError(`Las horas deben estar entre ${hourLimits.min} y ${hourLimits.max}.`);
+        isValid = false;
+      } else {
+        setHoursError('');
+      }
+      
+      if (calculatedUnits === 0) {
         setHoursError('Ingresa horas válidas para calcular las U.P.');
         isValid = false;
+      }
+    } else {
+      // Si es tutoría con una de las opciones de tutoringOptions, no pedimos horas.
+      setHoursError('');
     }
   
     return isValid;
@@ -960,49 +967,63 @@ function UnidadesPromocion() {
             )}
 
             {activitiesWithHours.has(activity) && (
-              <>
+            <>
                 {activity === "Carga académica" && (
-                  <div className="mb-4">
+                <div className="mb-4">
                     <label className="block text-white text-sm font-semibold mb-2">
-                      Tiempo de trabajo
+                    Tiempo de trabajo
                     </label>
                     <select
-                      value={workTime}
-                      onChange={(e) => handleWorkTimeChange(e)}
-                      className="w-full p-2 rounded-lg border border-gray-400"
+                    value={workTime}
+                    onChange={(e) => handleWorkTimeChange(e)}
+                    className="w-full p-2 rounded-lg border border-gray-400"
+                    disabled={
+                        // Deshabilitar si es tutorías y la opción seleccionada está en tutoringOptions
+                        activity === "Tutorías" && tutoringOptions.has(units)
+                    }
                     >
-                      <option value="" disabled>Selecciona una opción</option>
-                      <option value="medio_tiempo">Medio tiempo</option>
-                      <option value="tres_cuartos_tiempo">Tres cuartos</option>
-                      <option value="tiempo_completo">Tiempo completo</option>
+                    <option value="" disabled>Selecciona una opción</option>
+                    <option value="medio_tiempo">Medio tiempo</option>
+                    <option value="tres_cuartos_tiempo">Tres cuartos</option>
+                    <option value="tiempo_completo">Tiempo completo</option>
                     </select>
-                  </div>
+                </div>
                 )}
 
                 <div className="mb-4">
-                  <label className="block text-white text-sm font-semibold mb-2">
+                <label className="block text-white text-sm font-semibold mb-2">
                     Horas de trabajo
-                  </label>
-                  <input
+                </label>
+                <input
                     type="number"
                     value={hours}
                     onChange={handleHoursChange}
                     className="w-full p-2 rounded-lg border border-gray-400"
                     placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
-                    disabled={!isUnitsSelected}
-                  />
-                  {hoursError && <span className="text-red-500">{hoursError}</span>}
+                    disabled={
+                    !isUnitsSelected || 
+                    (activity === "Tutorías" && tutoringOptions.has(units))
+                    }
+                />
+                {hoursError && <span className="text-red-500">{hoursError}</span>}
                 </div>
 
-                  <div className="mb-4">
-                    <label className="block text-white text-sm font-semibold mb-2">
-                      U.P. Calculadas
-                    </label>
-                    <p className={`bg-white p-2 rounded-lg border border-gray-400 ${!isUnitsSelected || !isUnitsSelected ? 'opacity-50' : ''}`}>
+                <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">
+                    U.P. Calculadas
+                </label>
+                <p 
+                    className={`bg-white p-2 rounded-lg border border-gray-400 ${
+                    !isUnitsSelected ||
+                    (activity === "Tutorías" && tutoringOptions.has(units))
+                        ? 'opacity-50'
+                        : ''
+                    }`}
+                >
                     {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
-                    </p>
-                  </div>
-              </>
+                </p>
+                </div>
+            </>
             )}
 
 
