@@ -792,7 +792,7 @@ function KanbanBoard() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-8 rounded-lg shadow-xl w-96">
                     <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
-                        Editar Tarea
+                        Editar tarea
                     </h3>
 
                     {/* Campo de título */}
