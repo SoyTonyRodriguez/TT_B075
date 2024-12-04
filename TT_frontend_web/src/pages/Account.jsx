@@ -182,7 +182,7 @@ function Account() {
         <div className="w-2/3 ml-8">
           <form onSubmit={handleSave}>
             <div className="mb-4">
-              <label className="block text-sm mb-2">Nombre Completo</label>
+              <label className="block text-sm mb-2">Nombre completo</label>
               <input
                 type="text"
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"
@@ -192,7 +192,7 @@ function Account() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-2">E-mail</label>
+              <label className="block text-sm mb-2">Email</label>
               <input
                 type="email"
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"

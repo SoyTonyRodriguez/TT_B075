@@ -75,12 +75,12 @@ function NewProjection() {
               <div className="flex items-center justify-between bg-black bg-opacity-40 p-6 rounded-lg shadow-lg">
                 <div className="flex-1 mr-4">
                   <p className="text-lg text-white leading-relaxed text-center justify-center">
-                    En el Instituto Politécnico Nacional (IPN), las Unidades de Promoción (U.P.) son un sistema de reconocimiento al desempeño docente. Se otorgan a los profesores por realizar actividades que van más allá de sus obligaciones básicas.
+                    En el Instituto Politécnico Nacional (IPN), las unidades de promoción (U.P.) son un sistema de reconocimiento al desempeño docente. Se otorgan a los profesores por realizar actividades que van más allá de sus obligaciones básicas.
                   </p>
                   {projectionType === "Grado Académico" && (
                       <div className="flex items-center mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
                           <IoWarningOutline className="h-6 w-6 mr-2" />
-                          <span>Este botón está deshabilitado porque ya tiene una proyección de "Grado Académico".</span>
+                          <span>Este botón está deshabilitado porque ya tiene una proyección de "grado académico".</span>
                       </div>
                   )}
                 </div>
@@ -106,7 +106,7 @@ function NewProjection() {
                   {projectionType === "Unidades de Promoción" && (
                       <div className="flex items-center mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
                           <IoWarningOutline className="h-6 w-6 mr-2" />
-                          <span>Este botón está deshabilitado porque ya tiene una proyección de "Unidades de Promoción".</span>
+                          <span>Este botón está deshabilitado porque ya tiene una proyección de "unidades de promoción".</span>
                       </div>
                   )}
                 </div>

@@ -585,7 +585,7 @@ function KanbanBoard() {
                     
                     {/* Panel lateral derecho con proyecciones y su progreso */}
                     <div className="w-1/3 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px', overflowY: 'auto' }}>
-                        <h2 className="text-2xl font-bold mb-2">Progresos de Actividades</h2>
+                        <h2 className="text-2xl font-bold mb-2">Progresos de actividades</h2>
                         <div className="space-y-4">
                             {projections.map((projection) => {
                                 const projectionTasks = tasks.filter(task => task.projection_id === projection.id);
@@ -675,7 +675,7 @@ function KanbanBoard() {
                     onClick={openModal}
                     className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
                     >
-                    Crear Nueva Tarea
+                    Crear nueva tarea
                     </button>
                 </div>
                 </DndProvider>
@@ -684,7 +684,7 @@ function KanbanBoard() {
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                         <div className="bg-white p-8 rounded-lg shadow-xl w-96">
                         <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
-                            Crear Nueva Tarea
+                            Crear nueva tarea
                         </h3>
 
                         {/* Campo del título */}
