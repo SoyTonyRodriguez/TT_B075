@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { createTask, getTasks, updateTask, deleteTask } from "../api/tasks.api";
@@ -10,9 +10,8 @@ import Navigation from './Navigation/Navigation';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { IoTime } from "react-icons/io5";
 import { TbXboxXFilled } from "react-icons/tb";
-import { AiOutlinePaperClip } from 'react-icons/ai'; // Importar el icono de clip
+import { AiOutlinePaperClip } from 'react-icons/ai'; 
 import { get_Check_Products } from '../api/check_products.api';
-
 import { Link } from 'react-router-dom';
 
 function KanbanBoard() {
@@ -50,7 +49,6 @@ function KanbanBoard() {
         }
     }, []);
 
-    // Fetch data with caching and parallel execution
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -81,8 +79,6 @@ function KanbanBoard() {
     const handleDeleteProduct = async (productid) => {
         try {
             setLoading(true);
-    
-            // Llama al endpoint
             await deleteProduct(productid);
     
             // Actualiza los estados
@@ -90,7 +86,7 @@ function KanbanBoard() {
                 const updatedTasks = prevTasks.filter(task => task.projection_id !== productid);
                 return updatedTasks;
             });
-    
+
             setProjections((prevProjections) => {
                 const updatedProjections = prevProjections.filter(proj => proj.id !== productid);
                 return updatedProjections;
@@ -105,7 +101,7 @@ function KanbanBoard() {
                 accountDetails.units_projection = responseProductCheck.data.total_up;
             }            
             localStorage.setItem('accountDetails', JSON.stringify(accountDetails));
-    
+
             toast.success('Producto y tareas eliminadas con éxito');
         } catch (error) {
             console.error('Error eliminando proyección:', error);
@@ -129,7 +125,43 @@ function KanbanBoard() {
         });
     };
 
-    // Create a new task
+    // ---- FUNCION OPTIMIZADA ----
+    // Ahora NO llama a getProduct nuevamente, solo actualiza la proyección localmente.
+    const updateProjectionProgress = async (projectionId, currentTasks) => {
+        const progress = calculateProgress(currentTasks, projectionId);
+
+        const projection = projections.find(proj => proj.id === projectionId);
+        const projectionDocuments = Array.isArray(projection.documents_uploaded)
+            ? projection.documents_uploaded
+            : safeParseJSON(projection.documents_uploaded || '[]');
+
+        const documentsUploadedCount = projectionDocuments.length;
+        const documentsRequiredCount = projection.documents_number || 0;
+
+        if (progress === 100 && documentsUploadedCount < documentsRequiredCount) {
+            toast.error('No puedes completar esta proyección sin subir todos los documentos requeridos.');
+            return;
+        }
+
+        try {
+            await updateProduct(projectionId, { progress });
+
+            // Actualizar el estado local sin llamar a la API nuevamente
+            setProjections(prevProjections =>
+                prevProjections.map(proj => 
+                    proj.id === projectionId
+                        ? { ...proj, progress }
+                        : proj
+                )
+            );
+
+            console.log(`Progreso actualizado para la proyección ${projectionId}: ${progress}%`);
+        } catch (error) {
+            console.error('Error actualizando el progreso:', error);
+            toast.error('Error actualizando el progreso de la proyección.');
+        }
+    };
+
     const handleCreateTask = useCallback(async () => {
         if (!newTask.title  || !newTask.projection_id || !newTask.priority) {
             toast.error('Todos los campos son obligatorios.');
@@ -197,20 +229,20 @@ function KanbanBoard() {
             
             if (response && response.data) {
                 const updatedTask = response.data;
-                
-                // Actualizar la tarea en el estado local
-                setTasks(tasks.map(task => task.id === taskToEdit.id ? updatedTask : task));
-                
-                // Actualizar el progreso de la proyección si es necesario
+                const updatedTasks = tasks.map(task => 
+                    task.id === taskToEdit.id ? updatedTask : task
+                );
+
+                setTasks(updatedTasks);
+
                 if (updatedTask.projection_id) {
-                    await updateProjectionProgress(updatedTask.projection_id, tasks);
+                    await updateProjectionProgress(updatedTask.projection_id, updatedTasks);
                 }
-    
+
                 toast.success('Tarea actualizada con éxito');
                 closeEditModal();
             }
         } catch (error) {
-            // Manejo de errores
             console.error('Error actualizando la tarea:', error);
             toast.error('Error actualizando la tarea.');
         } finally {
@@ -230,15 +262,13 @@ function KanbanBoard() {
         // Obtener la proyección correspondiente
         const projection = projections.find(proj => proj.id === projectionId);
     
-        // Usar la función `safeParseJSON` para manejar documentos subidos
         const projectionDocuments = Array.isArray(projection.documents_uploaded)
-            ? projection.documents_uploaded  // Si ya es un array, usarlo directamente
+            ? projection.documents_uploaded
             : safeParseJSON(projection.documents_uploaded || '[]');
     
         const documentsUploadedCount = projectionDocuments.length;
         const documentsRequiredCount = projection.documents_number || 0;
     
-        // Limitar el progreso al 99% si faltan documentos
         if (documentsUploadedCount < documentsRequiredCount) {
             progress = Math.min(progress, 99);
         }
@@ -246,65 +276,13 @@ function KanbanBoard() {
         return Math.round(progress);
     };
 
-    // Actualizar el progreso de la proyección cuando cambie el estado de una tarea
-    const updateProjectionProgress = async (projectionId, tasks) => {
-        const progress = calculateProgress(tasks, projectionId);
-    
-        // Buscar la proyección correspondiente
-        const projection = projections.find(proj => proj.id === projectionId);
-    
-        // Verificar si los documentos están ya en array o intentar parsearlos
-        const projectionDocuments = Array.isArray(projection.documents_uploaded)
-            ? projection.documents_uploaded  // Si ya es array, úsalo directamente
-            : safeParseJSON(projection.documents_uploaded || '[]');  // Intentar parseo
-    
-        const documentsUploadedCount = projectionDocuments.length;
-        const documentsRequiredCount = projection.documents_number || 0;
-    
-        console.log(`Documentos subidos: ${documentsUploadedCount}/${documentsRequiredCount}`);
-    
-        // Validar que no se pueda marcar como 100% si faltan documentos
-        if (progress === 100 && documentsUploadedCount < documentsRequiredCount) {
-            toast.error('No puedes completar esta proyección sin subir todos los documentos requeridos.');
-            return;  // Evitar que continúe si faltan documentos
-        }
-    
-        try {
-            // Actualizar la proyección con el nuevo progreso
-            await updateProduct(projectionId, { progress });
-    
-            // Refrescar las proyecciones desde la API
-            const response = await getProduct(userId);
-            const updatedProjections = response.data;
-    
-            console.log(`Progreso actualizado para la proyección ${projectionId}:`, progress);
-    
-            // Actualizar el estado local de las proyecciones
-            setProjections(updatedProjections);
-        } catch (error) {
-            console.error('Error updating task status:', error);
-            toast.error('Error actualizando el progreso de la proyección.');
-        }
-    };
-    // Barra de progreso para cada proyección
-    const ProgressBar = ({ progress }) => (
-        <div className="w-full bg-gray-200 rounded-full h-2 relative mt-1">
-          <div
-            className="bg-blue-500 h-2 rounded-full"
-            style={{ width: `${progress}%` }}
-          >
-          </div>
-        </div>
-      );
-
     const safeParseJSON = (str) => {
         try {
-            // Reemplazar comillas simples y limpiar la cadena
             const cleanedStr = str.replace(/'/g, '"').trim();
-            return JSON.parse(cleanedStr);  // Intentar parsear el JSON limpio
+            return JSON.parse(cleanedStr);  
         } catch (error) {
             console.error('Error al parsear JSON:', error);
-            return [];  // Retornar un array vacío en caso de error
+            return [];
         }
     };
     
@@ -325,31 +303,35 @@ function KanbanBoard() {
         setTasks(updatedTasks); // Actualiza el estado con el cambio temporal
     
         const updatedTask = updatedTasks.find(task => task.id === id);
-    
+
         if (updatedTask.projection_id) {
             const projection = projections.find(proj => proj.id === updatedTask.projection_id);
     
             // Filtramos todas las tareas asociadas a esta proyección
             const projectionTasks = updatedTasks.filter(task => task.projection_id === updatedTask.projection_id);
-            const remainingTasks = projectionTasks.filter(task => task.status !== 'done'); // Tareas restantes
-    
-            // Usamos safeParseJSON para evitar errores al parsear documentos
+            const remainingTasks = projectionTasks.filter(task => task.status !== 'done');
+
             const projectionDocuments = Array.isArray(projection.documents_uploaded)
                 ? projection.documents_uploaded
                 : safeParseJSON(projection.documents_uploaded || '[]');
-    
+
             const documentsUploadedCount = projectionDocuments.length;
             const documentsRequiredCount = projection.documents_number || 0;
     
+    
+            console.log(`Restan ${remainingTasks.length} tareas. Documentos: ${documentsUploadedCount}/${documentsRequiredCount}`);
+    
+            // **Nueva validación**: Solo si NO hay más tareas restantes y faltan documentos
+
             console.log(`Restan ${remainingTasks.length} tareas. Documentos: ${documentsUploadedCount}/${documentsRequiredCount}`);
     
             // **Nueva validación**: Solo si NO hay más tareas restantes y faltan documentos
             if (newStatus === 'done' && remainingTasks.length === 0 && documentsUploadedCount < documentsRequiredCount) {
                 toast.error('No puedes completar esta actividad sin subir todos los documentos requeridos.');
-                setTasks(tasks); // Revertimos el estado si no cumple
+                setTasks(tasks); 
                 return;
             }
-    
+            
             // Calculamos el progreso localmente
             const localProgress = calculateProgress(updatedTasks, updatedTask.projection_id);
     
@@ -362,29 +344,16 @@ function KanbanBoard() {
                 )
             );
         }
-    
+
         try {
-            // Actualizamos localmente de forma optimista para mejorar la experiencia del usuario.
-            const updatedTasks = tasks.map(task =>
-                task.id === id ? { ...task, status: newStatus } : task
-            );
-            setTasks(updatedTasks);
-    
-            // Llamada a la API para actualizar la tarea.
             await updateTask(id, { status: newStatus });
-    
-            // Si la tarea pertenece a una proyección, recalculamos el progreso.
             if (taskBeforeUpdate.projection_id) {
                 await updateProjectionProgress(taskBeforeUpdate.projection_id, updatedTasks);
             }
-    
             toast.success('Tarea actualizada con éxito');
         } catch (error) {
-            // Si ocurre un error, revertimos el cambio.
             console.error('Error updating task status:', error);
             toast.error('Error actualizando la tarea.');
-    
-            // Revertir el estado local si falla la API.
             setTasks(tasks);
         }
     };
@@ -393,7 +362,6 @@ function KanbanBoard() {
 
     // TaskCard component that displays the task details
     const TaskCard = ({ task, onDelete, projections }) => {
-        // Hook para arrastrar y soltar
         const [{ isDragging }, drag] = useDrag({
             type: 'task',
             item: { id: task.id, status: task.status },
@@ -404,50 +372,35 @@ function KanbanBoard() {
     
         // Función que maneja la eliminación de la tarea
         const handleDelete = async (e) => {
-            e.stopPropagation();  // Detener la propagación del clic para que no abra el modal de edición
-
-            const taskToDelete = tasks.find(task => task.id === task.id);
-        
-            try {
-                // Eliminar la tarea del estado local
-                const updatedTasks = tasks.filter(task => task.id !== task.id);
-                setTasks(updatedTasks);
-        
-                // Llamar a la API para eliminar la tarea
-                onDelete(task.id);  // Eliminar la tarea del estado local
-                // await deleteTask(task.id);
-        
-                // Si la tarea pertenece a una proyección, recalcular el progreso
-                // if (taskToDelete && taskToDelete.projection_id) {
-                //     await updateProjectionProgress(taskToDelete.projection_id, updatedTasks);
-                // }
-        
-            } catch (error) {
-                console.error('Error deleting task:', error);
-                // toast.error('Error eliminando la tarea');
-            }
+            e.stopPropagation();
+            onDelete(task.id);
         };
     
+    
+        // Determinar el color de fondo según la prioridad
+
         // Determinar el color de fondo según la prioridad
         const getPriorityColor = () => {
             switch (task.priority) {
                 case 'Alta':
-                    return 'bg-red-200';    // Color para alta prioridad
+                    return 'bg-red-200';
                 case 'Media':
-                    return 'bg-yellow-200'; // Color para prioridad media
+                    return 'bg-yellow-200';
                 case 'Baja':
-                    return 'bg-blue-200';  // Color para baja prioridad
+                    return 'bg-blue-200';
                 default:
-                    return 'bg-gray-200';   // Color por defecto
+                    return 'bg-gray-200';
             }
         };
     
+    
+        // Buscar el nombre de la proyección en base al projection_id
+
         // Buscar el nombre de la proyección en base al projection_id
         const projection = projections.find(proj => proj.id === task.projection_id);
         const projectionName = projection ? projection.function : 'Sin proyección';
         const projectionActivity = projection ? projection.activity : 'Sin actividad';
-
-        const projectionColor =  projection ? projection.color : '#f0f0f0'; // Usar el color de la proyección de la API
+        const projectionColor =  projection ? projection.color : '#f0f0f0';
 
         return (
             <div
@@ -456,39 +409,33 @@ function KanbanBoard() {
                 className={`relative p-3 mb-2 rounded-lg shadow-md transition-all duration-300 transform ${getPriorityColor()} ${
                     isDragging ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
                 } hover:shadow-lg cursor-pointer`}
-                style={{ minHeight: '100px', paddingBottom: '3rem' }} // Altura mínima y espacio para el badge
+                style={{ minHeight: '100px', paddingBottom: '3rem' }}
             >
-                {/* Botón de eliminación más pequeño */}
                 <div 
                     className="absolute top-1 -right-1 text-red-500 hover:text-red-700 text-sm"
-                    onClick={handleDelete} // Agrega el manejador de eventos aquí
+                    onClick={handleDelete} 
                 >
                     <TbXboxXFilled className="mr-2" />
                 </div>
     
-                {/* Mostrar el título de la tarea */}
                 <div className="font-bold text-md mb-1 text-gray-800 truncate z-10">{task.title}</div>
-
-                {/* Fecha de vencimiento */}
                 <div className="absolute top-8 right-2 flex items-center text-gray-600 text-xs font-medium">
-                    <IoTime className="mr-2" /> {/* Ícono de reloj */}
+                    <IoTime className="mr-2" />
                     {task.end_date}
                 </div>
-
-                {/* Recuadro de proyección */}
                 <div
                     className="absolute bottom-2 left-2 right-2 bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-md shadow-sm border border-gray-300 text-right break-words overflow-hidden"
                     style={{ backgroundColor: projectionColor }}
                 >
-                    <div className="truncate">{projectionActivity}</div> {/* Nombre de la actividad */}
-                    <div className="text-gray-600 italic truncate">{projectionName}</div> {/* Nombre de la proyección */}
+                    <div className="truncate">{projectionActivity}</div>
+                    <div className="text-gray-600 italic truncate">{projectionName}</div>
                 </div>
             </div>
         );
     };
     
     const openEditModal = (task) => {     
-        setTaskToEdit(task);  // Asigna la tarea seleccionada al estado  
+        setTaskToEdit(task);  
         setIsEditModalOpen(true);
     };
     
@@ -497,14 +444,12 @@ function KanbanBoard() {
         setIsEditModalOpen(false);
     };
 
-    // Mapeo de los estados internos a sus equivalentes en español
     const STATUS_LABELS = {
         'todo': 'Por Hacer',
         'in-progress': 'En Progreso',
         'done': 'Hecho',
     };
 
-    // Column component that holds the tasks for each status
     const Column = ({ status, children }) => {
         const [{ isOver }, drop] = useDrop({
             accept: 'task',
@@ -524,9 +469,8 @@ function KanbanBoard() {
                 className={`w-1/3 p-4 rounded-lg shadow-md transition-all duration-300 transform ${
                     isOver ? 'bg-blue-300 scale-105' : 'bg-gray-100 scale-100'
                 }`}
-                style={{ height: '650px', overflowY: 'auto' }} // Tamaño fijo con scroll
+                style={{ height: '650px', overflowY: 'auto' }}
             >
-                {/* Usamos el mapeo para mostrar el nombre en español */}
                 <h2 className="text-2xl font-bold text-center mb-4">
                     {STATUS_LABELS[status].toUpperCase()}
                 </h2>
@@ -535,13 +479,21 @@ function KanbanBoard() {
         );
     };
 
-    // Modal toggles (Abrir y cerrar el modal)
     const openModal = () => {
         setIsModalOpen(true);
     };
     const closeModal = () => setIsModalOpen(false);
 
-    // Show loading (Mostrar pantalla de carga)
+    const ProgressBar = ({ progress }) => (
+        <div className="w-full bg-gray-200 rounded-full h-2 relative mt-1">
+          <div
+            className="bg-blue-500 h-2 rounded-full"
+            style={{ width: `${progress}%` }}
+          >
+          </div>
+        </div>
+    );
+
     if (loading) {
         return <LoadingAnimation />;
     }
@@ -554,7 +506,6 @@ function KanbanBoard() {
         <main className="min-h-screen bg-cover bg-center">
             {/* navegación fija */}
             <Navigation />
-
             <hr className="border-t-2 border-black my-4" />
 
             <Toaster /> {/* Añade el contenedor de toast */}
@@ -566,21 +517,21 @@ function KanbanBoard() {
                     
                     {/* Columna de Tareas */}
                     <div className="flex-1 flex gap-x-6">
-                    <Column status="todo">
-                        {tasks.filter(task => task.status === 'todo').map(task => (
-                        <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
-                        ))}
-                    </Column>
-                    <Column status="in-progress">
-                        {tasks.filter(task => task.status === 'in-progress').map(task => (
-                        <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
-                        ))}
-                    </Column>
-                    <Column status="done">
-                        {tasks.filter(task => task.status === 'done').map(task => (
-                        <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
-                        ))}
-                    </Column>
+                        <Column status="todo">
+                            {tasks.filter(task => task.status === 'todo').map(task => (
+                            <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
+                            ))}
+                        </Column>
+                        <Column status="in-progress">
+                            {tasks.filter(task => task.status === 'in-progress').map(task => (
+                            <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
+                            ))}
+                        </Column>
+                        <Column status="done">
+                            {tasks.filter(task => task.status === 'done').map(task => (
+                            <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} projections={projections} />
+                            ))}
+                        </Column>
                     </div>
                     
                     {/* Panel lateral derecho con proyecciones y su progreso */}
@@ -594,7 +545,7 @@ function KanbanBoard() {
 
                                 const projectionDocuments = Array.isArray(projection.documents_uploaded) 
                                     ? projection.documents_uploaded 
-                                    : JSON.parse(projection.documents_uploaded.replace(/'/g, '"') || '[]');
+                                    : safeParseJSON(projection.documents_uploaded || '[]');
 
                                 const documentsUploadedCount = projectionDocuments.length;
                                 const documentsRequiredCount = projection.documents_number || 0;
@@ -672,8 +623,8 @@ function KanbanBoard() {
                 {/* Botón para crear una nueva tarea */}
                 <div className="mt-8">
                     <button
-                    onClick={openModal}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                        onClick={openModal}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
                     >
                     Crear Nueva Tarea
                     </button>
@@ -785,8 +736,7 @@ function KanbanBoard() {
                         </div>
                         </div>
                     </div>
-                    )}
-
+                )}
 
                 {isEditModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -896,12 +846,10 @@ function KanbanBoard() {
                 </div>
                 )}
 
-                {isTaskLoading && <LoadingSpinner />} {/* Mostrar spinner discreto si hay carga */}
+                {isTaskLoading && <LoadingSpinner />}
             </div>
         </main>
-
     );
-
 }
 
 export default KanbanBoard;
