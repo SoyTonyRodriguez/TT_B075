@@ -353,7 +353,7 @@ const KanbanBoard = () => {
   
 
   const handleCreateTask = async () => {
-    if (!newTask.title || !newTask.description || !newTask.projection_id) {
+    if (!newTask.title || !newTask.projection_id || !newTask.priority) {
       Alert.alert("Error", "Todos los campos son obligatorios.");
       return;
     }
@@ -745,7 +745,7 @@ const KanbanBoard = () => {
               />
 
               {/* Campo de la descripción */}
-              <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Descripción</Text>
+              <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Descripción (Opcional)</Text>
               <TextInput
                 placeholder="Escribe la descripción"
                 value={newTask.description}
@@ -913,7 +913,7 @@ const KanbanBoard = () => {
             />
 
             {/* Campo de la descripción */}
-            <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Descripción</Text>
+            <Text style={tw`text-lg mb-2 font-semibold text-gray-800`}>Descripción (Opcional)</Text>
             <TextInput
               placeholder="Escribe la descripción"
               value={taskToEdit?.description || ''}
