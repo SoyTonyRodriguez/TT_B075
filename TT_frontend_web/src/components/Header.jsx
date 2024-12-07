@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
-import logo from "../img/logoescom.png";
+import logo from "../img/estudiar.png";
 import AuthContext from "./AuthContext";
 import { FaUserCircle, FaRegStar } from "react-icons/fa"; // Importa el icono adicional
 
@@ -56,10 +56,10 @@ function Header() {
 
     return (
         <header className="bg-gradient-to-r from-blue-950 via-sky-700 to-sky-600 text-white py-4 shadow-md">
-            <div className="container mx-auto flex items-center justify-between px-4 relative">
+            <div className="container mx-auto flex items-center justify-between px-4 relative md:w-full">
                 
                 {/* Vista móvil: Exclusivamente para pantallas pequeñas */}
-                <div className="md:hidden flex items-center w-full">
+                <div className="md:hidden flex items-center w-full px-4">
                     {/* Botón hamburguesa a la izquierda para móviles */}
                     <button
                         onClick={toggleMobileMenu}
@@ -71,7 +71,7 @@ function Header() {
 
                     {/* Logo centrado en móviles */}
                     <div className="absolute left-1/2 transform -translate-x-1/2">
-                        <img className="w-40 h-auto" src={logo} alt="Logo ESCOM" />
+                        <img className="w-16 h-auto md:w-16" src={logo} alt="Logo ESCOM" />
                     </div>
 
                     {/* Estrella de U.P. acumuladas a la derecha */}
@@ -122,7 +122,7 @@ function Header() {
                 <div className="hidden md:flex items-center justify-between w-full">
                     {/* Logo en la vista de escritorio */}
                     <div className="flex-shrink-0">
-                        <img className="w-40 h-auto" src={logo} alt="Logo ESCOM" />
+                        <img className="w-20 h-auto md:w-20" src={logo} alt="Logo ESCOM" />
                     </div>
 
                     {/* Menú principal para pantallas grandes */}
