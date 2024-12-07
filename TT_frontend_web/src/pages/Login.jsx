@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importar íconos para mostrar/ocultar contraseña
+import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 
 // new path:
 import { login as apiLogin, getAccount } from '../api/accounts.api'; // Llamada a la API
