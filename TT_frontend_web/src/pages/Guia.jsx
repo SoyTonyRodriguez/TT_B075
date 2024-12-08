@@ -91,7 +91,7 @@ function GuidePage() {
     {
       id: 10,
       icon: '🎓',
-      imgSrc: '/src/img/Hrs.png',
+      imgSrc: '/src/img/GradoAcademico.png',
       title: 'Seleccionar grado académico',
       description: 'Elige el grado académico obtenido para iniciar tu proyección.',
       details: 'Selecciona el grado académico de la lista: Pasantía, Título, Maestría o Doctorado. Una vez seleccionado, se te mostrarán los documentos requeridos para validar tu promoción.',
@@ -297,11 +297,13 @@ function GuidePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4 text-center">
             <h2 className="text-3xl font-bold mb-4 text-gray-800">{selectedCard.title}</h2>
-            <img
-              src={selectedCard.imgSrc}
-              alt={selectedCard.title}
-              className="w-full h-48 object-cover rounded-md mb-6"
-            />
+            <div className="max-w-[300px] max-h-[300px] mx-auto">
+              <img
+                src={selectedCard.imgSrc}
+                alt={selectedCard.title}
+                className="w-auto h-auto object-contain mb-3"
+              />
+            </div>
             <p className="text-gray-700 mb-6">{selectedCard.details}</p>
             <button
               className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
