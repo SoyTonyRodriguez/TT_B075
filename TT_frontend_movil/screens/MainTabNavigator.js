@@ -12,11 +12,6 @@ const Tab = createBottomTabNavigator();
 export default function MainTabNavigator() {
   const [filesKey, setFilesKey] = React.useState(0);
 
-  const handleFilesTabPress = () => {
-    // Cambiar la clave para forzar la recarga del componente
-    setFilesKey(prevKey => prevKey + 1);
-  };
-
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -46,30 +41,27 @@ export default function MainTabNavigator() {
       <Tab.Screen
         name="Home"
         component={HomeStackNavigator}
-        options={{ tabBarLabel: 'Inicio' }}
+        options={{ tabBarLabel: 'Inicio'}}
       />
       <Tab.Screen
         name="Calendar"
         component={CalendarScreen}
-        options={{ tabBarLabel: 'Calendario' }}
+        options={{ tabBarLabel: 'Calendario', unmountOnBlur: true }}
       />
       <Tab.Screen
         name="Files"
         component={() => <FilesScreen key={filesKey} />} // Pasar la clave única
-        options={{ tabBarLabel: 'Documentos' }}
-        listeners={{
-          tabPress: handleFilesTabPress, // Ejecutar la recarga en el evento tabPress
-        }}
+        options={{ tabBarLabel: 'Documentos', unmountOnBlur: true }}
       />
       <Tab.Screen
         name="Projection"
         component={ProjectionStackNavigator}
-        options={{ tabBarLabel: 'Proyección' }}
+        options={{ tabBarLabel: 'Proyección', unmountOnBlur: true }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileStackNavigator}
-        options={{ tabBarLabel: 'Perfil' }}
+        options={{ tabBarLabel: 'Perfil', unmountOnBlur: true }}
       />
     </Tab.Navigator>
   );

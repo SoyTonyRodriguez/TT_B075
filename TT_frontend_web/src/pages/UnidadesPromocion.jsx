@@ -342,23 +342,14 @@ function UnidadesPromocion() {
     setCalculatedUnits('')
   };
 
-  const getActividades = () => {
-    const mappedFunction = functionMapping[functionField]; // Mapeamos el nombre legible a la clave
-    if (mappedFunction && actividadesPorFuncion[mappedFunction]) {
-      return actividadesPorFuncion[mappedFunction].map((item, index) => (
-        <option key={index} value={item.actividad}>
-          {item.actividad}
-        </option>
-      ));
-    }
-    return null;
-  };
-
  // Manejar el cambio de actividad seleccionada
   const handleActivityChange = (e) => {
     const selectedActivity = e.target.value;
     setActivity(selectedActivity);
     setActivityError(false); // Elimina el error al seleccionar algo
+
+    setHours('');
+    setCalculatedUnits('');
 
     const mappedFunction = functionMapping[functionField];
     const activityInfo = actividadesPorFuncion[mappedFunction]?.find(
@@ -586,38 +577,42 @@ function UnidadesPromocion() {
     if (functionField === '') {
       setFunctionError(true);
       isValid = false;
+    } else {
+      setFunctionError(false);
     }
   
     if (activity === '') {
       setActivityError(true);
       isValid = false;
+    } else {
+      setActivityError(false);
     }
-
-    if (showWorkTime && (hours < hourLimits.min || hours > hourLimits.max)) {
-      setHoursError(`Las horas deben estar entre ${hourLimits.min} y ${hourLimits.max}.`);
+  
+    if (units === '') {
       isValid = false;
     }
-
-    // Verificar si supera el límite máximo de U.P.
-    if (conditions && category) {
-      const workConfig = conditions.carga_academica[category]?.[workTime];
-      const maxUP = workConfig?.up?.max || 0; // Obtener el máximo permitido
-
-      if (units > maxUP) {
-        setHoursError(`Las U.P. calculadas (${units}) superan el máximo permitido (${maxUP} U.P.).`);
+  
+    // Condición adicional:
+    // Si la actividad es Tutorías y la unidad seleccionada está en tutoringOptions,
+    // no validamos horas.
+    const isTutoringOptionSelected = activity === "Tutorías" && tutoringOptions.has(units);
+  
+    // Solo validamos horas si NO estamos en el caso de tutorías especiales
+    if (!isTutoringOptionSelected && activitiesWithHours.has(activity)) {
+      if (hours === '' || hours < hourLimits.min || hours > hourLimits.max) {
+        setHoursError(`Las horas deben estar entre ${hourLimits.min} y ${hourLimits.max}.`);
+        isValid = false;
+      } else {
+        setHoursError('');
       }
-    }
-  
-    // Validar rol solo si hay opciones de rol
-    if (roleOptions.length > 0 && role === '') {
-      setRoleError(true);
-      isValid = false;
-    }
-  
-    // Validar alcance solo si hay opciones de alcance
-    if (scopeOptions.length > 0 && scope === '') {
-      setScopeError(true);
-      isValid = false;
+      
+      if (calculatedUnits === 0) {
+        setHoursError('Ingresa horas válidas para calcular las U.P.');
+        isValid = false;
+      }
+    } else {
+      // Si es tutoría con una de las opciones de tutoringOptions, no pedimos horas.
+      setHoursError('');
     }
   
     return isValid;
@@ -815,26 +810,16 @@ function UnidadesPromocion() {
       }
     }
   
-    console.log('Primer número (U.P.):', firstNumber);
-    console.log('Segundo número (Horas calculadas):', secondNumber);
-  
     setUpAllowed(firstNumber); // Guardar el primer número
     setHoursCalculated(secondNumber || 1); // Guardar el segundo número si existe
   
-    // Verificar si la opción seleccionada está en el conjunto de opciones específicas
-    const shouldDisableFields = tutoringOptions.has(selectedUnit);
-  
-    if (shouldDisableFields) {
-      // Limpiar los campos si la opción seleccionada requiere deshabilitarlos
-      setHours(''); 
-      setCalculatedUnits(''); 
-      setHoursError(''); 
-      setHourLimits({ min: 0, max: 200 }); 
+    // Si el rol está vacío, asignar automáticamente la primera palabra de la U.P. seleccionada
+    if (!role) {
+      const firstWord = selectedUnit.split(' ')[0]; // Obtener la primera palabra
+      setRole(firstWord); // Asignar al estado de role
     }
   
-    setIsUnitsSelected(!shouldDisableFields); // Deshabilitar campos si es necesario
-  
-    console.log('Campos deshabilitados:', shouldDisableFields);
+    setIsUnitsSelected(true); // Asegurarse de habilitar los campos
   };
 
   if (loading) {
@@ -894,45 +879,49 @@ function UnidadesPromocion() {
             </div>
 
             {roleOptions.length > 1 ? (
-              <div className="mb-4">
-                <label className="block text-white text-sm font-semibold mb-2">Rol de participación</label>
-                <select
-                  value={role}
-                  onChange={handleRoleChange}
-                  className="w-full p-2 rounded-lg border border-gray-400"
-                >
-                  <option value="" disabled>Selecciona un rol</option>
-                  {roleOptions.map((rolOption, index) => (
-                    <option key={index} value={rolOption}>{rolOption}</option>
-                  ))}
-                </select>
-              </div>
-            ) : roleOptions.length === 1 && (
-              <div className="mb-4">
-                <label className="block text-white text-sm font-semibold mb-2">Rol de participación</label>
-                <p className="bg-white p-2 rounded-lg border border-gray-400">{roleOptions[0]}</p>
-              </div>
+                <div className="mb-4">
+                    <label className="block text-white text-sm font-semibold mb-2">Rol de participación</label>
+                    <select
+                    value={role}
+                    onChange={handleRoleChange}
+                    className="w-full p-2 rounded-lg border border-gray-400"
+                    >
+                    <option value="" disabled>Selecciona un rol</option>
+                    {roleOptions.map((rolOption, index) => (
+                        <option key={index} value={rolOption}>{rolOption}</option>
+                    ))}
+                    </select>
+                    {roleError && <span className="text-red-500">Por favor, selecciona un rol.</span>}
+                </div>
+                ) : roleOptions.length === 1 && (
+                <div className="mb-4">
+                    <label className="block text-white text-sm font-semibold mb-2">Rol de participación</label>
+                    <p className="bg-white p-2 rounded-lg border border-gray-400">{roleOptions[0]}</p>
+                    {roleError && <span className="text-red-500">Por favor, selecciona un rol.</span>}
+                </div>
             )}
 
             {scopeOptions.length > 1 ? (
-              <div className="mb-4">
+            <div className="mb-4">
                 <label className="block text-white text-sm font-semibold mb-2">Alcance</label>
                 <select
-                  value={scope}
-                  onChange={handleScopeChange}
-                  className="w-full p-2 rounded-lg border border-gray-400"
+                value={scope}
+                onChange={handleScopeChange}
+                className="w-full p-2 rounded-lg border border-gray-400"
                 >
-                  <option value="" disabled>Selecciona un alcance</option>
-                  {scopeOptions.map((scopeOption, index) => (
+                <option value="" disabled>Selecciona un alcance</option>
+                {scopeOptions.map((scopeOption, index) => (
                     <option key={index} value={scopeOption}>{scopeOption}</option>
-                  ))}
+                ))}
                 </select>
-              </div>
+                {scopeError && <span className="text-red-500">Por favor, selecciona un alcance.</span>}
+            </div>
             ) : scopeOptions.length === 1 && (
-              <div className="mb-4">
+            <div className="mb-4">
                 <label className="block text-white text-sm font-semibold mb-2">Alcance</label>
                 <p className="bg-white p-2 rounded-lg border border-gray-400">{scopeOptions[0]}</p>
-              </div>
+                {scopeError && <span className="text-red-500">Por favor, selecciona un alcance.</span>}
+            </div>
             )}
 
             {documents_required && (
@@ -951,19 +940,25 @@ function UnidadesPromocion() {
             )}
 
             {unitsOptions.length > 1 ? (
-              <div className="mb-4">
-                <label className="block text-white text-sm font-semibold mb-2">U.P. diponibles</label>
-                <select
-                  value={units} // Asegúrate de que el valor sea controlado por el estado
-                  onChange={handleUnitsChange} // Manejador para actualizar el estado
-                  className="w-full p-2 rounded-lg border border-gray-400"
-                >
-                  <option value="" disabled>Selecciona una opción</option>
-                  {unitsOptions.map((up, index) => (
-                    <option key={index} value={up}>{up}</option>
-                  ))}
-                </select>
-              </div>
+                <div className="mb-4">
+                    <label className="block text-white text-sm font-semibold mb-2">U.P. disponibles</label>
+                    <select
+                        value={units}
+                        onChange={handleUnitsChange}
+                        className={`w-full p-2 rounded-lg border border-gray-400 ${
+                        roleOptions.length > 0 && !role ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        disabled={roleOptions.length > 0 && !role} // Deshabilitar si hay opciones de rol pero no se ha seleccionado uno
+                    >
+                        <option value="" disabled>Selecciona una opción</option>
+                        {unitsOptions.map((up, index) => (
+                        <option key={index} value={up}>{up}</option>
+                        ))}
+                    </select>
+                    {roleOptions.length > 0 && !role && (
+                        <span className="text-red-500">Selecciona un rol para habilitar las U.P.</span>
+                    )}
+                    </div>
             ) : unitsOptions.length === 1 && (
               <div className="mb-4">
                 <label className="block text-white text-sm font-semibold mb-2">U.P. aproximadas</label>
@@ -972,49 +967,63 @@ function UnidadesPromocion() {
             )}
 
             {activitiesWithHours.has(activity) && (
-              <>
+            <>
                 {activity === "Carga académica" && (
-                  <div className="mb-4">
+                <div className="mb-4">
                     <label className="block text-white text-sm font-semibold mb-2">
-                      Tiempo de trabajo
+                    Tiempo de trabajo
                     </label>
                     <select
-                      value={workTime}
-                      onChange={(e) => handleWorkTimeChange(e)}
-                      className="w-full p-2 rounded-lg border border-gray-400"
+                    value={workTime}
+                    onChange={(e) => handleWorkTimeChange(e)}
+                    className="w-full p-2 rounded-lg border border-gray-400"
+                    disabled={
+                        // Deshabilitar si es tutorías y la opción seleccionada está en tutoringOptions
+                        activity === "Tutorías" && tutoringOptions.has(units)
+                    }
                     >
-                      <option value="" disabled>Selecciona una opción</option>
-                      <option value="medio_tiempo">Medio tiempo</option>
-                      <option value="tres_cuartos_tiempo">Tres cuartos</option>
-                      <option value="tiempo_completo">Tiempo completo</option>
+                    <option value="" disabled>Selecciona una opción</option>
+                    <option value="medio_tiempo">Medio tiempo</option>
+                    <option value="tres_cuartos_tiempo">Tres cuartos</option>
+                    <option value="tiempo_completo">Tiempo completo</option>
                     </select>
-                  </div>
+                </div>
                 )}
 
                 <div className="mb-4">
-                  <label className="block text-white text-sm font-semibold mb-2">
+                <label className="block text-white text-sm font-semibold mb-2">
                     Horas de trabajo
-                  </label>
-                  <input
+                </label>
+                <input
                     type="number"
                     value={hours}
                     onChange={handleHoursChange}
                     className="w-full p-2 rounded-lg border border-gray-400"
                     placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
-                    disabled={!isUnitsSelected}
-                  />
-                  {hoursError && <span className="text-red-500">{hoursError}</span>}
+                    disabled={
+                    !isUnitsSelected || 
+                    (activity === "Tutorías" && tutoringOptions.has(units))
+                    }
+                />
+                {hoursError && <span className="text-red-500">{hoursError}</span>}
                 </div>
 
-                  <div className="mb-4">
-                    <label className="block text-white text-sm font-semibold mb-2">
-                      U.P. Calculadas
-                    </label>
-                    <p className={`bg-white p-2 rounded-lg border border-gray-400 ${!isUnitsSelected || !isUnitsSelected ? 'opacity-50' : ''}`}>
+                <div className="mb-4">
+                <label className="block text-white text-sm font-semibold mb-2">
+                    U.P. Calculadas
+                </label>
+                <p 
+                    className={`bg-white p-2 rounded-lg border border-gray-400 ${
+                    !isUnitsSelected ||
+                    (activity === "Tutorías" && tutoringOptions.has(units))
+                        ? 'opacity-50'
+                        : ''
+                    }`}
+                >
                     {calculatedUnits ? `${calculatedUnits} U.P.` : '—'}
-                    </p>
-                  </div>
-              </>
+                </p>
+                </div>
+            </>
             )}
 
 

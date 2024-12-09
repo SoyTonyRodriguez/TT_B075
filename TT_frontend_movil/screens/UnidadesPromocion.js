@@ -188,6 +188,7 @@ import tw from 'twrnc';
           const normalizedCategory = normalizeCategory(accountDetails.category);
           console.log(userId);
           setCategoryNormalized(normalizeCategory(accountDetails.category));
+          console.log(normalizedCategory);
 
           setCategory(normalizedCategory);
           setConditions(JSON.parse(storedConditions));
@@ -197,9 +198,11 @@ import tw from 'twrnc';
       load_data();
     }, []);
 
-    // Función para normalizar la categoría del usuario
     const normalizeCategory = (category) => {
-      const words = category.toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
+      const removeAccents = (str) =>
+        str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Elimina acentos.
+      
+      const words = removeAccents(category).toLowerCase().trim().split(/\s+/); // Divide la cadena en palabras.
       words.pop(); // Elimina la última palabra.
       return words.join('_'); // Une las palabras restantes con '_'.
     };
@@ -416,52 +419,67 @@ import tw from 'twrnc';
       setModalWorkTimeVisible(false); // Cerrar el modal de tiempo de trabajo
     };
 
+    const tutoringOptions = new Set([
+        '3.00 U.P. en tutoría de regularización por unidad de aprendizaje al semestre.',
+        '5.00 U.P. en tutoría de recuperación académica por unidad de aprendizaje al semestre.',
+        '3.00 U.P. en tutoría a distancia por grupo atendido al semestre.',
+    ]);
+
     const validateForm = () => {
-      // Verificar que todos los campos obligatorios estén completos
-      if (!funcion) {
-        alert("Por favor selecciona una función.");
-        return false;
-      }
-    
-      if (!actividad) {
-        alert("Por favor selecciona una actividad.");
-        return false;
-      }
-    
-      if (mostrarDocumento && !documento) {
-        alert("Por favor completa el campo de documento requerido.");
-        return false;
-      }
-    
-      if (mostrarRol && !rol) {
-        alert("Por favor selecciona un rol.");
-        return false;
-      }
-    
-      if (mostrarAlcance && !alcance) {
-        alert("Por favor selecciona un alcance.");
-        return false;
-      }
-    
-      if (mostrarUp && !upSeleccionada) {
-        alert("Por favor selecciona una U.P.");
-        return false;
-      }
-    
-      if (activitiesWithHours.has(actividad)) {
-        if (actividad === "Carga académica" && !workTime) {
-          alert("Por favor selecciona un tiempo de trabajo.");
+        // Verificar que todos los campos obligatorios estén completos
+        if (!funcion) {
+          alert("Por favor selecciona una función.");
           return false;
         }
-    
-        if (!hours || hours < hourLimits.min || hours > hourLimits.max) {
-          alert(`Por favor ingresa una cantidad de horas entre ${hourLimits.min} y ${hourLimits.max}.`);
+      
+        if (!actividad) {
+          alert("Por favor selecciona una actividad.");
           return false;
         }
-      }
-    
-      return true; // Si todo está completo, retorna true
-    };
+      
+        if (mostrarDocumento && !documento) {
+          alert("Por favor completa el campo de documento requerido.");
+          return false;
+        }
+      
+        if (mostrarRol && !rol) {
+          alert("Por favor selecciona un rol.");
+          return false;
+        }
+      
+        if (mostrarAlcance && !alcance) {
+          alert("Por favor selecciona un alcance.");
+          return false;
+        }
+      
+        if (mostrarUp && !upSeleccionada) {
+          alert("Por favor selecciona una U.P.");
+          return false;
+        }
+      
+        // Verifica si la actividad es Tutorías y la U.P. seleccionada está en tutoringOptions
+        const isTutoringOptionSelected = (actividad === "Tutorías" && tutoringOptions.has(upSeleccionada));
+      
+        // Solo pedimos horas si la actividad requiere horas y NO es una opción de tutoría especial
+        if (activitiesWithHours.has(actividad) && !isTutoringOptionSelected) {
+          if (actividad === "Carga académica" && !workTime) {
+            alert("Por favor selecciona un tiempo de trabajo.");
+            return false;
+          }
+      
+          if (!hours || hours < hourLimits.min || hours > hourLimits.max) {
+            alert(`Por favor ingresa una cantidad de horas entre ${hourLimits.min} y ${hourLimits.max}.`);
+            return false;
+          }
+        }
+
+        if (calculatedUnits === 0) {
+            setHoursError('Ingresa horas válidas para calcular las U.P.');
+            isValid = false;
+          }
+      
+        return true; // Si todo está completo, retorna true
+      };
     
     const handleOnPress = async () => {
       if (!validateForm()) {
@@ -605,6 +623,9 @@ import tw from 'twrnc';
         setLoading(false);
       }
     };
+
+        // Justo antes del return define la constante:
+  const isTutoringOptionSelected = actividad === "Tutorías" && tutoringOptions.has(upSeleccionada);
   
     return (
       <ImageBackground
@@ -718,26 +739,29 @@ import tw from 'twrnc';
           {/* Campo de U.P */}
           {mostrarUp && (
             <View style={tw`mb-4`}>
-              <Text style={tw`text-base font-bold text-black`}>U.P. aproximadas a obtener</Text>
-              <TouchableOpacity
+                <Text style={tw`text-base font-bold text-black`}>U.P. aproximadas a obtener</Text>
+                <TouchableOpacity
                 onPress={() => {
-                  if (upsDisponibles.length > 1) {
+                    if (upsDisponibles.length > 1 && !(rolesDisponibles.length > 0 && !rol)) {
                     setModalType('up');
                     setModalVisible(true);
-                  }
+                    }
                 }}
-                style={tw`w-full p-4 border border-gray-700 rounded-lg mb-3 flex-row justify-between items-center bg-white`}
-                disabled={upsDisponibles.length === 0}
-              >
+                style={[
+                    tw`w-full p-4 border border-gray-700 rounded-lg mb-3 flex-row justify-between items-center bg-white`,
+                    (rolesDisponibles.length > 0 && !rol) && { opacity: 0.5 } // Visualmente deshabilitado
+                ]}
+                disabled={upsDisponibles.length === 0 || (rolesDisponibles.length > 0 && !rol)}
+                >
                 <View style={tw`flex-1`}>
-                  <Text style={tw`text-black text-left`}>
+                    <Text style={tw`text-black text-left`}>
                     {upSeleccionada || "Selecciona una U.P."}
-                  </Text>
+                    </Text>
                 </View>
                 <Ionicons name="chevron-down" size={24} color="rgba(0, 0, 0, 0.8)" />
-              </TouchableOpacity>
+                </TouchableOpacity>
             </View>
-          )}
+            )}
   
           {activitiesWithHours.has(actividad) && (
               <>
@@ -787,12 +811,15 @@ import tw from 'twrnc';
               <View style={tw`mb-4`}>
                 <Text style={tw`text-base font-bold text-black`}>Horas de trabajo</Text>
                 <TextInput
-                  value={hours}
-                  onChangeText={handleHoursChange}
-                  keyboardType="numeric"
-                  placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
-                  style={tw`w-full p-4 border border-gray-700 rounded-lg bg-white text-black`}
-                  maxLength={3} // Limitar a 3 dígitos (por si acaso)
+                value={hours}
+                onChangeText={handleHoursChange}
+                keyboardType="numeric"
+                placeholder={`Ingresa entre ${hourLimits.min} y ${hourLimits.max} horas`}
+                style={[
+                    tw`w-full p-4 border border-gray-700 rounded-lg bg-white text-black`,
+                    isTutoringOptionSelected && { opacity: 0.5 } // hace visible que está inactivo
+                ]}
+                editable={!isTutoringOptionSelected} // Aquí deshabilitamos el campo
                 />
                 {hoursError ? <Text style={tw`text-red-500`}>{hoursError}</Text> : null}
               </View>

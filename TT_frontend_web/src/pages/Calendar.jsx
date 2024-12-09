@@ -6,28 +6,34 @@ import { getAllDates } from '../api/calendar_dates.api';
 import LoadingAnimation from '../components/LoadingAnimation';
 
 const CalendarWithDetails = () => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [activities, setActivities] = useState([]);
-  const [activityDetails, setActivityDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-
-
   const currentYear = new Date().getFullYear();
   const minYear = currentYear - 2;
   const maxYear = currentYear + 2;
 
   // Fechas de inicio y final de la convocatoria
-  const inicioConvocatoria = new Date(`${currentYear}-01-18`); //Aqui tambien pasa un bug :((
-  const finalConvocatoria = new Date(`${currentYear}-05-31`); //Aqui tambien JAJAJAJAJA
+  const inicioConvocatoria = new Date(currentYear, 0, 17); // Enero es 0
+  const finalConvocatoria = new Date(currentYear, 4, 30);  // Mayo es 4
+
+  // Inicializa el estado con inicioConvocatoria
+  const [currentMonth, setCurrentMonth] = useState(inicioConvocatoria);
+  const [selectedDate, setSelectedDate] = useState(inicioConvocatoria);
+  const [activities, setActivities] = useState([]);
+  const [activityDetails, setActivityDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const colors = ['bg-red-200', 'bg-green-200', 'bg-blue-200', 'bg-yellow-200', 'bg-purple-200', 'bg-pink-200', 'bg-teal-200', 'bg-indigo-200'];
 
   // Fetch activities from API
   useEffect(() => {
     const fetchActivities = async () => {
       try {
         const response = await getAllDates();
-        setActivities(response.data);
+        // Asigna un color a cada actividad
+        const coloredActivities = response.data.map((activity, index) => ({
+          ...activity,
+          colorClass: colors[index % colors.length],
+        }));
+        setActivities(coloredActivities);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching activities:', error);
@@ -44,14 +50,13 @@ const CalendarWithDetails = () => {
       return <LoadingAnimation />;
   }
 
-
-  // Función para ajustar la fecha a la zona horaria local
+  // Función para ajustar la fecha a la zona horaria local (si es necesario)
   const adjustToLocaleDate = (dateString) => {
     const date = new Date(dateString);
     return new Date(date.getTime() + date.getTimezoneOffset() * 60000); 
   };
 
-  // Nueva función para verificar si una fecha está dentro del rango de una actividad
+  // Función para verificar si una fecha está dentro del rango de una actividad
   const isWithinActivityRange = (day, activity) => {
     const start = adjustToLocaleDate(activity.start_date);
     const end = adjustToLocaleDate(activity.end_date);
@@ -107,7 +112,6 @@ const CalendarWithDetails = () => {
     const years = Array.from({ length: 5 }, (e, i) => {
       return minYear + i;
     });
-
 
     return (
       <div className="flex justify-between items-center py-2 mb-4">
@@ -168,44 +172,31 @@ const CalendarWithDetails = () => {
     let days = [];
     let day = startDate;
   
-    // Función para verificar si un día está dentro del rango de una actividad
-    const isWithinActivityRange = (day, activity) => {
-      const start = adjustToLocaleDate(activity.start_date);
-      const end = adjustToLocaleDate(activity.end_date);
-      return day >= start && day <= end;
-    };
-  
-    // Función para verificar si es el día de inicio de la actividad
-    const isActivityStartDay = (day, activity) => {
-      const start = adjustToLocaleDate(activity.start_date);
-      return isSameDay(day, start); // Verifica si el día es el inicio de la actividad
-    };
-  
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         const formattedDate = format(day, dateFormat);
         const cloneDay = day;
         const isSelected = isSameDay(day, selectedDate);
-        const isToday = isSameDay(day, new Date()); // Nuevo: verificar si es hoy
-  
+        const isToday = isSameDay(day, new Date());
         const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+  
+        // Encuentra la actividad para el día actual
         const activityOnDay = !isWeekend && activities.find(activity =>
           isWithinActivityRange(day, activity)
         );
   
-        // Clases aplicadas sin alterar el diseño original
+        // Clases aplicadas a la celda
         let cellClass = "p-2 text-center border ";
         if (!isSameMonth(day, monthStart)) {
-          cellClass += "text-gray-400 "; // Días de otros meses
+          cellClass += "text-gray-400 ";
         } else if (isSelected) {
-          cellClass += "bg-orange-500 text-white "; // Día seleccionado
+          cellClass += "bg-orange-500 text-white ";
         } else if (activityOnDay) {
-          cellClass += "bg-green-200 "; // Día con actividad
+          cellClass += activityOnDay.colorClass + " "; // Aplica el color de la actividad
         } else {
-          cellClass += "text-black "; // Días normales
+          cellClass += "text-black ";
         }
   
-        // Nuevo: Añadir borde solo si es el día actual
         if (isToday) {
           cellClass += "border-blue-500 ";
         }
@@ -231,7 +222,6 @@ const CalendarWithDetails = () => {
   
     return <div>{rows}</div>;
   };
-  
 
   const renderSelectedDateDetails = () => {
     if (!selectedDate) return <p className="text-center">Haz clic sobre alguna fecha en específico para más detalles</p>;
