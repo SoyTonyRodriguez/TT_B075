@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
-import logo from "../img/logoescom.png";
+import logo from "../img/estudiar.png";
 import AuthContext from "./AuthContext";
 import { FaUserCircle, FaRegStar } from "react-icons/fa"; // Importa el icono adicional
 
@@ -56,10 +56,10 @@ function Header() {
 
     return (
         <header className="bg-gradient-to-r from-blue-950 via-sky-700 to-sky-600 text-white py-4 shadow-md">
-            <div className="container mx-auto flex items-center justify-between px-4 relative">
+            <div className="container mx-auto flex items-center justify-between px-4 relative md:w-full">
                 
                 {/* Vista móvil: Exclusivamente para pantallas pequeñas */}
-                <div className="md:hidden flex items-center w-full">
+                <div className="md:hidden flex items-center w-full px-4">
                     {/* Botón hamburguesa a la izquierda para móviles */}
                     <button
                         onClick={toggleMobileMenu}
@@ -71,7 +71,7 @@ function Header() {
 
                     {/* Logo centrado en móviles */}
                     <div className="absolute left-1/2 transform -translate-x-1/2">
-                        <img className="w-40 h-auto" src={logo} alt="Logo ESCOM" />
+                        <img className="w-16 h-auto md:w-16" src={logo} alt="Logo ESCOM" />
                     </div>
 
                     {/* Estrella de U.P. acumuladas a la derecha */}
@@ -105,20 +105,15 @@ function Header() {
                         </div>
                     )}
 
-                    {/* Este boton no sirve JAJAJAJAJAJAJAJA */}
                     {isAuthenticated && isMenuOpen && (
-                        <motion.div 
+                        <motion.div
                             whileHover={{ scale: 1.05, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)" }}
                             transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className="absolute top-16 right-4 w-48 bg-gradient-to-r from-blue-600 to-sky-500 rounded-lg shadow-md z-50"
+                            className="absolute top-16 right-4 w-64 bg-gradient-to-r from-blue-600 to-sky-500 rounded-lg shadow-md z-50"
                         >
-                            <button
-                                onClick={handleLogout}
-                                className="flex items-center space-x-2 w-full px-4 py-3 hover:bg-blue-800 transition"
-                            >
-                                <FaUserCircle className="text-white text-2xl" />
-                                <span className="text-white font-medium">Cerrar sesión</span>
-                            </button>
+                            <div className="flex flex-col items-start p-4">
+                                <span className="text-white font-medium text-base">Correo: {email}</span>
+                            </div>
                         </motion.div>
                     )}
                 </div>
@@ -127,7 +122,7 @@ function Header() {
                 <div className="hidden md:flex items-center justify-between w-full">
                     {/* Logo en la vista de escritorio */}
                     <div className="flex-shrink-0">
-                        <img className="w-40 h-auto" src={logo} alt="Logo ESCOM" />
+                        <img className="w-20 h-auto md:w-20" src={logo} alt="Logo ESCOM" />
                     </div>
 
                     {/* Menú principal para pantallas grandes */}
@@ -173,7 +168,7 @@ function Header() {
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="fixed inset-y-0 left-0 w-1/2 bg-blue-500 p-4 text-white z-50"  // Cambié el ancho a w-1/2
+                    className="fixed inset-y-0 left-0 w-1/2 bg-blue-500 p-4 text-white z-50"  
                 >
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-semibold">Menú</h2>
@@ -191,6 +186,19 @@ function Header() {
                     <Link to="/Nosotros" className="block px-4 py-2 text-white hover:bg-blue-700" onClick={toggleMobileMenu}>
                         Nosotros
                     </Link>
+
+                    {/* Botón para iniciar sesión */}
+                    {!isAuthenticated && (
+                        <div className="mt-6">
+                            <Link
+                                to="/login"
+                                className="block w-full text-center bg-blue-600 text-white py-2 rounded-lg shadow-md hover:bg-blue-800 transition"
+                                onClick={toggleMobileMenu}
+                            >
+                                Iniciar sesión
+                            </Link>
+                        </div>
+                    )}
 
                     {/* Botón de cerrar sesión en menú móvil */}
                     {isAuthenticated && (
