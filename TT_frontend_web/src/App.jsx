@@ -25,6 +25,7 @@ import Footer from "./components/Footer";
 import fondo from './img/BackImage.png';
 import ProjectionFirstTime from './pages/Projection_FirstTime';
 import CategoryLimits from './pages/CategoryLimits'
+import UP_Check from "./pages/UP_Check";
 import { Toaster } from "react-hot-toast";
 
 import ExternalRedirect from './components/ExternalRedirect';
@@ -72,6 +73,7 @@ function App() {
         <Route path="/InfoProjection" element={<ProtectedRoute component={InfoProjection} />} />
         <Route path="/Projection-first" element={<ProtectedRoute component={ProjectionFirstTime} />} />
         <Route path="/CategoryLimits" element={<ProtectedRoute component= {CategoryLimits}/>} />
+        <Route path="/unidades" element={<ProtectedRoute component={UP_Check} />} />
       </Routes>
       <Footer />
       <Toaster />
