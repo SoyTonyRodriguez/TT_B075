@@ -80,9 +80,10 @@ function Header() {
                             whileHover={{ rotate: 360 }}
                             transition={{ duration: 0.5, ease: "easeInOut" }}
                             className="cursor-pointer ml-auto"
-                            onClick={() => setShowUnits(!showUnits)}
                         >
-                            <FaRegStar className="text-yellow-400 text-3xl" />
+                            <Link to="/unidades"> 
+                                <FaRegStar className="text-yellow-400 text-3xl" />
+                            </Link>
                         </motion.div>
                     )}
 
@@ -134,7 +135,10 @@ function Header() {
                     {/* Botón de usuario / Login para pantallas grandes */}
                     <div className="hidden md:flex items-center space-x-4">
                         {isAuthenticated && (
-                            <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-sky-600 p-2 rounded-lg shadow-md transform transition-all hover:scale-105 hover:shadow-lg">
+                            <Link 
+                                to="/unidades"
+                                className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-sky-600 p-2 rounded-lg shadow-md transform transition-all hover:scale-105 hover:shadow-lg"
+                            >
                                 <motion.div
                                     whileHover={{ rotate: 360 }}
                                     transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -144,7 +148,7 @@ function Header() {
                                 <span className="text-white font-semibold">
                                     U.P. acumuladas: {unitsProjection}
                                 </span>
-                            </div>
+                            </Link>
                         )}
                         {isAuthenticated ? (
                             <UserButton
