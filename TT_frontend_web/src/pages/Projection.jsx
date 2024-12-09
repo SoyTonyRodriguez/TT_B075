@@ -89,7 +89,7 @@ function ProyeccionSeguimiento() {
               className="bg-blue-500 text-white p-8 rounded-lg shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 w-56 h-56 flex flex-col items-center justify-center"
             >
               <IoCreateOutline className="mb-4 w-20 h-20" />
-              <p className="text-center text-lg font-semibold">Crear Proyección</p>
+              <p className="text-center text-lg font-semibold">Crear proyección</p>
             </Link>
           </motion.div>
 
@@ -107,7 +107,7 @@ function ProyeccionSeguimiento() {
               } text-white p-8 rounded-lg shadow-lg transition-transform transform w-56 h-56 flex flex-col items-center justify-center`}
             >
               <IoGlassesOutline className="mb-4 w-20 h-20" />
-              <p className="text-center text-lg font-semibold">Ver mi Proyección</p>
+              <p className="text-center text-lg font-semibold">Ver mi proyección</p>
             </Link>
           </motion.div>
 

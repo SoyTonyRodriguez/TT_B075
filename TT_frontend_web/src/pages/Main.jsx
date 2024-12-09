@@ -58,7 +58,7 @@ function MainContent() {
           variants={iconVariants}
         >
           <IoPeopleOutline className="mb-4 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
-          <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Nuestro Proyecto</p>
+          <p className="text-center text-sm md:text-md lg:text-lg font-semibold">Nuestro proyecto</p>
         </motion.div>
       </Link>
       
@@ -98,7 +98,7 @@ function MainContent() {
               Este proceso se rige por normativas internas y acuerdos de la Comisión Central Mixta Paritaria de Promoción Docente.
             </p>
             <p className="text-lg mt-4 text-black text-justify w-3/4 mx-auto">
-              Para ascender, los empleados deben acumular Unidades de Promoción, logradas a través de la enseñanza, investigación, actividades de extensión o logros académicos, conforme a los estándares y puntos definidos por el 
+              Para ascender, los empleados deben acumular unidades de promoción, logradas a través de la enseñanza, investigación, actividades de extensión o logros académicos, conforme a los estándares y puntos definidos por el 
               Reglamento Interno de las Condiciones Interiores de Trabajo del Personal Académico (RCITAIPN), artículos y anexos del Reglamento de Promoción Docente (RPDIPN) y los acuerdos suscritos por la Comisión Central Mixta Paritaria de Promoción Docente (CCMPPD).
             </p>
             <div  className="mt-8 mb-8">
@@ -109,7 +109,7 @@ function MainContent() {
               Este proceso se rige por normativas internas y acuerdos de la Comisión Central Mixta Paritaria de Promoción Docente.
             </p>
             <p className="text-lg mt-4 text-black text-justify w-3/4 mx-auto">
-            La Promoción Docente en el Instituto Politécnico Nacional (IPN) nace como parte de su compromiso por impulsar el desarrollo académico y reconocer el esfuerzo de su personal. Desde su 
+            La promoción docente en el Instituto Politécnico Nacional (IPN) nace como parte de su compromiso por impulsar el desarrollo académico y reconocer el esfuerzo de su personal. Desde su 
             creación, el IPN ha tenido como objetivo principal la excelencia educativa y la mejora continua de sus docentes. A finales del siglo XX, con la creciente demanda de calidad en la 
             educación superior, el IPN implementó un proceso formal para que los docentes pudieran ascender en su carrera mediante el reconocimiento de sus méritos en docencia, investigación y 
             formación académica. Este proceso fue diseñado para asegurar que los profesores más dedicados y capacitados tuvieran la oportunidad de crecer profesionalmente, fortaleciendo así la 
@@ -134,7 +134,7 @@ function MainContent() {
               <h3 className="text-xl font-bold mb-2">¡Da el siguiente paso en tu carrera!</h3>
               <hr className='border-t border-black mb-4'/>
               <p>
-              La Promoción Docente en el IPN es tu oportunidad para brillar. Cada clase que impartes, cada investigación que desarrollas, te acerca más a nuevas metas. ¡Es momento de reconocer tu esfuerzo y 
+              La promoción docente en el IPN es tu oportunidad para brillar. Cada clase que impartes, cada investigación que desarrollas, te acerca más a nuevas metas. ¡Es momento de reconocer tu esfuerzo y 
               avanzar en tu camino profesional! No solo creces tú, crecemos todos. Tu dedicación merece ser recompensada. ¡Participa y sigue construyendo el futuro!</p>
             </div>
             <a href="https://www.dsapp.ipn.mx/dsi/" target="_blank" rel="noopener noreferrer">
