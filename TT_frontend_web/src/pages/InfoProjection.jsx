@@ -498,7 +498,7 @@ function InfoProjection({ userName }) {
       </div>
 
       {/* Selector de categorías */}
-      <div className="w-full max-w-screen-2xl mx-auto my-6">
+      <div className="w-full max-w-screen-xl mx-auto my-6">
         <label className="text-black text-lg">Selecciona una función:</label>
         <select
           className="ml-4 p-2 rounded-lg"
