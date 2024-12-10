@@ -210,8 +210,11 @@ function UnidadesPromocion() {
         const units = enteredHours * 4;
         setCalculatedUnits(units);
       } else {
-        const units = Math.floor(enteredHours / hoursCalculated) * up_allowed;
-        //console.log(enteredHours, hoursCalculated, up_allowed, units);
+        const units = parseFloat(((enteredHours / hoursCalculated) * up_allowed).toFixed(2));
+        // console.log("Horas colocadas", enteredHours)
+        // console.log("Horas calculadas", hoursCalculated)
+        // console.log("U.P. permitidas", up_allowed)
+        // console.log("U.P. calculadas", units)
         setCalculatedUnits(units);
       }
     }
