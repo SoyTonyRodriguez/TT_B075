@@ -67,13 +67,17 @@ function Navigation() {
         setIcon(<IoSchoolOutline size={60} />); 
         break;
       case '/CategoryLimits':  
-        setTitle('Mínimos y máximos de Unidades de Promoción ');
+        setTitle('Mínimos y máximos de unidades de promoción ');
         setIcon(<IoSchoolOutline size={60} />); 
         break;
       case '/Convocatoria':  
         setTitle('¿En qué consiste la convocatoria?');
         setIcon(<IoSchoolOutline size={60} />); 
-        break;  
+        break;
+      case '/unidades':  
+        setTitle('Desglose de unidades de promoción');
+        setIcon(<IoStarOutline size={60} />); 
+        break;    
       default:
         setTitle('');
         setIcon(null); 
