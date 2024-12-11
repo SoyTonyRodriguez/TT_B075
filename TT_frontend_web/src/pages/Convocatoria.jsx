@@ -15,7 +15,7 @@ function Convocatoria() {
       <hr className="border-t-2 border-black my-4" />
 
       {/* Contenido de la Convocatoria */}
-      <div className='flex flex-wrap justify-center'>
+      <div className='flex flex-wrap justify-center px-4'>
         <div className='w-full md:w-2/3 mb-8'>
           {/* Título de la Convocatoria */}
 
