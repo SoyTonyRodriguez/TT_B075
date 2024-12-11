@@ -252,32 +252,33 @@ const CalendarWithDetails = () => {
       <Navigation />
 
       <hr className="border-t-2 border-black my-4" />
-
-      {/* Botones de Inicio y Final */}
-      <div className="flex justify-center space-x-6 mb-4">
-        <button
-          onClick={goToStart}
-          className="bg-blue-600 text-white py-2 px-6 rounded transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:bg-blue-700"
-        >
-          Inicio
-        </button>
-        <button
-          onClick={goToEnd}
-          className="bg-blue-600 text-white py-2 px-6 rounded transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:bg-blue-700"
-        >
-          Final
-        </button>
-      </div>
-
-      {/* Contenido del Calendario */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-4 shadow rounded-lg">
-          {renderHeader()}
-          {renderDays()}
-          {renderCells()}
+      <div className="max-w-5xl mx-auto space-y-8 px-4">
+        {/* Botones de Inicio y Final */}
+        <div className="flex justify-center space-x-6 mb-4">
+          <button
+            onClick={goToStart}
+            className="bg-blue-600 text-white py-2 px-6 rounded transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:bg-blue-700"
+          >
+            Inicio
+          </button>
+          <button
+            onClick={goToEnd}
+            className="bg-blue-600 text-white py-2 px-6 rounded transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:bg-blue-700"
+          >
+            Final
+          </button>
         </div>
-        <div className="bg-white p-4 shadow rounded-lg">
-          {renderSelectedDateDetails()}
+
+        {/* Contenido del Calendario */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white p-4 shadow rounded-lg">
+            {renderHeader()}
+            {renderDays()}
+            {renderCells()}
+          </div>
+          <div className="bg-white p-4 shadow rounded-lg">
+            {renderSelectedDateDetails()}
+          </div>
         </div>
       </div>
     </div>

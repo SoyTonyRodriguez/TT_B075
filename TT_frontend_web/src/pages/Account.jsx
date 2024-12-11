@@ -159,105 +159,107 @@ function Account() {
     <div className="min-h-screen bg-cover bg-center">
       <Navigation />
       <hr className="border-t-2 border-black my-4" />
-      <div className="bg-gray-700 text-white p-8 rounded-lg shadow-md max-w-4xl mx-auto flex items-center">
-        <div className="w-1/3 flex flex-col items-center">
-          <div className="bg-blue-400 rounded-full h-40 w-40 flex items-center justify-center text-white text-4xl mb-4">
-            <img src={imagePreview || profileImage} alt="Perfil" className="h-40 w-40 rounded-full object-cover" />
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            ref={fileInputRef}
-            className="hidden"
-          />
-          <button onClick={triggerFileInput} className="text-blue-300 hover:underline">
-            Cambiar imagen
-          </button>
-          <button onClick={handleImageSave} className="text-blue-300 hover:underline mt-2">
-            Guardar imagen
-          </button>
+      <div className="px-4">
+        <div className="bg-gray-700 text-white p-8 rounded-lg shadow-md max-w-4xl mx-auto flex items-center">
+          <div className="w-1/3 flex flex-col items-center">
+            <div className="bg-blue-400 rounded-full h-40 w-40 flex items-center justify-center text-white text-4xl mb-4">
+              <img src={imagePreview || profileImage} alt="Perfil" className="h-40 w-40 rounded-full object-cover" />
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              ref={fileInputRef}
+              className="hidden"
+            />
+            <button onClick={triggerFileInput} className="text-blue-300 hover:underline">
+              Cambiar imagen
+            </button>
+            <button onClick={handleImageSave} className="text-blue-300 hover:underline mt-2">
+              Guardar imagen
+            </button>
 
-        </div>
-        <div className="w-2/3 ml-8">
-          <form onSubmit={handleSave}>
-            <div className="mb-4">
-              <label className="block text-sm mb-2">Nombre completo</label>
-              <input
-                type="text"
-                className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                disabled={!isEditing}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm mb-2">Email</label>
-              <input
-                type="email"
-                className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={!isEditing}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm mb-2">Categoría</label>
-              <select
-                className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                disabled={!isEditing}
-              >
-                <option value="">Selecciona una categoría</option>
-                <option value="Técnico Docente de Asignatura A">Técnico Docente de Asignatura A</option>
-                <option value="Técnico Docente de Asignatura B">Técnico Docente de Asignatura B</option>
-                <option value="Técnico Docente Auxiliar A">Técnico Docente Auxiliar A</option>
-                <option value="Técnico Docente Auxiliar B">Técnico Docente Auxiliar B</option>
-                <option value="Técnico Docente Auxiliar C">Técnico Docente Auxiliar C</option>
-                <option value="Técnico Docente Asociado A">Técnico Docente Asociado A</option>
-                <option value="Técnico Docente Asociado B">Técnico Docente Asociado B</option>
-                <option value="Técnico Docente Asociado C">Técnico Docente Asociado C</option>
-                <option value="Técnico Docente Titular A">Técnico Docente Titular A</option>
-                <option value="Profesor de Asignatura A">Profesor de Asignatura A</option>
-                <option value="Profesor Asistente A">Profesor Asistente A</option>
-                <option value="Profesor Asistente B">Profesor Asistente B</option>
-                <option value="Profesor Asistente C">Profesor Asistente C</option>
-                <option value="Profesor Asociado A">Profesor Asociado A</option>
-                <option value="Profesor Asociado B">Profesor Asociado B</option>
-                <option value="Profesor Asociado C">Profesor Asociado C</option>
-                <option value="Profesor Titular A">Profesor Titular A</option>
-                <option value="Profesor Titular B">Profesor Titular B</option>
-              </select>
-            </div>
-            <div className="flex justify-end mt-8">
-              {!isEditing ? (
-                <button
-                  type="button"
-                  onClick={handleEdit}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2"
+          </div>
+          <div className="w-2/3 ml-8">
+            <form onSubmit={handleSave}>
+              <div className="mb-4">
+                <label className="block text-sm mb-2">Nombre completo</label>
+                <input
+                  type="text"
+                  className="w-full p-2 rounded bg-gray-800 border border-gray-600"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm mb-2">Email</label>
+                <input
+                  type="email"
+                  className="w-full p-2 rounded bg-gray-800 border border-gray-600"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm mb-2">Categoría</label>
+                <select
+                  className="w-full p-2 rounded bg-gray-800 border border-gray-600"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  disabled={!isEditing}
                 >
-                  Editar información
-                </button>
-              ) : (
-                <>
+                  <option value="">Selecciona una categoría</option>
+                  <option value="Técnico Docente de Asignatura A">Técnico Docente de Asignatura A</option>
+                  <option value="Técnico Docente de Asignatura B">Técnico Docente de Asignatura B</option>
+                  <option value="Técnico Docente Auxiliar A">Técnico Docente Auxiliar A</option>
+                  <option value="Técnico Docente Auxiliar B">Técnico Docente Auxiliar B</option>
+                  <option value="Técnico Docente Auxiliar C">Técnico Docente Auxiliar C</option>
+                  <option value="Técnico Docente Asociado A">Técnico Docente Asociado A</option>
+                  <option value="Técnico Docente Asociado B">Técnico Docente Asociado B</option>
+                  <option value="Técnico Docente Asociado C">Técnico Docente Asociado C</option>
+                  <option value="Técnico Docente Titular A">Técnico Docente Titular A</option>
+                  <option value="Profesor de Asignatura A">Profesor de Asignatura A</option>
+                  <option value="Profesor Asistente A">Profesor Asistente A</option>
+                  <option value="Profesor Asistente B">Profesor Asistente B</option>
+                  <option value="Profesor Asistente C">Profesor Asistente C</option>
+                  <option value="Profesor Asociado A">Profesor Asociado A</option>
+                  <option value="Profesor Asociado B">Profesor Asociado B</option>
+                  <option value="Profesor Asociado C">Profesor Asociado C</option>
+                  <option value="Profesor Titular A">Profesor Titular A</option>
+                  <option value="Profesor Titular B">Profesor Titular B</option>
+                </select>
+              </div>
+              <div className="flex justify-end mt-8">
+                {!isEditing ? (
                   <button
                     type="button"
-                    onClick={() => setIsEditing(false)}
+                    onClick={handleEdit}
                     className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2"
                   >
-                    Cancelar
+                    Editar información
                   </button>
-                  <button
-                    type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                  >
-                    Guardar
-                  </button>
-                </>
-              )}
-            </div>
-          </form>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                      Guardar
+                    </button>
+                  </>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
