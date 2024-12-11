@@ -69,7 +69,7 @@ function NewProjection() {
           <hr className="border-t-2 border-black my-4" />
     
           {/* Contenido Principal */}
-          <div className="container mx-auto mt-8 mb-8">
+          <div className="container mx-auto mt-8 mb-8 px-4">
             <div className="grid grid-cols-1 gap-6">
               {/* Por unidades de promoción */}
               <div className="flex items-center justify-between bg-black bg-opacity-40 p-6 rounded-lg shadow-lg">

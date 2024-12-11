@@ -479,7 +479,7 @@ function InfoProjection({ userName }) {
     <main className="min-h-screen relative overflow-hidden">
       <Navigation />
       <hr className="border-t-2 border-black my-4" />
-      <div className="w-full max-w-screen-xl mx-auto">
+      <div className="w-full max-w-screen-xl mx-auto px-4">
         <div className="bg-gray-800 bg-opacity-40 p-6 rounded-lg shadow-lg">
           <p className="text-lg mt-4 text-white text-justify">
             La documentación para las convocatorias de promoción dentro del Instituto Politécnico Nacional (IPN) debe ser muy detallada, ya que cada actividad 

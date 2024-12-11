@@ -838,7 +838,7 @@ function UnidadesPromocion() {
       <hr className="border-t-2 border-black my-4" />
 
       {/* Contenido Principal */}
-      <div className="container mx-auto mt-8 mb-8">
+      <div className="container mx-auto mt-8 mb-8 px-4">
         <div className="flex flex-wrap justify-between">
           {/* Formulario de Actividad */}
           <form onSubmit={handleSubmit} className="bg-gray-800 bg-opacity-40 p-6 rounded-lg shadow-lg w-full md:w-1/2 lg:w-1/3">
