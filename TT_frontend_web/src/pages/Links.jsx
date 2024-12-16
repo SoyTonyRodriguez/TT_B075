@@ -76,10 +76,10 @@ function Links() {
               >
                 <IoLinkOutline className="mb-4 w-20 h-20" />
                 <p className="text-center text-lg font-semibold">
-                  {key === 'convocatoria' && 'Convocatoria del Año en Curso'}
+                  {key === 'convocatoria' && 'Convocatoria del año en curso'}
                   {key === 'reglamento' && 'Reglamento de Promoción Docente'}
-                  {key === 'cronograma' && 'Cronograma del Proceso del Año en Curso'}
-                  {key === 'valoracionactividades' && 'Valoración de Actividades (100 U.P.)'}
+                  {key === 'cronograma' && 'Cronograma del Proceso del año en curso'}
+                  {key === 'valoracionactividades' && 'Valoración de actividades (100 U.P.)'}
                   {key === 'gaceta' && 'Gaceta Politécnica No. 1511'}
                 </p>
               </button>

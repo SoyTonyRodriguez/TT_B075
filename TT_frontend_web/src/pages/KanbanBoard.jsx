@@ -513,7 +513,7 @@ function KanbanBoard() {
             <div className="container mx-auto p-8">
                 <DndProvider backend={HTML5Backend}>
                 {/* Contenedor flex que envuelve las columnas y el panel lateral */}
-                <div className="flex justify-between gap-x-6 p-6 bg-gray-800 rounded-lg shadow-md" style={{ height: '700px', overflow: 'hidden' }}>
+                <div className="flex justify-between gap-x-6 p-6 bg-gray-800 rounded-lg shadow-md" style={{ height: '700px', overflowX: 'auto', overflowY: 'hidden', height: '100%',  }}>
                     
                     {/* Columna de Tareas */}
                     <div className="flex-1 flex gap-x-6">
@@ -535,7 +535,7 @@ function KanbanBoard() {
                     </div>
                     
                     {/* Panel lateral derecho con proyecciones y su progreso */}
-                    <div className="w-1/3 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px', overflowY: 'auto' }}>
+                    <div className="w-1/3 p-6 bg-gray-100 shadow-lg rounded-lg" style={{ height: '650px'}}>
                         <h2 className="text-2xl font-bold mb-2">Progresos de actividades</h2>
                         <div className="space-y-4">
                             {projections.map((projection) => {
