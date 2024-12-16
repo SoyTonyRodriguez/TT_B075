@@ -245,7 +245,7 @@ import tw from 'twrnc';
       const units = enteredHours * 4;
       setCalculatedUnits(units);
     } else {
-      const units = Math.floor(enteredHours / hoursCalculated) * up_allowed;
+      const units = parseFloat(((enteredHours / hoursCalculated) * up_allowed).toFixed(2));
       setCalculatedUnits(units);
     }
   };
