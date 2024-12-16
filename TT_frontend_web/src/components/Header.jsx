@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import logo from "../img/estudiar.png";
 import AuthContext from "./AuthContext";
 import { FaUserCircle, FaRegStar } from "react-icons/fa"; // Importa el icono adicional
+import { jwtDecode } from "jwt-decode";
+import { getAccount } from '../api/accounts.api'; // Llamada a la API
+import LoadingAnimation from "./LoadingAnimation"; // Importa el componente de animación de carga
 
 function Header() {
     const { isAuthenticated, email, logout } = useContext(AuthContext);
@@ -12,9 +15,57 @@ function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [unitsProjection, setUnitsProjection] = useState(0); // Agrega el estado para las unidades
     const [showUnits, setShowUnits] = useState(false); // Para mostrar las unidades acumuladas al hacer clic en la estrella
+    const [userId, setUserId] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                setUserId(decodedToken.user_id);
+            } catch (error) {
+                console.error("Invalid token:", error);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        const fetchUnitsProjection = async () => {
+            if (!userId) return; // No llama a la API si userId no está disponible
+    
+            try {
+                setLoading(true);
+                const response = await getAccount(userId); // Llama a la API con el userId
+                console.log("Respuesta de getAccount:", response.data);
+    
+                if (response.data) {
+                    const projectionValue = response.data.units_projection === 0
+                        ? "0"
+                        : response.data.units_projection;
+    
+                    setUnitsProjection(projectionValue);
+    
+                    // Actualiza localStorage
+                    const accountDetails = JSON.parse(localStorage.getItem("accountDetails")) || {};
+                    accountDetails.units_projection = projectionValue;
+                    localStorage.setItem("accountDetails", JSON.stringify(accountDetails));
+                }
+            } catch (error) {
+                console.error("Error al obtener las unidades de promoción:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        if (userId) {
+            fetchUnitsProjection(); // Llama a la función solo si userId está definido
+        }
+    }, [userId]); // Ejecuta el efecto solo cuando userId cambia
+    
 
     // Obtener el valor de units_projection de localStorage al cargar el componente
     useEffect(() => {
@@ -36,7 +87,7 @@ function Header() {
         // Comprueba periódicamente si hay cambios en el localStorage
         const interval = setInterval(() => {
             updateUnitsProjection();
-        }, 1000); // Verifica cada segundo
+        }, 600); // Verifica cada segundo
     
         // Limpia el intervalo al desmontar el componente
         return () => clearInterval(interval);
@@ -48,6 +99,10 @@ function Header() {
     }, [location]);
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+    if (loading) {
+        return <LoadingAnimation />;
+    }
 
     const handleLogout = () => {
         logout();
