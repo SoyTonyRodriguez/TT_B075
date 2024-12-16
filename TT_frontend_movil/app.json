@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "TT_frontend_movil",
+    "name": "TT B075",
     "slug": "TT_frontend_movil",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/estudiar.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
