@@ -1,0 +1,216 @@
+[{
+  "_id": {
+    "$oid": "6734f3e15bffdf825ab113c9"
+  },
+  "id": "task_057c6c8b-7311-4a20-a9bb-7e4db4762e84",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "title": "Trabajo terminal becas EDI",
+  "description": "Director del trabajo terminal becas EDI",
+  "status": "done",
+  "priority": "Baja",
+  "created_at": {
+    "$date": "2024-11-13T18:45:53.351Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:22:17.995Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_d5456791-da0e-4ae4-b25a-0da7ca1bcc5f"
+},
+{
+  "_id": {
+    "$oid": "6734f4225bffdf825ab113ca"
+  },
+  "id": "task_bc4d0161-5238-40e1-9ec8-c920dca65bae",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "title": "Reunión TT",
+  "description": "Reunión con los alumnos en el 1202 para fechas",
+  "status": "done",
+  "priority": "Media",
+  "created_at": {
+    "$date": "2024-11-13T18:46:57.518Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:22:18.569Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_d5456791-da0e-4ae4-b25a-0da7ca1bcc5f"
+},
+{
+  "_id": {
+    "$oid": "6734f3425bffdf825ab113c7"
+  },
+  "id": "task_0dcdcf23-c75b-4be3-ad41-d86e841b6859",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "title": "Rediseño de unidad de aprendizaje",
+  "description": "Resideñar la unidad de aprendizaje de \"Administración de servicios en red\".",
+  "status": "in-progress",
+  "priority": "Alta",
+  "created_at": {
+    "$date": "2024-11-13T18:43:14.040Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:34:50.959Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_89468820-9cf7-4b61-8525-7e80d77c0467"
+},
+{
+  "_id": {
+    "$oid": "6734f3785bffdf825ab113c8"
+  },
+  "id": "task_ecfe1200-9f7d-48bb-951a-08d10fcbb434",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "title": "Trabajo terminal B075",
+  "description": "Director del trabajo terminal B075 promoción docente",
+  "status": "done",
+  "priority": "Media",
+  "created_at": {
+    "$date": "2024-11-13T18:44:07.553Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:22:18.987Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_6567e59b-8c42-4e16-871c-e346ce66423b"
+},
+{
+  "_id": {
+    "$oid": "6734f4765bffdf825ab113cb"
+  },
+  "id": "task_2413368d-7933-4cd2-a1f7-84dea98495f1",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "title": "ExpoEscom",
+  "description": "Definir el tema y los puntos a presentar el día de expoescom / Redes 3",
+  "status": "todo",
+  "priority": "Baja",
+  "created_at": {
+    "$date": "2024-11-13T18:48:21.475Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-09T23:39:13.803Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_de90b61b-6724-4cff-ae80-dc14a8a5b208"
+},
+{
+  "_id": {
+    "$oid": "6734f4fd5bffdf825ab113cd"
+  },
+  "id": "task_1683c1eb-40b6-4df9-af05-aaf6935f1af7",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "title": "Doctorado",
+  "description": "Iniciar trámite para la constancia de créditos sobre el doctorado",
+  "status": "todo",
+  "priority": "Alta",
+  "created_at": {
+    "$date": "2024-11-13T18:50:37.314Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T18:50:37.314Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_1ec77705-dd20-4eac-bd93-c8ba21c4903a"
+},
+{
+  "_id": {
+    "$oid": "6734eae65bffdf825ab113c1"
+  },
+  "id": "task_6d2aab93-59b9-4db5-aa02-e8676597e1fc",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "title": "Solicitud de registro",
+  "description": "Solicitar el registro unico de actividades a dirección de capital humano",
+  "status": "done",
+  "priority": "Alta",
+  "created_at": {
+    "$date": "2024-11-13T18:07:34.342Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:22:53.443Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_d716121e-898b-4842-bc66-ad7f2771980f"
+},
+{
+  "_id": {
+    "$oid": "6757695aec8b8ed54e1776d1"
+  },
+  "id": "task_bc1c064c-03f3-4439-805f-79f40489a767",
+  "account_id": "acc_1fa77a33-bf84-464e-a325-a2ffa73e3195",
+  "title": "aaaa",
+  "description": "aaa",
+  "status": "done",
+  "priority": "Media",
+  "created_at": {
+    "$date": "2024-12-09T22:04:10.313Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-09T22:06:24.884Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_26c3f414-3b1b-4c5d-8b70-5e7fbd08d107"
+},
+{
+  "_id": {
+    "$oid": "6759b171ec8b8ed54e17771b"
+  },
+  "id": "task_e8aa72a5-e544-46dd-a2ae-543b7f2c87e7",
+  "account_id": "acc_03a775fe-7f91-426b-a295-48d5b917b19f",
+  "title": "Unidad de aprendizaje en linea",
+  "description": "",
+  "status": "todo",
+  "priority": "Alta",
+  "created_at": {
+    "$date": "2024-12-11T15:36:17.458Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-16T04:42:19.718Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  },
+  "projection_id": "product_ba177be6-3c58-4627-bc0c-d7acdf192041"
+}]

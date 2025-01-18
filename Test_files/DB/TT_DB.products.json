@@ -1,0 +1,451 @@
+[{
+  "_id": {
+    "$oid": "672ae4575d28bc913d9d1d50"
+  },
+  "id": "product_491272c1-62a0-4c15-b2ee-2c3401f5f352",
+  "account_id": "acc_9ea4c6ea-deea-4fc3-9028-67f10d81ed6a",
+  "projection_id": "projection_25678690-94d5-4568-836d-ca94d4c64f02",
+  "function": "Pasantía de Licenciatura",
+  "activity": "Pasantía de Licenciatura",
+  "role": "",
+  "scope": "",
+  "tasks": [],
+  "documents_required": "Copia cotejada del original de la carta de pasante o en su caso, del original de la boleta de calificaciones con el 100% de los créditos. \nConstancia de realización de servicio social.",
+  "documents_uploaded": [],
+  "documents_number": 2,
+  "created_at": {
+    "$date": "2024-11-06T03:36:55.645Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-06T03:36:55.645Z"
+  },
+  "type": "Grado Académico",
+  "units_str": null,
+  "units": 100,
+  "priority": null,
+  "color": "#FBDA96",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "6734e9d85bffdf825ab113bf"
+  },
+  "id": "product_d716121e-898b-4842-bc66-ad7f2771980f",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "projection_id": "projection_e1a331a7-d907-4aaf-a9de-42175787ed9a",
+  "function": "Docencia",
+  "activity": "Carga académica",
+  "role": "",
+  "scope": "",
+  "tasks": [
+    "task_6d2aab93-59b9-4db5-aa02-e8676597e1fc"
+  ],
+  "documents_required": "Registro Único de Actividades Académicas (RUAA) o constancia de carga académica suscrita por las autoridades competentes.",
+  "documents_uploaded": [
+    "doc_bd686a63-f143-44d8-996a-23cd81a3ea27"
+  ],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-11-13T18:03:04.107Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:22:58.953Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 35,
+  "priority": null,
+  "color": "#AAE9E7",
+  "progress": 100
+},
+{
+  "_id": {
+    "$oid": "6734f09b5bffdf825ab113c4"
+  },
+  "id": "product_d5456791-da0e-4ae4-b25a-0da7ca1bcc5f",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "projection_id": "projection_e1a331a7-d907-4aaf-a9de-42175787ed9a",
+  "function": "Actividades complementarias de apoyo a la docencia y a la investigación",
+  "activity": "Dirección o asesoría de trabajos escritos para titulación",
+  "role": "",
+  "scope": "",
+  "tasks": [
+    "task_057c6c8b-7311-4a20-a9bb-7e4db4762e84",
+    "task_bc4d0161-5238-40e1-9ec8-c920dca65bae"
+  ],
+  "documents_required": "Oficio, constancia o formato de designación suscrito por el Titular de la unidad académica o autoridad competente.",
+  "documents_uploaded": [
+    "doc_d5b87959-04db-4b7e-bad4-ade27aa87125"
+  ],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-11-13T18:31:55.337Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:22:27.687Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 5,
+  "priority": null,
+  "color": "#D5C3D7",
+  "progress": 100
+},
+{
+  "_id": {
+    "$oid": "6734f2d65bffdf825ab113c6"
+  },
+  "id": "product_89468820-9cf7-4b61-8525-7e80d77c0467",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "projection_id": "projection_e1a331a7-d907-4aaf-a9de-42175787ed9a",
+  "function": "Otras actividades en docencia",
+  "activity": "Evaluación, diseño y/o rediseño de programas académicos",
+  "role": "Coordinador",
+  "scope": "",
+  "tasks": [
+    "task_0dcdcf23-c75b-4be3-ad41-d86e841b6859"
+  ],
+  "documents_required": "Constancia emitida por la DEMS, DES o SIP.",
+  "documents_uploaded": [],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-11-13T18:41:26.276Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:34:55.517Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 5,
+  "priority": null,
+  "color": "#8E96D7",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "6734f0745bffdf825ab113c3"
+  },
+  "id": "product_6567e59b-8c42-4e16-871c-e346ce66423b",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "projection_id": "projection_e1a331a7-d907-4aaf-a9de-42175787ed9a",
+  "function": "Actividades complementarias de apoyo a la docencia y a la investigación",
+  "activity": "Dirección o asesoría de trabajos escritos para titulación",
+  "role": "",
+  "scope": "",
+  "tasks": [
+    "task_ecfe1200-9f7d-48bb-951a-08d10fcbb434"
+  ],
+  "documents_required": "Oficio, constancia o formato de designación suscrito por el Titular de la unidad académica o autoridad competente.",
+  "documents_uploaded": [
+    "doc_20ab8fd6-2116-4ee8-a246-c71e9ad8b829"
+  ],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-11-13T18:31:15.643Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:22:30.070Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 5,
+  "priority": null,
+  "color": "#A5DCA3",
+  "progress": 100
+},
+{
+  "_id": {
+    "$oid": "6734f4ca5bffdf825ab113cc"
+  },
+  "id": "product_1ec77705-dd20-4eac-bd93-c8ba21c4903a",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "projection_id": "projection_e1a331a7-d907-4aaf-a9de-42175787ed9a",
+  "function": "Superación académica",
+  "activity": "Estudios de especialidad, maestría y doctorado",
+  "role": "",
+  "scope": "",
+  "tasks": [
+    "task_1683c1eb-40b6-4df9-af05-aaf6935f1af7"
+  ],
+  "documents_required": "Constancia de validación emitida por la SIP.",
+  "documents_uploaded": [],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-11-13T18:49:46.270Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T18:50:44.022Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 108.5,
+  "priority": null,
+  "color": "#FEEFF1",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "6734f16b5bffdf825ab113c5"
+  },
+  "id": "product_de90b61b-6724-4cff-ae80-dc14a8a5b208",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "projection_id": "projection_e1a331a7-d907-4aaf-a9de-42175787ed9a",
+  "function": "Actividades complementarias de apoyo a la docencia y a la investigación",
+  "activity": "Ponente en conferencias, videoconferencias y expositor de carteles",
+  "role": "Expositor",
+  "scope": "Nacional",
+  "tasks": [
+    "task_2413368d-7933-4cd2-a1f7-84dea98495f1"
+  ],
+  "documents_required": "Constancia de participación como conferencista o expositor de carteles.",
+  "documents_uploaded": [],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-11-13T18:35:23.178Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-09T23:39:15.356Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 3,
+  "priority": null,
+  "color": "#B5B7D2",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "67488734b225d0893f920516"
+  },
+  "id": "product_1952ecf5-6819-4b43-91e3-894f37ac7fcc",
+  "account_id": "acc_b98cd5d1-22d6-4b88-a21f-faa662c70c96",
+  "projection_id": "projection_d2745c85-c09c-4016-b1b1-f8f6d24a7098",
+  "function": "Investigación",
+  "activity": "Estancias de Investigación",
+  "role": "",
+  "scope": "",
+  "tasks": [],
+  "documents_required": "Oficio de aceptación para realizar la estancia\n Dictamen del COTEBAL o de la Coordinación de Proyectos Especiales de la Secretaría Académica\n Carta de terminación expedida por la institución donde se realizó la estancia.",
+  "documents_uploaded": [],
+  "documents_number": 3,
+  "created_at": {
+    "$date": "2024-11-28T15:07:32.637Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-28T15:07:32.637Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 15,
+  "priority": null,
+  "color": "#C2C0A3",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "675768c1ec8b8ed54e1776cf"
+  },
+  "id": "product_26c3f414-3b1b-4c5d-8b70-5e7fbd08d107",
+  "account_id": "acc_1fa77a33-bf84-464e-a325-a2ffa73e3195",
+  "projection_id": "projection_ce69f7ce-ea60-43f8-95ca-c18d2fbe8531",
+  "function": "Docencia",
+  "activity": "Carga académica",
+  "role": "1.00",
+  "scope": "",
+  "tasks": [
+    "task_bc1c064c-03f3-4439-805f-79f40489a767"
+  ],
+  "documents_required": "Registro Único de Actividades Académicas (RUAA) o constancia de carga académica suscrita por las autoridades competentes.",
+  "documents_uploaded": [
+    "doc_b27c4aa2-3e93-43e5-8061-429848b3467f"
+  ],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-12-09T22:01:37.606Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-09T22:06:26.280Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 28,
+  "priority": null,
+  "color": "#92CDC4",
+  "progress": 100
+},
+{
+  "_id": {
+    "$oid": "6759b14eec8b8ed54e17771a"
+  },
+  "id": "product_ba177be6-3c58-4627-bc0c-d7acdf192041",
+  "account_id": "acc_03a775fe-7f91-426b-a295-48d5b917b19f",
+  "projection_id": "projection_496cb1b6-94ac-47bd-a58b-18af1f293058",
+  "function": "Otras actividades en docencia",
+  "activity": "Producción de Unidades de Aprendizaje en línea",
+  "role": "Programador web",
+  "scope": "",
+  "tasks": [
+    "task_e8aa72a5-e544-46dd-a2ae-543b7f2c87e7"
+  ],
+  "documents_required": "Constancia emitida por la UPEV con el visto bueno de la DEMS, DES o SIP.",
+  "documents_uploaded": [
+    "doc_c24aa2ef-81a0-4939-ad07-728fd01168ae"
+  ],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-12-11T15:35:42.447Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-16T04:42:21.023Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 5,
+  "priority": null,
+  "color": "#D09DAA",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "6759b5e8ec8b8ed54e177721"
+  },
+  "id": "product_fc1c0f06-2b95-43db-8bdd-8db00022edf0",
+  "account_id": "acc_d7435ac4-285d-4ef4-9413-38e6b9cc6d2e",
+  "projection_id": "projection_2b99d1a1-65da-41bc-ab00-e4a14f651843",
+  "function": "Otras actividades en docencia",
+  "activity": "Autoría de libros",
+  "role": "80.00",
+  "scope": "",
+  "tasks": [],
+  "documents_required": "Constancia de validación emitida por la DEMS, DES o SIP.",
+  "documents_uploaded": [],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-12-11T15:55:20.330Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-11T15:55:20.330Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 80,
+  "priority": null,
+  "color": "#88CEFD",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "675e32dcec8b8ed54e17775b"
+  },
+  "id": "product_a4f96498-7c3a-40ad-a156-094a2096a27f",
+  "account_id": "acc_908694ad-16cd-4519-823c-7f7b76d9255d",
+  "projection_id": "projection_e607c518-982f-4eef-87a2-f3256233e45c",
+  "function": "Otras actividades en docencia",
+  "activity": "Evaluación, diseño y/o rediseño de programas académicos",
+  "role": "Coordinador",
+  "scope": "",
+  "tasks": [],
+  "documents_required": "Constancia emitida por la DEMS, DES o SIP.",
+  "documents_uploaded": [
+    "doc_7ded40a3-3281-4fcb-92f2-71e8a41d0d1a"
+  ],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-12-15T01:37:32.804Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-15T22:52:57.109Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 5,
+  "priority": null,
+  "color": "#99A086",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "675e330bec8b8ed54e17775d"
+  },
+  "id": "product_4aa15bc1-c1f9-4dcf-bdea-3cb7cb217061",
+  "account_id": "acc_908694ad-16cd-4519-823c-7f7b76d9255d",
+  "projection_id": "projection_e607c518-982f-4eef-87a2-f3256233e45c",
+  "function": "Superación académica",
+  "activity": "Diplomados",
+  "role": "",
+  "scope": "",
+  "tasks": [],
+  "documents_required": "Constancia emitida por la DEMS, DES, SIP o CGFIE.",
+  "documents_uploaded": [],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-12-15T01:38:19.457Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-15T01:38:19.457Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 40,
+  "priority": null,
+  "color": "#C5ADC6",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "67609021ec8b8ed54e1777f3"
+  },
+  "id": "product_2637af6b-36cd-48fc-a43f-ba40f7acd49c",
+  "account_id": "acc_9534318f-1626-4263-91dd-704064d1bdb2",
+  "projection_id": "projection_f48a7fb2-c9d9-4564-a8a6-5dc3725c9ae2",
+  "function": "Otras actividades en docencia",
+  "activity": "Diseño y planeación didáctica en el aula",
+  "role": "",
+  "scope": "",
+  "tasks": [],
+  "documents_required": "Constancia emitida por la DEMS, DES o SIP.",
+  "documents_uploaded": [],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-12-16T20:40:01.146Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-16T20:40:01.146Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 10,
+  "priority": null,
+  "color": "#B1C0F2",
+  "progress": 0
+},
+{
+  "_id": {
+    "$oid": "6760906eec8b8ed54e1777f4"
+  },
+  "id": "product_ad5f3cb1-df4e-418e-8fe8-a8f5ae7e5c90",
+  "account_id": "acc_9534318f-1626-4263-91dd-704064d1bdb2",
+  "projection_id": "projection_f48a7fb2-c9d9-4564-a8a6-5dc3725c9ae2",
+  "function": "Superación académica",
+  "activity": "Diplomados",
+  "role": "",
+  "scope": "",
+  "tasks": [],
+  "documents_required": "Constancia emitida por la DEMS, DES, SIP o CGFIE.",
+  "documents_uploaded": [
+    "doc_534cecff-1249-486c-8486-e6f09857df4b"
+  ],
+  "documents_number": 1,
+  "created_at": {
+    "$date": "2024-12-16T20:41:17.921Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-16T20:43:09.260Z"
+  },
+  "type": "Unidades de Promoción",
+  "units_str": null,
+  "units": 23.11,
+  "priority": null,
+  "color": "#F2E3FA",
+  "progress": 0
+}]

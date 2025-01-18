@@ -1,0 +1,296 @@
+[{
+  "_id": {
+    "$oid": "672c4302ca616725bfdac63f"
+  },
+  "password": "pbkdf2_sha256$390000$A8FQGZ1e9NbYc4YCQ7zbAZ$MSipyI/VEXFXMv0gVN3mceCKHzKFxlDH3J8Ze/XHkQU=",
+  "last_login": null,
+  "id": "acc_d7435ac4-285d-4ef4-9413-38e6b9cc6d2e",
+  "email": "gustavomontiel3122@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-11-07T04:33:06.617Z"
+  },
+  "name": "Gustavo Garcia Montiel",
+  "category": "Técnico Docente Auxiliar B",
+  "projection_id": "projection_2b99d1a1-65da-41bc-ab00-e4a14f651843",
+  "units_projection": 80,
+  "is_superuser": false
+},
+{
+  "_id": {
+    "$oid": "6732309d64d45052a6ac9dc9"
+  },
+  "password": "pbkdf2_sha256$390000$QnVTcJoUYP5PM0EzbOWVcC$KCKjMHUs2HOCkNCFfPyGBnpljb+uADN5D0ZVZx/Rp2w=",
+  "last_login": null,
+  "id": "acc_9534318f-1626-4263-91dd-704064d1bdb2",
+  "email": "casaos022@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-11-11T16:28:13.582Z"
+  },
+  "name": "PruebaModificada",
+  "category": "Profesor Titular A",
+  "projection_id": "projection_f48a7fb2-c9d9-4564-a8a6-5dc3725c9ae2",
+  "units_projection": 73,
+  "is_superuser": false
+},
+{
+  "_id": {
+    "$oid": "6734e8865bffdf825ab113ba"
+  },
+  "password": "pbkdf2_sha256$390000$jYGB2IKGig3fJckZ92bRIV$vw11roOEvRxiqcah9cw1Nm6ONhXaS51R4sXLmQ4XifU=",
+  "last_login": null,
+  "id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "email": "prueba@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-11-13T17:57:23.154Z"
+  },
+  "name": "Prueba Soto",
+  "category": "Profesor Titular A",
+  "projection_id": "projection_e1a331a7-d907-4aaf-a9de-42175787ed9a",
+  "units_projection": 161,
+  "is_superuser": false
+},
+{
+  "_id": {
+    "$oid": "673d12d92855a7e3997962e0"
+  },
+  "password": "pbkdf2_sha256$390000$nwzkc7L7JGCf2qozMvvbZD$iaOIPde2DWvTZQM2oP9Yfvo06oy+oXXWpPp6hNw72Bs=",
+  "last_login": null,
+  "id": "acc_03a775fe-7f91-426b-a295-48d5b917b19f",
+  "email": "1234@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-11-19T22:36:08.674Z"
+  },
+  "name": "test",
+  "category": "Técnico Docente Auxiliar C",
+  "projection_id": "projection_496cb1b6-94ac-47bd-a58b-18af1f293058",
+  "units_projection": 45,
+  "is_superuser": false
+},
+{
+  "_id": {
+    "$oid": "67488626b225d0893f920512"
+  },
+  "password": "pbkdf2_sha256$390000$2f4Njeuyl4pWFK4K6gnEFh$mVDDhQciZi7zPtYQ5GXG/sHFHBfCK/OHnEEQm6G6Ko4=",
+  "last_login": null,
+  "id": "acc_b98cd5d1-22d6-4b88-a21f-faa662c70c96",
+  "email": "movil@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-11-28T15:03:02.252Z"
+  },
+  "name": "Usuario_Movil",
+  "category": "Técnico Docente Titular A",
+  "is_superuser": false,
+  "projection_id": "projection_d2745c85-c09c-4016-b1b1-f8f6d24a7098",
+  "units_projection": 15
+},
+{
+  "_id": {
+    "$oid": "6717fd9b8d47cb79b5de3d80"
+  },
+  "password": "pbkdf2_sha256$390000$Yf4ai2cnyx8AYVUmhxzZ2B$ACTPnDhUmYS98LqTYOYm+NZb3xNiaGzGQ6gtBkxGS5A=",
+  "last_login": null,
+  "id": "acc_5511646b-f9b2-4e8f-86d5-bd18be8c5c90",
+  "email": "123@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-10-22T19:31:38.825Z"
+  },
+  "name": "Pruebas de datos",
+  "category": "Profesor Asistente B",
+  "projection_id": "projection_4cedb1dc-7ab7-41af-bc79-d6f1a99c0116",
+  "units_projection": 0,
+  "is_superuser": false
+},
+{
+  "_id": {
+    "$oid": "673b7cf43ce2f3e283f2471c"
+  },
+  "password": "pbkdf2_sha256$390000$ziLdgf4RudqB9o1CBs7faU$NpfeFVgZhlvaHeK/d1BXAL6xnI2MeeYj+zS751aVuFU=",
+  "last_login": null,
+  "id": "acc_2a7e3444-c0f3-41c8-9cb2-5f11cf20c31f",
+  "email": "gosilac830@merotx.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-11-18T17:44:20.066Z"
+  },
+  "name": "Prueba_Mail",
+  "category": "Profesor Asociado C",
+  "projection_id": "",
+  "units_projection": 0,
+  "is_superuser": false
+},
+{
+  "_id": {
+    "$oid": "6744d1ac6d69471141bf45a4"
+  },
+  "password": "pbkdf2_sha256$390000$ySVaf0H5yEw16KLk8Ht2RS$V552YoQzfjKy+RFXXxoGWaEo6Mt9uKvEKuyc4+hmXTA=",
+  "last_login": {
+    "$date": "2024-12-10T17:12:31.635Z"
+  },
+  "id": "acc_869e0f2a-d60f-4e84-a2c4-cefa8b122c5e",
+  "email": "rodriguez.flores.antonioo@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": true,
+  "date_joined": {
+    "$date": "2024-11-25T19:36:11.989Z"
+  },
+  "name": "",
+  "category": "",
+  "projection_id": "",
+  "units_projection": 0,
+  "is_superuser": false
+},
+{
+  "_id": {
+    "$oid": "674dfb21ec8b8ed54e177608"
+  },
+  "password": "pbkdf2_sha256$390000$CsQCc2bODbslvvFOzLrA29$Oc0KuWs0B+Z4TAMC5Ke+OfCtrXZloAnvc8uiCnIIV+k=",
+  "last_login": null,
+  "id": "acc_e7881025-9383-4960-841b-6543c1ed5b10",
+  "email": "lostibiosb075@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-12-02T18:23:28.407Z"
+  },
+  "name": "Manuel Alejandro Soto Ramos",
+  "category": "Profesor Asociado C",
+  "is_superuser": false,
+  "projection_id": "projection_f7341b13-e664-4418-a3c1-cd6190f143cf",
+  "units_projection": 40
+},
+{
+  "_id": {
+    "$oid": "675766bbec8b8ed54e1776cb"
+  },
+  "password": "pbkdf2_sha256$390000$u6QJWNvroTbUOeAMqhmyZ9$C3j44bjoxIphkynblFFb8H9bUbdLFGGi//TiXUOc30E=",
+  "last_login": null,
+  "id": "acc_1fa77a33-bf84-464e-a325-a2ffa73e3195",
+  "email": "rose.palace@hotmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-12-09T21:52:58.519Z"
+  },
+  "name": "Rocio Palacios",
+  "category": "Profesor Titular A",
+  "is_superuser": false,
+  "projection_id": "projection_ce69f7ce-ea60-43f8-95ca-c18d2fbe8531",
+  "units_projection": 28
+},
+{
+  "_id": {
+    "$oid": "67577a17ec8b8ed54e1776d6"
+  },
+  "password": "pbkdf2_sha256$390000$moWt6zZ4F0lIEHW17wv6eb$jKv6niRKDDkpm56zFXWLyMPJtm2S0DUqxBZHLKS/M5Y=",
+  "last_login": null,
+  "id": "acc_e743a8b8-dd37-49f3-a296-f1f4a8cf6a3a",
+  "email": "aramospo@ipn.mx",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-12-09T23:15:34.439Z"
+  },
+  "name": "Alejandra Ramos Porras",
+  "category": "Técnico Docente Asociado C",
+  "is_superuser": false,
+  "projection_id": "",
+  "units_projection": 0
+},
+{
+  "_id": {
+    "$oid": "675c8d52ec8b8ed54e177740"
+  },
+  "password": "pbkdf2_sha256$390000$TO9Up1LvAv7mz0CAsOIIoN$eNzR9mOLsC1IqK/D7i1DJBA+TpDhKjD8u5/Ksmk4KDE=",
+  "last_login": null,
+  "id": "acc_b78de4b7-813f-41e0-9c44-5358b5fa6ca1",
+  "email": "PruebaDic@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-12-13T19:38:58.168Z"
+  },
+  "name": "PruebaDic",
+  "category": "Profesor de Asignatura A",
+  "is_superuser": false,
+  "projection_id": "projection_6ab0ddce-4615-4be6-8848-bf8858e96553",
+  "units_projection": 5
+},
+{
+  "_id": {
+    "$oid": "675c9a13ec8b8ed54e17774a"
+  },
+  "password": "pbkdf2_sha256$390000$JzBWc1sf06GjGOAmZGxLo1$w+Fqij/IlGdqvcPiWGxUfM7Xyj8NmClk1atczPd/szs=",
+  "last_login": null,
+  "id": "acc_b504b934-ad5d-41a0-9dc4-6da95702927c",
+  "email": "casaos22@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-12-13T20:33:22.277Z"
+  },
+  "name": "Luis Angel",
+  "category": "Profesor Asociado B",
+  "is_superuser": false,
+  "projection_id": "projection_c37e490e-ee81-4cd0-937c-db765c4f95e0",
+  "units_projection": 0
+},
+{
+  "_id": {
+    "$oid": "675e3285ec8b8ed54e177757"
+  },
+  "password": "pbkdf2_sha256$390000$HJSH2JVetYiwWf9kmMITea$lflE5Y2bZFvVrg9bshlpaVwABILplBaXWjxfkwwPnJM=",
+  "last_login": null,
+  "id": "acc_908694ad-16cd-4519-823c-7f7b76d9255d",
+  "email": "gustavogarcia3122@gmail.com",
+  "first_name": "",
+  "last_name": "",
+  "is_active": true,
+  "is_staff": false,
+  "date_joined": {
+    "$date": "2024-12-15T01:36:04.412Z"
+  },
+  "name": "Gustavo Garcia Montiel",
+  "category": "Profesor Asociado B",
+  "is_superuser": false,
+  "projection_id": "projection_e607c518-982f-4eef-87a2-f3256233e45c",
+  "units_projection": 45
+}]

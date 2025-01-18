@@ -1,0 +1,180 @@
+[{
+  "_id": {
+    "$oid": "66f9fddc3526edb6cd21fd92"
+  },
+  "id": "date_d5672bec-f79d-4e59-b87f-045f2b639110",
+  "activity": "De la valoración realizada por los Jurados Calificadores, análisis de los expedientes con base en el cumplimiento de los requisitos generales",
+  "responsible": "Comisión de Promoción Docente",
+  "duration": 4,
+  "start_date": {
+    "$date": "2024-02-29T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-03-05T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fdfd3526edb6cd21fd96"
+  },
+  "id": "date_d12f7169-1e65-4a6b-9903-8f58bf1f872e",
+  "activity": "Al resultado de 'No promovido', registro del recurso de reconsideración a través del SIPAC",
+  "responsible": "Personal Académico",
+  "duration": 10,
+  "start_date": {
+    "$date": "2024-04-29T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-05-14T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fe123526edb6cd21fd98"
+  },
+  "id": "date_072086a2-d8f0-4ce7-8169-1b0225207055",
+  "activity": "Publicación de los resultados del recurso de reconsideración, a través del SIPAC",
+  "responsible": "Dirección de Capital Humano",
+  "duration": 1,
+  "start_date": {
+    "$date": "2024-05-30T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-05-30T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fdec3526edb6cd21fd94"
+  },
+  "id": "date_cb80856d-6a3a-4540-9a67-8bf4275a60f9",
+  "activity": "Verificación del cumplimiento de lo establecido en el Reglamento de Promoción Docente y acuerdos vigentes, de los expedientes revisados y analizados por la Comisión de Promoción Docente y sus Jurados Calificadores",
+  "responsible": "Dirección de Capital Humano",
+  "duration": 28,
+  "start_date": {
+    "$date": "2024-03-07T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-04-25T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fe0b3526edb6cd21fd97"
+  },
+  "id": "date_c44d8cc6-b428-4b8f-98b5-c6e50340353c",
+  "activity": "Revisión de los recursos de reconsideración y establecimiento de las resoluciones definitivas e irrevocables",
+  "responsible": "Comisión Central Mixta Paritaria de Promoción Docente",
+  "duration": 10,
+  "start_date": {
+    "$date": "2024-05-16T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-05-29T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fba03526edb6cd21fd8d"
+  },
+  "id": "date_85705667-511b-4cea-a135-2d4a0156e76f",
+  "activity": "Publicación y difusión de la convocatoria",
+  "responsible": "Dirección de Capital Humano y Sección 60 del SNTE",
+  "duration": 1,
+  "start_date": {
+    "$date": "2024-01-17T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-01-17T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fd783526edb6cd21fd8f"
+  },
+  "id": "date_b769feb9-a370-46f2-8c41-d80e76fd9423",
+  "activity": "Instalación de la Comisión de Promoción Docente y asignación de expedientes a los Jurados Calificadores",
+  "responsible": "Dirección General, Secretaría Académica, Dirección de Capital Humano y Centros de Trabajo",
+  "duration": 3,
+  "start_date": {
+    "$date": "2024-02-20T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-02-22T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fdd43526edb6cd21fd91"
+  },
+  "id": "date_d33ae83b-bade-40f2-b80e-21ed9db27039",
+  "activity": "Revisión y calificación de los méritos declarados por los participantes",
+  "responsible": "Jurados Calificadores",
+  "duration": 4,
+  "start_date": {
+    "$date": "2024-02-23T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-02-28T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fdf53526edb6cd21fd95"
+  },
+  "id": "date_a0319d34-1685-43f1-a1ce-ce3a1f0cae7b",
+  "activity": "Publicación de resultados de 'Promovido' y 'No promovido' a través del SIPAC",
+  "responsible": "Dirección de Capital Humano",
+  "duration": 1,
+  "start_date": {
+    "$date": "2024-04-26T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-04-26T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fd6e3526edb6cd21fd8e"
+  },
+  "id": "date_5da4b355-c4f3-46fb-af9c-d24e632a9a3e",
+  "activity": "Registro de solicitud a través del Sistema Institucional del Personal Académico (SIPAC)",
+  "responsible": "Personal Académico",
+  "duration": 20,
+  "start_date": {
+    "$date": "2024-01-22T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-02-19T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66f9fde43526edb6cd21fd93"
+  },
+  "id": "date_d72e1e22-e050-4b4b-89d5-d26fccae3db4",
+  "activity": "Envío de documentos de trabajo de la Comisión de Promoción Docente y Jurados Calificadores a la Dirección de Capital Humano",
+  "responsible": "Titulares de los Centros de Trabajo",
+  "duration": 1,
+  "start_date": {
+    "$date": "2024-03-06T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-03-06T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "675fa0e7ec8b8ed54e1777c3"
+  },
+  "id": "date_08db0a41-a932-4790-b322-d0a936d094b9",
+  "activity": "Prueba en TT",
+  "responsible": "TT-B075",
+  "duration": 1,
+  "start_date": {
+    "$date": "2024-12-16T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2024-12-16T00:00:00.000Z"
+  }
+}]
