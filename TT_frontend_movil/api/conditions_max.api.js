@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa
 
 // Initial set-up
 const accountsAPI = axios.create({
-    baseURL: 'https://tt-b075.onrender.com/api/v1/'
+    baseURL: 'http://192.168.1.142:8000/api/v1/',
 })
 
 

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Initial set-up
 const accountsAPI = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: 'http://192.168.1.142:8000/api/v1/',
 })
 
 // getall dates

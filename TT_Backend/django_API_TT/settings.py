@@ -139,14 +139,14 @@ MIGRATION_MODULES = {
 # }
 
 # Local host conection
-#DATABASES = {
-#  'default': {
-#      'ENGINE': 'djongo',
-#      'NAME': 'TT_DB',  # Replace with your MongoDB database name
-#      'host': 'localhost',  # Replace with your MongoDB host
-#      'port': 27017,  # Replace with your MongoDB port
-#  }
-#}
+DATABASES = {
+ 'default': {
+     'ENGINE': 'djongo',
+     'NAME': 'TT_DB',  # Replace with your MongoDB database name
+     'host': 'localhost',  # Replace with your MongoDB host
+     'port': 27017,  # Replace with your MongoDB port
+ }
+}
 
 # Configuración de entorno
 env = environ.Env()
@@ -154,18 +154,18 @@ env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, 'mongo.env'))
 
 # Configuración de la base de datos
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': env('MONGO_NAME'),  # Nombre de la base de datos
-        'CLIENT': {
-            'host': env('MONGO_HOST'),  # Host de MongoDB
-            'username': env('MONGO_USERNAME'),  # Usuario de MongoDB
-            'password': env('MONGO_PASSWORD'),  # Contraseña de MongoDB
-            'authSource': env('MONGO_AUTH_DB'),  # Base de autenticación
-        }
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': env('MONGO_NAME'),  # Nombre de la base de datos
+#         'CLIENT': {
+#             'host': env('MONGO_HOST'),  # Host de MongoDB
+#             'username': env('MONGO_USERNAME'),  # Usuario de MongoDB
+#             'password': env('MONGO_PASSWORD'),  # Contraseña de MongoDB
+#             'authSource': env('MONGO_AUTH_DB'),  # Base de autenticación
+#         }
+#     }
+# }
 
 # Initialise environment variables
 env = environ.Env()
@@ -244,17 +244,17 @@ CORS_ALLOW_ALL_ORIGINS = True
 AUTH_USER_MODEL='accounts.Accounts'
 
 # Initialise environment variables
-env = environ.Env()
+# env = environ.Env()
 
 # Specify the path to the .env file
-env_file = os.path.join(os.path.dirname(__file__), 'email.env')
+# env_file = os.path.join(os.path.dirname(__file__), 'email.env')
 
-environ.Env.read_env(env_file)  # Reads the .env file
+# environ.Env.read_env(env_file)  # Reads the .env file
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Cambia según tu proveedor
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'  # Cambia según tu proveedor
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 

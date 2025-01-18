@@ -25,7 +25,7 @@ export default function OfficialLinksScreen({ navigation }) {
         <View style={tw`flex-1 flex-row flex-wrap justify-evenly items-center py-5`}>
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-20`}
-            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Convocatoria.pdf')}
+            onPress={() => openPDF('http://192.168.1.142:8000/docs/Convocatoria.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Convocatoria 2024</Text>
@@ -33,7 +33,7 @@ export default function OfficialLinksScreen({ navigation }) {
 
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-20`}
-            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Reglamento.pdf')}
+            onPress={() => openPDF('http://192.168.1.142:8000/docs/Reglamento.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Reglamento promoción</Text>
@@ -41,7 +41,7 @@ export default function OfficialLinksScreen({ navigation }) {
 
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-20`}
-            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Cronograma.pdf')}
+            onPress={() => openPDF('http://192.168.1.142:8000/docs/Cronograma.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Cronograma 2024</Text>
@@ -49,7 +49,7 @@ export default function OfficialLinksScreen({ navigation }) {
 
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-20`}
-            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Valoracion.pdf')}
+            onPress={() => openPDF('http://192.168.1.142:8000/docs/Valoracion.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Valoración de actividades</Text>
@@ -57,7 +57,7 @@ export default function OfficialLinksScreen({ navigation }) {
 
           <TouchableOpacity
             style={tw`w-38 h-38 bg-[rgba(0,0,0,0.3)] rounded-xl justify-center items-center mb-8`}
-            onPress={() => openPDF('https://tt-b075.onrender.com/docs/Gaceta.pdf')}
+            onPress={() => openPDF('http://192.168.1.142:8000/docs/Gaceta.pdf')}
           >
             <Ionicons name="link-outline" size={40} color="#fff" />
             <Text style={tw`mt-2 text-white text-center text-base`}>Gaceta Politécnica No. 1511</Text>

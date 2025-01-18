@@ -46,7 +46,7 @@ function App() {
       <Routes>
         {/* Redirigiendo la pagina principal(/) a /welcome con Navigate */}
         <Route path='/' element={<Navigate to="/welcome" />} />
-        <Route path="/admin" element={<ExternalRedirect url="https://tt-b075.onrender.com/admin/" />} />
+        <Route path="/admin" element={<ExternalRedirect url="http://192.168.1.142:8000/admin/" />} />
 
         {/* Asignando qué páginas mostrar cuando se visite cierta URL */}
         <Route path='/welcome' element={<MainContent className="flex-grow" />} />
