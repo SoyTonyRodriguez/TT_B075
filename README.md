@@ -31,10 +31,6 @@
 
 <!--te-->
 
-## Demostration
-<iframe src="https://drive.google.com/file/d/1UEpHAkeTG0PK3_KzYqR5vz8CtPOZPnzT/preview" width="640" height="360" allow="autoplay"></iframe>
-
-
 ## Node js
 #### Instalacion en windows
 
