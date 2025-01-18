@@ -1,0 +1,315 @@
+[{
+  "_id": {
+    "$oid": "672ac370ed6d2bcbe6428183"
+  },
+  "id": "projection_25678690-94d5-4568-836d-ca94d4c64f02",
+  "account_id": "acc_9ea4c6ea-deea-4fc3-9028-67f10d81ed6a",
+  "type": "Grado Académico",
+  "products": [
+    "product_491272c1-62a0-4c15-b2ee-2c3401f5f352"
+  ],
+  "created_at": {
+    "$date": "2024-11-06T01:16:32.807Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-06T03:36:57.165Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "672ce882ca616725bfdac65f"
+  },
+  "id": "projection_d123737d-d4d8-43dd-ab60-5d377dcd850a",
+  "account_id": "acc_d7435ac4-285d-4ef4-9413-38e6b9cc6d2e",
+  "products": [],
+  "created_at": {
+    "$date": "2024-11-07T16:19:14.401Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-07T16:19:14.401Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6734e8c35bffdf825ab113be"
+  },
+  "id": "projection_e1a331a7-d907-4aaf-a9de-42175787ed9a",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "type": "Unidades de Promoción",
+  "products": [
+    "product_d716121e-898b-4842-bc66-ad7f2771980f",
+    "product_6567e59b-8c42-4e16-871c-e346ce66423b",
+    "product_d5456791-da0e-4ae4-b25a-0da7ca1bcc5f",
+    "product_de90b61b-6724-4cff-ae80-dc14a8a5b208",
+    "product_89468820-9cf7-4b61-8525-7e80d77c0467",
+    "product_1ec77705-dd20-4eac-bd93-c8ba21c4903a",
+    "product_d5456791-da0e-4ae4-b25a-0da7ca1bcc5f",
+    "product_d5456791-da0e-4ae4-b25a-0da7ca1bcc5f"
+  ],
+  "created_at": {
+    "$date": "2024-11-13T17:58:27.189Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-13T19:22:30.380Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "674886b1b225d0893f920515"
+  },
+  "id": "projection_d2745c85-c09c-4016-b1b1-f8f6d24a7098",
+  "account_id": "acc_b98cd5d1-22d6-4b88-a21f-faa662c70c96",
+  "type": "Unidades de Promoción",
+  "products": [
+    "product_1952ecf5-6819-4b43-91e3-894f37ac7fcc"
+  ],
+  "created_at": {
+    "$date": "2024-11-28T15:05:21.347Z"
+  },
+  "updated_at": {
+    "$date": "2024-11-28T15:07:33.828Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6755224eec8b8ed54e1776ad"
+  },
+  "id": "projection_496cb1b6-94ac-47bd-a58b-18af1f293058",
+  "account_id": "acc_03a775fe-7f91-426b-a295-48d5b917b19f",
+  "type": "Unidades de Promoción",
+  "products": [
+    "product_ba177be6-3c58-4627-bc0c-d7acdf192041"
+  ],
+  "created_at": {
+    "$date": "2024-12-08T04:36:29.899Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-11T15:35:43.094Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6757677dec8b8ed54e1776ce"
+  },
+  "id": "projection_ce69f7ce-ea60-43f8-95ca-c18d2fbe8531",
+  "account_id": "acc_1fa77a33-bf84-464e-a325-a2ffa73e3195",
+  "type": "Unidades de Promoción",
+  "products": [
+    "product_26c3f414-3b1b-4c5d-8b70-5e7fbd08d107"
+  ],
+  "created_at": {
+    "$date": "2024-12-09T21:56:13.764Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-09T22:01:38.283Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6757aed6ec8b8ed54e1776ec"
+  },
+  "id": "projection_4cedb1dc-7ab7-41af-bc79-d6f1a99c0116",
+  "account_id": "acc_5511646b-f9b2-4e8f-86d5-bd18be8c5c90",
+  "type": null,
+  "products": [],
+  "created_at": {
+    "$date": "2024-12-10T03:00:37.887Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-10T03:00:37.887Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6759b5deec8b8ed54e177720"
+  },
+  "id": "projection_2b99d1a1-65da-41bc-ab00-e4a14f651843",
+  "account_id": "acc_d7435ac4-285d-4ef4-9413-38e6b9cc6d2e",
+  "type": "Unidades de Promoción",
+  "products": [
+    "product_fc1c0f06-2b95-43db-8bdd-8db00022edf0"
+  ],
+  "created_at": {
+    "$date": "2024-12-11T15:55:10.483Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-11T15:55:21.005Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "675c8e71ec8b8ed54e177743"
+  },
+  "id": "projection_6ab0ddce-4615-4be6-8848-bf8858e96553",
+  "account_id": "acc_b78de4b7-813f-41e0-9c44-5358b5fa6ca1",
+  "type": "Unidades de Promoción",
+  "products": [],
+  "created_at": {
+    "$date": "2024-12-13T19:43:45.853Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-13T19:54:07.644Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "675c9a73ec8b8ed54e17774f"
+  },
+  "id": "projection_63168f02-80b8-470a-8950-f836c9fab68f",
+  "account_id": "acc_b504b934-ad5d-41a0-9dc4-6da95702927c",
+  "type": "Unidades de Promoción",
+  "products": [],
+  "created_at": {
+    "$date": "2024-12-13T20:34:59.204Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-13T20:45:00.993Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "675c9c48ec8b8ed54e177753"
+  },
+  "id": "projection_c37e490e-ee81-4cd0-937c-db765c4f95e0",
+  "account_id": "acc_b504b934-ad5d-41a0-9dc4-6da95702927c",
+  "type": "Unidades de Promoción",
+  "products": [],
+  "created_at": {
+    "$date": "2024-12-13T20:42:48.712Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-13T20:44:44.089Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "675e32a0ec8b8ed54e17775a"
+  },
+  "id": "projection_e607c518-982f-4eef-87a2-f3256233e45c",
+  "account_id": "acc_908694ad-16cd-4519-823c-7f7b76d9255d",
+  "type": "Unidades de Promoción",
+  "products": [
+    "product_a4f96498-7c3a-40ad-a156-094a2096a27f",
+    "product_4aa15bc1-c1f9-4dcf-bdea-3cb7cb217061"
+  ],
+  "created_at": {
+    "$date": "2024-12-15T01:36:32.129Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-15T01:38:19.926Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67607e01ec8b8ed54e1777dd"
+  },
+  "id": "projection_936f542c-45f7-4012-90cf-74b199c7b4e4",
+  "account_id": "acc_e7881025-9383-4960-841b-6543c1ed5b10",
+  "type": "Unidades de Promoción",
+  "products": [],
+  "created_at": {
+    "$date": "2024-12-16T19:22:41.645Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-16T19:27:40.801Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67607e11ec8b8ed54e1777de"
+  },
+  "id": "projection_f7341b13-e664-4418-a3c1-cd6190f143cf",
+  "account_id": "acc_e7881025-9383-4960-841b-6543c1ed5b10",
+  "type": "Unidades de Promoción",
+  "products": [],
+  "created_at": {
+    "$date": "2024-12-16T19:22:56.910Z"
+  },
+  "updated_at": {
+    "$date": "2024-12-16T19:27:52.458Z"
+  },
+  "start_date": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "end_date": {
+    "$date": "2026-01-01T00:00:00.000Z"
+  }
+}]

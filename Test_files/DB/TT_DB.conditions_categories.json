@@ -1,0 +1,513 @@
+[{
+  "_id": {
+    "$oid": "672ac6413c55b3de8b420f16"
+  },
+  "carga_academica": {
+    "tecnico_docente_auxiliar": {
+      "medio_tiempo": {
+        "horas": {
+          "min": 10,
+          "max": 12
+        },
+        "up": {
+          "min": 25,
+          "max": 30
+        }
+      },
+      "tres_cuartos_tiempo": {
+        "horas": {
+          "min": 12,
+          "max": 20
+        },
+        "up": {
+          "min": 30,
+          "max": 50
+        }
+      },
+      "tiempo_completo": {
+        "horas": {
+          "min": 12,
+          "max": 22
+        },
+        "up": {
+          "min": 30,
+          "max": 55
+        }
+      }
+    },
+    "tecnico_docente_asociado": {
+      "medio_tiempo": {
+        "horas": {
+          "min": 9,
+          "max": 12
+        },
+        "up": {
+          "min": 22.5,
+          "max": 30
+        }
+      },
+      "tres_cuartos_tiempo": {
+        "horas": {
+          "min": 9,
+          "max": 14
+        },
+        "up": {
+          "min": 22.5,
+          "max": 35
+        }
+      },
+      "tiempo_completo": {
+        "horas": {
+          "min": 9,
+          "max": 18
+        },
+        "up": {
+          "min": 22.5,
+          "max": 45
+        }
+      }
+    },
+    "tecnico_docente_titular": {
+      "medio_tiempo": {
+        "horas": {
+          "min": 6,
+          "max": 10
+        },
+        "up": {
+          "min": 15,
+          "max": 25
+        }
+      },
+      "tres_cuartos_tiempo": {
+        "horas": {
+          "min": 6,
+          "max": 12
+        },
+        "up": {
+          "min": 15,
+          "max": 30
+        }
+      },
+      "tiempo_completo": {
+        "horas": {
+          "min": 6,
+          "max": 12
+        },
+        "up": {
+          "min": 15,
+          "max": 35
+        }
+      }
+    },
+    "profesor_asistente": {
+      "medio_tiempo": {
+        "horas": {
+          "min": 10,
+          "max": 12
+        },
+        "up": {
+          "min": 25,
+          "max": 30
+        }
+      },
+      "tres_cuartos_tiempo": {
+        "horas": {
+          "min": 12,
+          "max": 20
+        },
+        "up": {
+          "min": 30,
+          "max": 50
+        }
+      },
+      "tiempo_completo": {
+        "horas": {
+          "min": 12,
+          "max": 22
+        },
+        "up": {
+          "min": 30,
+          "max": 55
+        }
+      }
+    },
+    "profesor_asociado": {
+      "medio_tiempo": {
+        "horas": {
+          "min": 9,
+          "max": 12
+        },
+        "up": {
+          "min": 22.5,
+          "max": 30
+        }
+      },
+      "tres_cuartos_tiempo": {
+        "horas": {
+          "min": 9,
+          "max": 14
+        },
+        "up": {
+          "min": 22.5,
+          "max": 35
+        }
+      },
+      "tiempo_completo": {
+        "horas": {
+          "min": 9,
+          "max": 18
+        },
+        "up": {
+          "min": 22.5,
+          "max": 45
+        }
+      }
+    },
+    "profesor_titular": {
+      "medio_tiempo": {
+        "horas": {
+          "min": 6,
+          "max": 10
+        },
+        "up": {
+          "min": 15,
+          "max": 25
+        }
+      },
+      "tres_cuartos_tiempo": {
+        "horas": {
+          "min": 6,
+          "max": 14
+        },
+        "up": {
+          "min": 15,
+          "max": 35
+        }
+      },
+      "tiempo_completo": {
+        "horas": {
+          "min": 6,
+          "max": 12
+        },
+        "up": {
+          "min": 15,
+          "max": 30
+        }
+      }
+    },
+    "profesor_de_asignatura": {
+      "medio_tiempo": {
+        "horas": {
+          "min": 1,
+          "max": 100
+        },
+        "up": {
+          "min": 1,
+          "max": 100
+        }
+      },
+      "tres_cuartos_tiempo": {
+        "horas": {
+          "min": 1,
+          "max": 100
+        },
+        "up": {
+          "min": 1,
+          "max": 100
+        }
+      },
+      "tiempo_completo": {
+        "horas": {
+          "min": 1,
+          "max": 100
+        },
+        "up": {
+          "min": 1,
+          "max": 100
+        }
+      }
+    },
+    "tecnico_docente_de_asignatura": {
+      "medio_tiempo": {
+        "horas": {
+          "min": 1,
+          "max": 100
+        },
+        "up": {
+          "min": 1,
+          "max": 100
+        }
+      },
+      "tres_cuartos_tiempo": {
+        "horas": {
+          "min": 1,
+          "max": 100
+        },
+        "up": {
+          "min": 1,
+          "max": 100
+        }
+      },
+      "tiempo_completo": {
+        "horas": {
+          "min": 1,
+          "max": 100
+        },
+        "up": {
+          "min": 1,
+          "max": 100
+        }
+      }
+    }
+  },
+  "otras_actividades": {
+    "tecnico_docente_auxiliar": {
+      "up": {
+        "min": 10,
+        "max": 70
+      }
+    },
+    "tecnico_docente_asociado": {
+      "up": {
+        "min": 10,
+        "max": 70
+      }
+    },
+    "tecnico_docente_titular": {
+      "up": {
+        "min": 10,
+        "max": 70
+      }
+    },
+    "profesor_asistente": {
+      "up": {
+        "min": 10,
+        "max": 70
+      }
+    },
+    "profesor_asociado": {
+      "up": {
+        "min": 10,
+        "max": 70
+      }
+    },
+    "profesor_titular": {
+      "up": {
+        "min": 10,
+        "max": 70
+      }
+    },
+    "profesor_de_asignatura": {
+      "up": {
+        "min": 10,
+        "max": 70
+      }
+    },
+    "tecnico_docente_de_asignatura": {
+      "up": {
+        "min": 10,
+        "max": 70
+      }
+    }
+  },
+  "investigacion": {
+    "tecnico_docente_auxiliar": {
+      "up": {
+        "min": 0,
+        "max": 0
+      }
+    },
+    "tecnico_docente_asociado": {
+      "up": {
+        "min": 0,
+        "max": 0
+      }
+    },
+    "tecnico_docente_titular": {
+      "up": {
+        "min": 25,
+        "max": 88.5
+      }
+    },
+    "profesor_asistente": {
+      "up": {
+        "min": 0,
+        "max": 0
+      }
+    },
+    "profesor_asociado": {
+      "up": {
+        "min": 25,
+        "max": 88.5
+      }
+    },
+    "profesor_titular": {
+      "up": {
+        "min": 25,
+        "max": 88.5
+      }
+    },
+    "profesor_de_asignatura": {
+      "up": {
+        "min": 0,
+        "max": 88.5
+      }
+    },
+    "tecnico_docente_de_asignatura": {
+      "up": {
+        "min": 0,
+        "max": 88.5
+      }
+    }
+  },
+  "superacion_academica": {
+    "tecnico_docente_auxiliar": {
+      "up": {
+        "min": 10,
+        "max": 88.5
+      }
+    },
+    "tecnico_docente_asociado": {
+      "up": {
+        "min": 20,
+        "max": 88.5
+      }
+    },
+    "tecnico_docente_titular": {
+      "up": {
+        "min": 25,
+        "max": 88.5
+      }
+    },
+    "profesor_asistente": {
+      "up": {
+        "min": 25,
+        "max": 88.5
+      }
+    },
+    "profesor_asociado": {
+      "up": {
+        "min": 25,
+        "max": 88.5
+      }
+    },
+    "profesor_titular": {
+      "up": {
+        "min": 25,
+        "max": 88.5
+      }
+    },
+    "profesor_de_asignatura": {
+      "up": {
+        "min": 0,
+        "max": 88.5
+      }
+    },
+    "tecnico_docente_de_asignatura": {
+      "up": {
+        "min": 0,
+        "max": 88.5
+      }
+    }
+  },
+  "actividades_complementarias": {
+    "tecnico_docente_auxiliar": {
+      "up": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    "tecnico_docente_asociado": {
+      "up": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    "tecnico_docente_titular": {
+      "up": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    "profesor_asistente": {
+      "up": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    "profesor_asociado": {
+      "up": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    "profesor_titular": {
+      "up": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    "profesor_de_asignatura": {
+      "up": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    "tecnico_docente_de_asignatura": {
+      "up": {
+        "min": 0,
+        "max": 60
+      }
+    }
+  },
+  "actividades_extension": {
+    "tecnico_docente_auxiliar": {
+      "up": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    "tecnico_docente_asociado": {
+      "up": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    "tecnico_docente_titular": {
+      "up": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    "profesor_asistente": {
+      "up": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    "profesor_asociado": {
+      "up": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    "profesor_titular": {
+      "up": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    "profesor_de_asignatura": {
+      "up": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    "tecnico_docente_de_asignatura": {
+      "up": {
+        "min": 0,
+        "max": 10
+      }
+    }
+  }
+}]

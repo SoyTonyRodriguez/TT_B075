@@ -1,0 +1,244 @@
+[{
+  "_id": {
+    "$oid": "67488735b225d0893f920517"
+  },
+  "id": "check_8b88ab19-df67-4224-b119-861c4781518d",
+  "account_id": "acc_b98cd5d1-22d6-4b88-a21f-faa662c70c96",
+  "categories": {
+    "Investigación": {
+      "Estancias de Investigación": {
+        "length": 1,
+        "up": 15
+      },
+      "total": 15
+    },
+    "total_up": 15
+  }
+},
+{
+  "_id": {
+    "$oid": "6734e9d95bffdf825ab113c0"
+  },
+  "id": "check_6b51cfba-5b27-4deb-a73f-df399f04013b",
+  "account_id": "acc_f09ca12f-d3e1-431b-b247-683575dbee7c",
+  "categories": {
+    "Docencia": {
+      "Carga académica": {
+        "length": 1,
+        "up": 35
+      },
+      "total": 35
+    },
+    "total_up": 161.5,
+    "Actividades complementarias de apoyo a la docencia y a la investigación": {
+      "Dirección o asesoría de trabajos escritos para titulación": {
+        "length": 2,
+        "up": 10
+      },
+      "total": 13,
+      "Ponente en conferencias, videoconferencias y expositor de carteles": {
+        "length": 1,
+        "up": 3
+      }
+    },
+    "Otras actividades en docencia": {
+      "Evaluación, diseño y/o rediseño de programas académicos": {
+        "length": 1,
+        "up": 5
+      },
+      "total": 5
+    },
+    "Superación académica": {
+      "Estudios de especialidad, maestría y doctorado": {
+        "length": 1,
+        "up": 108.5
+      },
+      "total": 108.5
+    }
+  }
+},
+{
+  "_id": {
+    "$oid": "673b8dfb01876a72491016b2"
+  },
+  "id": "check_c55f2edc-244f-45f9-93a6-31d8f5d07787",
+  "account_id": "acc_94af818f-4f55-4b8e-945d-d5faa30ebe01",
+  "categories": {
+    "Título de Licenciatura": {
+      "Título de Licenciatura": {
+        "length": 1,
+        "up": 100
+      },
+      "total": 100
+    },
+    "total_up": 100
+  }
+},
+{
+  "_id": {
+    "$oid": "67552257ec8b8ed54e1776af"
+  },
+  "id": "check_2de55c44-ff14-467d-ad12-1b03496c0e0c",
+  "account_id": "acc_03a775fe-7f91-426b-a295-48d5b917b19f",
+  "categories": {
+    "Superación académica": {
+      "total": 40,
+      "Diplomados": {
+        "length": 1,
+        "up": 40
+      }
+    },
+    "total_up": 45,
+    "Docencia": {
+      "total": 0
+    },
+    "Otras actividades en docencia": {
+      "total": 5,
+      "Producción de Unidades de Aprendizaje en línea": {
+        "length": 1,
+        "up": 5
+      }
+    },
+    "Actividades de extensión, integración y difusión de la ciencia y de la cultura": {
+      "total": 0
+    },
+    "Actividades complementarias de apoyo a la docencia y a la investigación": {
+      "total": 0
+    }
+  }
+},
+{
+  "_id": {
+    "$oid": "675768c2ec8b8ed54e1776d0"
+  },
+  "id": "check_410b475a-22c9-456b-9064-3ae93fe21978",
+  "account_id": "acc_1fa77a33-bf84-464e-a325-a2ffa73e3195",
+  "categories": {
+    "Docencia": {
+      "Carga académica": {
+        "length": 1,
+        "up": 28
+      },
+      "total": 28
+    },
+    "total_up": 28
+  }
+},
+{
+  "_id": {
+    "$oid": "6759b5e9ec8b8ed54e177722"
+  },
+  "id": "check_24b87097-541d-48dc-a1d1-e5c72b9aeeee",
+  "account_id": "acc_d7435ac4-285d-4ef4-9413-38e6b9cc6d2e",
+  "categories": {
+    "Otras actividades en docencia": {
+      "Autoría de libros": {
+        "length": 1,
+        "up": 80
+      },
+      "total": 80
+    },
+    "total_up": 80
+  }
+},
+{
+  "_id": {
+    "$oid": "675c8f70ec8b8ed54e177745"
+  },
+  "id": "check_4b0871e3-8be2-489b-ae83-245c16dec1af",
+  "account_id": "acc_b78de4b7-813f-41e0-9c44-5358b5fa6ca1",
+  "categories": {
+    "Investigación": {
+      "Publicación de artículos científicos y técnicos": {
+        "length": 1,
+        "up": 5
+      },
+      "total": 5
+    },
+    "total_up": 5
+  }
+},
+{
+  "_id": {
+    "$oid": "675c9aebec8b8ed54e177751"
+  },
+  "id": "check_f1725174-083c-4c56-9609-7830bc800ef9",
+  "account_id": "acc_b504b934-ad5d-41a0-9dc4-6da95702927c",
+  "categories": {
+    "Superación académica": {
+      "total": 0
+    },
+    "total_up": 0,
+    "Actividades complementarias de apoyo a la docencia y a la investigación": {
+      "total": 0
+    }
+  }
+},
+{
+  "_id": {
+    "$oid": "675e32ddec8b8ed54e17775c"
+  },
+  "id": "check_6691e47f-c202-440b-8722-65059f42ce9e",
+  "account_id": "acc_908694ad-16cd-4519-823c-7f7b76d9255d",
+  "categories": {
+    "Otras actividades en docencia": {
+      "Evaluación, diseño y/o rediseño de programas académicos": {
+        "length": 1,
+        "up": 5
+      },
+      "total": 5
+    },
+    "total_up": 45,
+    "Superación académica": {
+      "Diplomados": {
+        "length": 1,
+        "up": 40
+      },
+      "total": 40
+    }
+  }
+},
+{
+  "_id": {
+    "$oid": "67607e4dec8b8ed54e1777e0"
+  },
+  "id": "check_e50058a8-47bc-41d1-a47c-4d7a4532b937",
+  "account_id": "acc_e7881025-9383-4960-841b-6543c1ed5b10",
+  "categories": {
+    "Superación académica": {
+      "Diplomados": {
+        "length": 1,
+        "up": 40
+      },
+      "total": 40
+    },
+    "total_up": 40,
+    "Otras actividades en docencia": {
+      "total": 0
+    }
+  }
+},
+{
+  "_id": {
+    "$oid": "67608ad2ec8b8ed54e1777ef"
+  },
+  "id": "check_dfe192d7-f0c7-45af-b357-b11d19bcaabd",
+  "account_id": "acc_9534318f-1626-4263-91dd-704064d1bdb2",
+  "categories": {
+    "Otras actividades en docencia": {
+      "total": 10,
+      "Diseño y planeación didáctica en el aula": {
+        "length": 1,
+        "up": 10
+      }
+    },
+    "total_up": 73.11,
+    "Superación académica": {
+      "Diplomados": {
+        "length": 2,
+        "up": 63.11
+      },
+      "total": 63.11
+    }
+  }
+}]

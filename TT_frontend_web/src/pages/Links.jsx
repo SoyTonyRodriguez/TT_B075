@@ -10,11 +10,11 @@ function Links() {
   const [isOpen, setIsOpen] = useState(false);
 
   const pdfLinks = {
-    convocatoria: 'https://tt-b075.onrender.com/docs/Convocatoria.pdf',
-    reglamento: 'https://tt-b075.onrender.com/docs/Reglamento.pdf',
-    cronograma: 'https://tt-b075.onrender.com/docs/Cronograma.pdf',
-    valoracionactividades: 'https://tt-b075.onrender.com/docs/Valoracion.pdf',
-    gaceta: 'https://tt-b075.onrender.com/docs/Gaceta.pdf',
+    convocatoria: 'http://192.168.1.142:8000/docs/Convocatoria.pdf',
+    reglamento: 'http://192.168.1.142:8000/docs/Reglamento.pdf',
+    cronograma: 'http://192.168.1.142:8000/docs/Cronograma.pdf',
+    valoracionactividades: 'http://192.168.1.142:8000/docs/Valoracion.pdf',
+    gaceta: 'http://192.168.1.142:8000/docs/Gaceta.pdf',
   };
 
   // Abre el modal con el PDF
