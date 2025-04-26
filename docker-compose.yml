@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    container_name: tt_mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mongo-network
+    command: ["--bind_ip_all"]
+
+
+  backend:
+    build: ./TT_Backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./TT_Backend:/app
+    env_file:                  # ← importa las variables corregidas
+      - ./TT_Backend/django_API_TT/database.env
+    depends_on:
+      - mongo
+    command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - mongo-network
+
+  frontend_web:
+    build: ./TT_frontend_web
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./TT_frontend_web:/app 
+      - node_modules:/app/node_modules
+    networks:
+      - mongo-network
+
+networks:   # <= ¡este bloque va fuera de services!
+  mongo-network:
+    driver: bridge
+
+volumes:    # <= ¡también va fuera de services!
+  mongo_data:
+    driver: local
+  node_modules:

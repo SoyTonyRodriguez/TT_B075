@@ -139,19 +139,19 @@ MIGRATION_MODULES = {
 # }
 
 # Local host conection
-DATABASES = {
- 'default': {
-     'ENGINE': 'djongo',
-     'NAME': 'TT_DB',  # Replace with your MongoDB database name
-     'host': 'localhost',  # Replace with your MongoDB host
-     'port': 27017,  # Replace with your MongoDB port
- }
-}
+# DATABASES = {
+#  'default': {
+#      'ENGINE': 'djongo',
+#      'NAME': 'TT_DB',  # Replace with your MongoDB database name
+#      'host': 'localhost',  # Replace with your MongoDB host
+#      'port': 27017,  # Replace with your MongoDB port
+#  }
+# }
 
 # Configuración de entorno
-env = environ.Env()
-# Lee el archivo .env
-environ.Env.read_env(os.path.join(BASE_DIR, 'mongo.env'))
+# env = environ.Env()
+# # Lee el archivo .env
+# environ.Env.read_env(os.path.join(BASE_DIR, 'mongo.env'))
 
 # Configuración de la base de datos
 # DATABASES = {
@@ -178,6 +178,19 @@ environ.Env.read_env(env_file)  # Reads the .env file
 # Example of getting the connection string
 MONGO_CONNECTION_STRING = env('MONGO_CONNECTION_STRING')
 DB_CLIENT = env('DB_CLIENT')
+
+DATABASES = {
+    "default": {
+        "ENGINE": "djongo",
+        "NAME": os.environ.get("DB_CLIENT", "TT_DB"),
+        "CLIENT": {
+            "host": os.environ.get("MONGO_CONNECTION_STRING"),
+            # Si usas replica set u otras opciones, agrégalas aquí
+        },
+    }
+}
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
